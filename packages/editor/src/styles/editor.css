@@ -1,0 +1,104 @@
+/* ProseMirror Styles */
+.ProseMirror {
+	@apply outline-none;
+}
+
+.ProseMirror p {
+	@apply my-2;
+}
+
+.ProseMirror h1 {
+	@apply text-4xl font-bold my-4;
+}
+
+.ProseMirror h2 {
+	@apply text-3xl font-bold my-3;
+}
+
+.ProseMirror h3 {
+	@apply text-2xl font-bold my-2;
+}
+
+.ProseMirror ul {
+	@apply list-disc ml-6 my-2;
+}
+
+.ProseMirror ol {
+	@apply list-decimal ml-6 my-2;
+}
+
+.ProseMirror code {
+	@apply font-mono bg-gray-100 px-1 rounded;
+}
+
+.ProseMirror pre {
+	@apply bg-gray-900 p-4 rounded-lg my-4 font-mono text-white overflow-x-auto;
+}
+
+.ProseMirror blockquote {
+	@apply border-l-4 border-gray-300 pl-4 my-4 italic;
+}
+
+.ProseMirror table {
+	@apply border-collapse w-full my-4;
+}
+
+.ProseMirror th {
+	@apply border border-gray-300 px-4 py-2 bg-gray-50 font-semibold;
+}
+
+.ProseMirror td {
+	@apply border border-gray-300 px-4 py-2;
+}
+
+.ProseMirror .selectedCell {
+	@apply bg-blue-50;
+}
+
+/* Syntax Highlighting */
+.syntax-highlighted {
+	@apply font-mono text-sm;
+}
+
+.syntax-highlighted .token.comment,
+.syntax-highlighted .token.prolog,
+.syntax-highlighted .token.doctype,
+.syntax-highlighted .token.cdata {
+	@apply text-gray-400;
+}
+
+.syntax-highlighted .token.punctuation {
+	@apply text-gray-300;
+}
+
+.syntax-highlighted .token.property,
+.syntax-highlighted .token.keyword,
+.syntax-highlighted .token.tag {
+	@apply text-pink-400;
+}
+
+.syntax-highlighted .token.string {
+	@apply text-green-400;
+}
+
+.syntax-highlighted .token.operator,
+.syntax-highlighted .token.entity,
+.syntax-highlighted .token.url {
+	@apply text-yellow-400;
+}
+
+.syntax-highlighted .token.function,
+.syntax-highlighted .token.class-name {
+	@apply text-blue-400;
+}
+
+.syntax-highlighted .token.boolean,
+.syntax-highlighted .token.number {
+	@apply text-purple-400;
+}
+
+.syntax-highlighted .token.regex,
+.syntax-highlighted .token.important,
+.syntax-highlighted .token.variable {
+	@apply text-red-400;
+}
