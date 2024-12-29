@@ -4,6 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "yarn workspace @tdata/web dev",
+		"dev:editor": "yarn workspace @tdata/editor dev",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint"

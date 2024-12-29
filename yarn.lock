@@ -2081,6 +2081,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@tdata/global@workspace:packages/global":
+  version: 0.0.0-use.local
+  resolution: "@tdata/global@workspace:packages/global"
+  languageName: unknown
+  linkType: soft
+
 "@tdata/web@workspace:packages/web":
   version: 0.0.0-use.local
   resolution: "@tdata/web@workspace:packages/web"
