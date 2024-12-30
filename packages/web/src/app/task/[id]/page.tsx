@@ -1,142 +1,160 @@
 'use client'
 
-import { useParams, useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
-import { ArrowLeft, Clock, History, MessageSquare } from 'lucide-react'
+import { Plus, LinkIcon, Paperclip, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Editor } from '@tdata/editor'
-import { TaskProperties } from '@/components/task-properties'
-import { AssigneeAvatar } from '@/components/assignee-avatar'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import type { Task } from '@/types/kanban'
+import { Badge } from '@/components/ui/badge'
+import { Editor } from '@tdata/editor'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import React from 'react'
+import { NewTaskPopup } from '@/components/new-task-popup'
+import { StatusSelect } from '@/components/selects/status'
+import { PrioritySelect } from '@/components/selects/priority'
+import { AssigneeSelect } from '@/components/selects/assignee'
 
-export default function TaskDetailsPage() {
-	const params = useParams()
-	const router = useRouter()
-	const [task, setTask] = useState<Task | null>(null)
-	const [title, setTitle] = useState('')
-
-	useEffect(() => {
-		const mockTask: Task = {
-			id: params.id as string,
-			title: 'Example Task',
-			status: 'TODO',
-			priority: 'MEDIUM',
-			projectId: 'PROJ-1',
-			dueDate: '2024-01-25',
-			assignee: {
-				id: 'USER-1',
-				name: 'Alice',
-				avatar: '/placeholder.svg?height=32&width=32',
-				email: 'alice@example.com'
-			},
-			description: '<p>This is an example task description.</p>'
-		}
-		setTask(mockTask)
-		setTitle(mockTask.title)
-	}, [params.id])
-
-	if (!task) {
-		return <div>Loading...</div>
-	}
-
-	const handleUpdate = (updates: Partial<Task>) => {
-		setTask((prevTask) => ({ ...prevTask!, ...updates }))
-	}
+export default function TaskDetails() {
+	const [subIssueDialogOpen, setSubIssueDialogOpen] = React.useState(false)
 
 	return (
-		<div className='h-full flex flex-col bg-background'>
-			<header className='flex items-center px-6 py-3 border-b'>
-				<div className='flex-1 flex items-center gap-4'>
-					<Button
-						variant='ghost'
-						size='sm'
-						onClick={() => router.back()}
-						className='text-muted-foreground hover:text-foreground'
-					>
-						<ArrowLeft className='h-4 w-4 mr-2' />
-						Back
-					</Button>
-					<span className='text-sm text-muted-foreground font-mono'>{task.id}</span>
-				</div>
-				<div className='flex items-center gap-2'>
-					{task.assignee && <AssigneeAvatar onAssigneeChange={() => {}} assignee={task.assignee} size='md' />}
-				</div>
-			</header>
-			<div className='flex-1 flex overflow-hidden'>
-				<main className='flex-1 overflow-y-auto'>
-					<div className='max-w-3xl mx-auto px-6 py-4'>
-						<Input
-							value={title}
-							onChange={(e) => {
-								setTitle(e.target.value)
-								handleUpdate({ title: e.target.value })
-							}}
-							className='text-2xl font-medium px-0 border-0 bg-transparent focus-visible:ring-0 -mx-0.5 my-1 h-auto'
+		<div className='min-h-screen bg-[#121212] text-white'>
+			<div className='container py-4'>
+				<div className='text-sm text-gray-500 mb-4'>RSTHA-4</div>
+
+				<div className='grid grid-cols-1 md:grid-cols-[1fr,300px] gap-6'>
+					{/* Main Content */}
+					<div className='space-y-6'>
+						<input
+							type='text'
+							defaultValue='Task Title'
+							className='text-2xl font-semibold bg-transparent border-0 w-full focus:outline-none'
 						/>
-						<Tabs defaultValue='content' className='mt-6'>
-							<TabsList className='w-full justify-start h-auto p-0 bg-transparent border-b rounded-none'>
-								<TabsTrigger
-									value='content'
-									className='text-sm data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none'
-								>
-									Content
-								</TabsTrigger>
-								<TabsTrigger
-									value='activity'
-									className='text-sm data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none'
-								>
-									Activity
-								</TabsTrigger>
-							</TabsList>
-							<TabsContent value='content' className='mt-6'>
-								<Editor />
-							</TabsContent>
-							<TabsContent value='activity' className='mt-6'>
-								<div className='space-y-4'>
-									<div className='flex items-start gap-3'>
-										<Avatar className='h-8 w-8'>
-											<AvatarImage src={task.assignee?.avatar} />
-											<AvatarFallback>{task.assignee?.name[0]}</AvatarFallback>
-										</Avatar>
-										<div className='flex-1 space-y-1'>
-											<p className='text-sm'>
-												<span className='font-medium'>{task.assignee?.name}</span>
-												<span className='text-muted-foreground'> created this task</span>
-											</p>
-											<p className='text-xs text-muted-foreground'>2 hours ago</p>
-										</div>
-									</div>
-								</div>
-							</TabsContent>
-						</Tabs>
-					</div>
-				</main>
-				<aside className='w-[400px] border-l overflow-y-auto'>
-					<div className='p-6 space-y-6'>
-						<TaskProperties task={task} onUpdate={handleUpdate} />
-						<div>
-							<h3 className='text-sm font-medium mb-4'>Activity Overview</h3>
-							<div className='space-y-4 text-sm'>
-								<div className='flex items-center gap-4 text-muted-foreground'>
-									<Clock className='h-4 w-4' />
-									<span>Created 2 hours ago</span>
-								</div>
-								<div className='flex items-center gap-4 text-muted-foreground'>
-									<History className='h-4 w-4' />
-									<span>Updated 30 minutes ago</span>
-								</div>
-								<div className='flex items-center gap-4 text-muted-foreground'>
-									<MessageSquare className='h-4 w-4' />
-									<span>2 comments</span>
+
+						<Editor />
+
+						<div className='flex space-x-4'>
+							<Button
+								variant='outline'
+								size='sm'
+								className='bg-transparent border-gray-800 hover:bg-gray-800'
+								onClick={() => setSubIssueDialogOpen(true)}
+							>
+								<Plus className='h-4 w-4 mr-2' />
+								Add sub-issue
+							</Button>
+							<Button
+								variant='outline'
+								size='sm'
+								className='bg-transparent border-gray-800 hover:bg-gray-800'
+							>
+								<Plus className='h-4 w-4 mr-2' />
+								Add relation
+							</Button>
+							<Button
+								variant='outline'
+								size='sm'
+								className='bg-transparent border-gray-800 hover:bg-gray-800'
+							>
+								<LinkIcon className='h-4 w-4 mr-2' />
+								Add link
+							</Button>
+							<Button
+								variant='outline'
+								size='sm'
+								className='bg-transparent border-gray-800 hover:bg-gray-800'
+							>
+								<Paperclip className='h-4 w-4 mr-2' />
+								Attach
+							</Button>
+						</div>
+
+						<div className='space-y-4'>
+							<div className='flex items-center justify-between'>
+								<h2 className='text-lg font-semibold'>Activity</h2>
+								<div className='flex items-center space-x-2'>
+									<Button variant='ghost' size='sm' className='text-gray-400'>
+										<RotateCcw className='h-4 w-4' />
+									</Button>
+									<Button variant='ghost' size='sm' className='text-gray-400'>
+										Filters
+									</Button>
 								</div>
 							</div>
+
+							<ScrollArea className='h-[400px]'>
+								<div className='space-y-4'>
+									{[
+										{ type: 'created', time: '4 months ago' },
+										{ type: 'label', label: 'labela', time: '10 days ago' },
+										{ type: 'label', label: 'ne label', time: '10 days ago' },
+										{ type: 'label', label: 'super label', time: '10 days ago' },
+										{ type: 'label', label: 'haha', time: '10 days ago' },
+										{ type: 'assignee', time: '10 days ago' },
+										{ type: 'title', time: '9 days ago' },
+										{ type: 'description', time: '9 days ago' }
+									].map((activity, i) => (
+										<div key={i} className='flex items-start space-x-3 text-sm'>
+											<Avatar className='h-6 w-6'>
+												<AvatarImage src='/placeholder.svg' />
+												<AvatarFallback>R</AvatarFallback>
+											</Avatar>
+											<div className='flex-1'>
+												<div className='flex items-center space-x-2'>
+													<span className='font-medium'>rsthaofficial</span>
+													{activity.type === 'created' && (
+														<span className='text-gray-400'>created the issue</span>
+													)}
+													{activity.type === 'label' && (
+														<>
+															<span className='text-gray-400'>added a new label</span>
+															<Badge
+																variant='outline'
+																className='bg-purple-500/10 text-purple-400 border-purple-500/20'
+															>
+																{activity.label}
+															</Badge>
+														</>
+													)}
+													{activity.type === 'assignee' && (
+														<span className='text-gray-400'>
+															added a new assignee Rsthaofficial
+														</span>
+													)}
+													{activity.type === 'title' && (
+														<span className='text-gray-400'>
+															set the name to Task Title
+														</span>
+													)}
+													{activity.type === 'description' && (
+														<span className='text-gray-400'>updated the description</span>
+													)}
+													<span className='text-gray-500'>{activity.time}</span>
+												</div>
+											</div>
+										</div>
+									))}
+								</div>
+							</ScrollArea>
 						</div>
 					</div>
-				</aside>
+
+					{/* Properties Sidebar */}
+					<div className='space-y-6'>
+						<h3 className='text-sm font-medium'>Properties</h3>
+
+						<div className='space-y-4'>
+							<StatusSelect onChange={() => {}} value='BACKLOG' />
+							<PrioritySelect onChange={() => {}} value='LOW' />
+							<AssigneeSelect onSelect={() => {}} value='' />
+						</div>
+					</div>
+				</div>
 			</div>
+			<NewTaskPopup
+				open={subIssueDialogOpen}
+				onOpenChange={setSubIssueDialogOpen}
+				parentTaskId='RSTHA-4'
+				parentTaskTitle='Task Title'
+			/>
 		</div>
 	)
 }
