@@ -62,7 +62,7 @@ export function Editor() {
 	}, [])
 
 	return (
-		<div className='w-full max-w-4xl mx-auto'>
+		<div className='w-full'>
 			<div className='bg-inherit rounded-lg shadow-sm border border-border-200 relative'>
 				{viewRef.current && <MenuBar view={viewRef.current} />}
 				<div ref={editorRef} className='p-6' />
