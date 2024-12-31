@@ -1,7 +1,9 @@
+import { useState } from 'react'
+
 import { ArrowDown, ArrowRight, ArrowUp } from 'lucide-react'
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Priority } from '@/types/kanban'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 const priorityIcons = {
 	LOW: ArrowDown,
@@ -15,41 +17,46 @@ const priorityColors = {
 	HIGH: 'text-red-500'
 }
 
-interface PrioritySelectProps {
-	value: Priority
-	onChange: (value: Priority) => void
+const priorityMap: Record<Priority, string> = {
+	LOW: 'Low',
+	MEDIUM: 'Medium',
+	HIGH: 'High'
 }
 
-export function PrioritySelect({ value, onChange }: PrioritySelectProps) {
-	const Icon = priorityIcons[value]
+interface PrioritySelectProps {
+	priority?: Priority
+	onChange?: (value: Priority) => void
+}
+
+export function PrioritySelect({ priority: initialPriority, onChange }: PrioritySelectProps) {
+	const [priority, setPriority] = useState<Priority>(initialPriority || 'LOW')
+	const Icon = priorityIcons[priority]
+
+	const handleChange = (priority: Priority) => {
+		setPriority(priority)
+		if (onChange) onChange(priority)
+	}
+
 	return (
-		<TooltipProvider>
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Select value={value} onValueChange={onChange}>
-						<SelectTrigger className='w-8 h-8 p-0 flex items-center justify-center [&>svg]:hidden'>
-							<SelectValue>
-								<Icon className={`h-4 w-4 ${priorityColors[value]}`} />
-							</SelectValue>
-						</SelectTrigger>
-						<SelectContent>
-							{Object.entries(priorityIcons).map(([priority, PriorityIcon]) => (
-								<SelectItem key={priority} value={priority}>
-									<div className='flex items-center'>
-										<PriorityIcon
-											className={`mr-2 h-4 w-4 ${priorityColors[priority as Priority]}`}
-										/>
-										{priority.charAt(0) + priority.slice(1).toLowerCase()}
-									</div>
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</TooltipTrigger>
-				<TooltipContent>
-					<p>{value.charAt(0) + value.slice(1).toLowerCase()} Priority</p>
-				</TooltipContent>
-			</Tooltip>
-		</TooltipProvider>
+		<Select value={priority} onValueChange={handleChange}>
+			<SelectTrigger className='w-fit h-8 p-0 px-2 flex items-center justify-center [&>svg]:mt-0.5'>
+				<SelectValue asChild>
+					<p className='flex items-center space-x-2 mr-2'>
+						<Icon className={`h-4 w-4 ${priorityColors[priority]}`} />
+						<span className='text-sm'>{priorityMap[priority]}</span>
+					</p>
+				</SelectValue>
+			</SelectTrigger>
+			<SelectContent>
+				{Object.entries(priorityIcons).map(([priority, PriorityIcon]) => (
+					<SelectItem key={priority} value={priority}>
+						<div className='flex items-center'>
+							<PriorityIcon className={`mr-2 h-4 w-4 ${priorityColors[priority as Priority]}`} />
+							{priority.charAt(0) + priority.slice(1).toLowerCase()}
+						</div>
+					</SelectItem>
+				))}
+			</SelectContent>
+		</Select>
 	)
 }

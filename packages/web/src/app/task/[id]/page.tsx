@@ -16,7 +16,7 @@ export default function TaskDetails() {
 	const [subIssueDialogOpen, setSubIssueDialogOpen] = React.useState(false)
 
 	return (
-		<div className='min-h-screen bg-[#121212] text-white'>
+		<div className='min-h-screen bg-background text-white'>
 			<div className='container py-4'>
 				<div className='text-sm text-gray-500 mb-4'>RSTHA-4</div>
 
@@ -142,9 +142,9 @@ export default function TaskDetails() {
 						<h3 className='text-sm font-medium'>Properties</h3>
 
 						<div className='space-y-4'>
-							<StatusSelect onChange={() => {}} value='BACKLOG' />
-							<PrioritySelect onChange={() => {}} value='LOW' />
-							<AssigneeSelect onSelect={() => {}} value='' />
+							<StatusSelect status='BACKLOG' />
+							<PrioritySelect priority='LOW' />
+							<AssigneeSelect />
 						</div>
 					</div>
 				</div>
