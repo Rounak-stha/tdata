@@ -6,6 +6,7 @@ import { getPlugins } from '../../lib/plugins'
 import { MenuBar } from './MenuBar'
 import { SlashMenu } from './SlashMenu'
 import { slashMenuPluginKey } from '../../lib/plugins/slash-menu'
+import { getMenuPosition } from '../../lib/plugins/slash-menu/utils'
 
 export function Editor() {
 	const editorRef = useRef<HTMLDivElement>(null)
@@ -31,16 +32,12 @@ export function Editor() {
 
 				// Update slash menu state
 				const slashState = slashMenuPluginKey.getState(newState)
-				if (slashState?.open && slashState.position !== null) {
-					const coords = view.coordsAtPos(slashState.position)
-					const domRect = view.dom.getBoundingClientRect()
+				if (slashState && slashState.open && slashState.position !== null) {
+					const position = getMenuPosition(view, slashState.slashPos as number)
 
 					setSlashMenu({
 						open: true,
-						position: {
-							top: coords.top - domRect.top + 52,
-							left: coords.left - domRect.left
-						}
+						position
 					})
 				} else {
 					setSlashMenu(null)

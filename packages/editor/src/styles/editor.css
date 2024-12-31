@@ -55,6 +55,17 @@
 	@apply bg-blue-50;
 }
 
+/* Placeholder */
+.ProseMirror .placeholder {
+	color: #aaa;
+	pointer-events: none;
+	height: 0;
+}
+
+.ProseMirror:focus .placeholder {
+	display: none;
+}
+
 /* Syntax Highlighting */
 .syntax-highlighted {
 	@apply font-mono text-sm;

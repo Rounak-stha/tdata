@@ -1,6 +1,6 @@
 import { Plugin, PluginKey } from 'prosemirror-state'
 import type { SlashMenuMeta, SlashMenuPluginState } from './types'
-import { Number_Of_Command_Items } from './commands/slash'
+import { Commands as InitialCommands } from './commands/slash'
 
 export const slashMenuPluginKey = new PluginKey<SlashMenuPluginState>('slashMenu')
 
@@ -11,7 +11,8 @@ export const slashMenuPlugin = () => {
 			init() {
 				return {
 					open: false,
-					numberOfCommandItems: Number_Of_Command_Items,
+					filter: '',
+					commands: InitialCommands,
 					shouldExecute: false,
 					selectedIndex: 0,
 					position: null,
@@ -25,16 +26,20 @@ export const slashMenuPlugin = () => {
 					const textBefore = $from.parent.textContent.slice(0, $from.parentOffset)
 
 					// Check for a slash preceded by a space or at the start of a block
-					const hasValidSlash = textBefore.match(/(?:^|\s)\/$/)
+					const slashMatch = textBefore.match(/(?:^|\s)\/([^\s]*)$/)
 					const hasDoubleSlash = textBefore.endsWith('//')
 
-					if (hasValidSlash && !hasDoubleSlash) {
-						const slashPos = $from.pos - 1
+					if (slashMatch && !hasDoubleSlash) {
+						const filter = (slashMatch[1] || '').toLowerCase()
+						const slashPos = $from.pos - 1 - filter.length
 						return {
 							open: true,
-							selectedIndex: state.selectedIndex,
+							filter,
+							selectedIndex: 0,
 							shouldExecute: false,
-							numberOfCommandItems: state.numberOfCommandItems,
+							commands: filter
+								? InitialCommands.filter((command) => command.title.toLowerCase().includes(filter))
+								: InitialCommands,
 							position: $from.pos,
 							slashPos
 						}
@@ -45,16 +50,18 @@ export const slashMenuPlugin = () => {
 				if (tr.docChanged) {
 					return {
 						open: false,
+						filter: '',
 						selectedIndex: 0,
 						shouldExecute: false,
-						numberOfCommandItems: state.numberOfCommandItems,
+						commands: InitialCommands,
 						position: null,
 						slashPos: null
 					}
 				}
 
 				const meta: SlashMenuMeta | undefined = tr.getMeta(slashMenuPluginKey)
-				const { selectedIndex } = state
+				const { selectedIndex, commands } = state
+				const numberOfCommandItems = commands.length
 
 				if (meta?.type == 'execute') {
 					return {
@@ -66,7 +73,7 @@ export const slashMenuPlugin = () => {
 				if (meta?.type == 'NextItem') {
 					return {
 						...state,
-						selectedIndex: Math.min(selectedIndex + 1, state.numberOfCommandItems - 1)
+						selectedIndex: Math.min(selectedIndex + 1, numberOfCommandItems - 1)
 					}
 				}
 				if (meta?.type == 'PrevItem') {

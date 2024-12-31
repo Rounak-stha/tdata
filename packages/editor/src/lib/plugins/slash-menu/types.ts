@@ -5,7 +5,8 @@ export type CommandFunction = (state: EditorState, dispatch?: EditorView['dispat
 
 export type SlashMenuPluginState = {
 	open: boolean
-	numberOfCommandItems: number
+	filter: string
+	commands: Command[]
 	shouldExecute: boolean
 	selectedIndex: number
 	position: number | null

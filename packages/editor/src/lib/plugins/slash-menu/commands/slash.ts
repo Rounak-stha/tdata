@@ -14,11 +14,11 @@ export const createSlashCommand = (command: CommandFunction): CommandFunction =>
 		const pluginState = slashMenuPluginKey.getState(state)
 		if (!pluginState?.slashPos) return command(state, dispatch)
 
-		// NOTE: I do not understand the mapping it does here
-		// If you do, please explain it to me
-
 		// Create a transaction to delete the slash
 		const deleteSlashTr = state.tr.delete(pluginState.slashPos, state.selection.from)
+
+		// NOTE: I do not understand the mapping it does here
+		// If you do, please explain it to me
 
 		// Execute the command and combine transactions
 		const success = command(state, (commandTr) => {
@@ -40,7 +40,12 @@ export const createSlashCommand = (command: CommandFunction): CommandFunction =>
 	}
 }
 
-export const commands: Command[] = [
+export const NodeTypeOffset = {
+	paragraph: 0,
+	heading: 32
+}
+
+export const Commands: Command[] = [
 	{
 		title: 'Heading 1',
 		icon: Heading1,
@@ -99,5 +104,3 @@ export const commands: Command[] = [
 		})
 	}
 ]
-
-export const Number_Of_Command_Items = commands.length
