@@ -4,7 +4,6 @@ import { EditorView } from 'prosemirror-view'
 import { schema } from '../../lib/schema'
 import { getPlugins } from '../../lib/plugins'
 import { MenuBar } from './MenuBar'
-import { Placeholder } from './Placeholder'
 import { SlashMenu } from './SlashMenu'
 import { slashMenuPluginKey } from '../../lib/plugins/slash-menu'
 
@@ -66,7 +65,6 @@ export function Editor() {
 			<div className='bg-inherit rounded-lg shadow-sm border border-border-200 relative'>
 				{viewRef.current && <MenuBar view={viewRef.current} />}
 				<div ref={editorRef} className='p-6' />
-				{viewRef.current && <Placeholder editorView={viewRef.current} />}
 				{slashMenu?.open && viewRef.current && (
 					<SlashMenu
 						view={viewRef.current}

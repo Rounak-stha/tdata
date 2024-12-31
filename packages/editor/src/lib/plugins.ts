@@ -9,8 +9,10 @@ import { buildInputRules } from './inputrules'
 import { schema } from './schema'
 import { codeBlockHighlightPlugin } from './syntax-highlight'
 import { slashMenuPlugin } from './plugins/slash-menu'
+import { placeholder } from './plugins/placeholder'
 
 export const getPlugins = () => [
+	placeholder('Type / for commands'),
 	buildInputRules(schema),
 	keymap(buildKeymap(schema)),
 	slashMenuPlugin(), // Slash Menu Plugin should come before baseKeymap as the baseKeyMap consumes the enter key
