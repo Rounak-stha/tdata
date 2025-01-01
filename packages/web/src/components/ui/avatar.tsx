@@ -4,8 +4,9 @@ import * as React from 'react'
 import * as AvatarPrimitive from '@radix-ui/react-avatar'
 
 import { cn } from '@/lib/utils'
+import { UserIcon } from 'lucide-react'
 
-const Avatar = React.forwardRef<
+const AvatarRoot = React.forwardRef<
 	React.ElementRef<typeof AvatarPrimitive.Root>,
 	React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
 >(({ className, ...props }, ref) => (
@@ -15,7 +16,7 @@ const Avatar = React.forwardRef<
 		{...props}
 	/>
 ))
-Avatar.displayName = AvatarPrimitive.Root.displayName
+AvatarRoot.displayName = AvatarPrimitive.Root.displayName
 
 const AvatarImage = React.forwardRef<
 	React.ElementRef<typeof AvatarPrimitive.Image>,
@@ -37,4 +38,26 @@ const AvatarFallback = React.forwardRef<
 ))
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName
 
-export { Avatar, AvatarImage, AvatarFallback }
+type AvatarProps = {
+	src?: string | null
+	alt?: string
+	size?: 'sm' | 'md' | 'lg'
+}
+
+const Avatar: React.FC<AvatarProps> = ({ src, alt, size = 'md' }) => {
+	const className = cn({
+		'h-4 w-4': size === 'sm',
+		'h-6 w-6': size === 'md',
+		'h-8 w-8': size == 'lg'
+	})
+	return (
+		<AvatarRoot className={className}>
+			<AvatarImage src={src || ''} alt={alt} />
+			<AvatarFallback>
+				<UserIcon className={className} />
+			</AvatarFallback>
+		</AvatarRoot>
+	)
+}
+
+export { Avatar }

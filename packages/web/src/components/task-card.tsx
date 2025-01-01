@@ -25,7 +25,6 @@ export function TaskCard({ task, onUpdate }: TaskCardProps) {
 	}
 
 	const handleAssigneeChange = (newAssigneeId: string) => {
-		console.log(newAssigneeId)
 		const newAssignee = newAssigneeId ? { id: newAssigneeId, name: newAssigneeId } : undefined
 		onUpdate({ ...task, assignee: newAssignee })
 	}
@@ -34,14 +33,14 @@ export function TaskCard({ task, onUpdate }: TaskCardProps) {
 		<Card className='p-4 cursor-pointer bg-background hover:bg-accent/50 transition-colors border shadow-sm'>
 			<div className='flex items-center justify-between mb-2'>
 				<span className='text-xs text-muted-foreground font-mono'>{task.id}</span>
-				<AssigneeSelect value={task.assignee?.id} onSelect={handleAssigneeChange} />
+				<AssigneeSelect type='icon' assigneeId={task.assignee?.id} onSelect={handleAssigneeChange} />
 			</div>
 			<Link href={`/task/${task.id}`} className='block'>
 				<h3 className='text-sm font-medium leading-none mb-3 hover:underline'>{task.title}</h3>
 			</Link>
 			<div className='flex items-center gap-2'>
-				<StatusSelect value={task.status} onChange={handleStatusChange} />
-				<PrioritySelect value={task.priority} onChange={handlePriorityChange} />
+				<StatusSelect type='icon' status={task.status} onChange={handleStatusChange} />
+				<PrioritySelect type='icon' priority={task.priority} onChange={handlePriorityChange} />
 				<DatePicker
 					date={task.dueDate ? new Date(task.dueDate) : undefined}
 					onSelect={handleDateChange}

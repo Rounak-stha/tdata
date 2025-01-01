@@ -2,6 +2,7 @@ import { CheckCircle2, CircleDashed, CircleDot, Circle } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Status } from '@/types/kanban'
 import { useState } from 'react'
+import { cn } from '@/lib/utils'
 
 const statusIcons = {
 	BACKLOG: CircleDashed,
@@ -27,9 +28,10 @@ const StatusMap: Record<Status, string> = {
 interface StatusSelectProps {
 	status?: Status
 	onChange?: (value: Status) => void
+	type?: 'icon' | 'default'
 }
 
-export function StatusSelect({ status: InitialStatus, onChange }: StatusSelectProps) {
+export function StatusSelect({ status: InitialStatus, onChange, type = 'default' }: StatusSelectProps) {
 	const [status, setStatus] = useState<Status>(InitialStatus || 'BACKLOG')
 	const Icon = statusIcons[status]
 
@@ -39,11 +41,16 @@ export function StatusSelect({ status: InitialStatus, onChange }: StatusSelectPr
 	}
 	return (
 		<Select value={status} onValueChange={handleChange}>
-			<SelectTrigger className='w-fit h-8 p-0 px-2 flex items-center justify-center  [&>svg]:mt-0.5'>
+			<SelectTrigger
+				className={cn('w-fit h-8 p-0 px-2 flex items-center justify-center', {
+					'[&>svg]:mt-0.5': type == 'default',
+					'[&>svg]:hidden': type == 'icon'
+				})}
+			>
 				<SelectValue asChild>
-					<p className='flex items-center space-x-2 mr-2'>
+					<p className={cn('flex items-center space-x-2', { 'mr-2': type == 'default' })}>
 						<Icon className={`h-4 w-4 ${statusColors[status]}`} />
-						<span className='text-sm'>{StatusMap[status]}</span>
+						{type == 'default' && <span className='text-sm'>{StatusMap[status]}</span>}
 					</p>
 				</SelectValue>
 			</SelectTrigger>
