@@ -22,10 +22,10 @@ export function Filters({ selectedPriorities, selectedStatuses, onPriorityChange
 	]
 
 	const statuses: { label: string; value: Status }[] = [
-		{ label: 'Backlog', value: 'BACKLOG' },
-		{ label: 'Todo', value: 'TODO' },
-		{ label: 'In Progress', value: 'IN_PROGRESS' },
-		{ label: 'Done', value: 'DONE' }
+		{ label: 'Backlog', value: 'Backlog' },
+		{ label: 'Todo', value: 'ToDo' },
+		{ label: 'In Progress', value: 'InProgress' },
+		{ label: 'Done', value: 'Done' }
 	]
 
 	const togglePriority = (priority: Priority) => {

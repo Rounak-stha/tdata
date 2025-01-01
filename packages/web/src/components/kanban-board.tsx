@@ -11,7 +11,7 @@ const INITIAL_TASKS: Task[] = [
 	{
 		id: 'TASK-1',
 		title: 'Design system implementation',
-		status: 'BACKLOG',
+		status: 'Backlog',
 		priority: 'HIGH',
 		projectId: 'PROJ-1',
 		dueDate: '2024-01-20',
@@ -25,7 +25,7 @@ const INITIAL_TASKS: Task[] = [
 	{
 		id: 'TASK-2',
 		title: 'API integration',
-		status: 'TODO',
+		status: 'ToDo',
 		priority: 'MEDIUM',
 		projectId: 'PROJ-1',
 		dueDate: '2024-01-25',
@@ -39,7 +39,7 @@ const INITIAL_TASKS: Task[] = [
 	{
 		id: 'TASK-3',
 		title: 'User authentication flow',
-		status: 'IN_PROGRESS',
+		status: 'InProgress',
 		priority: 'HIGH',
 		projectId: 'PROJ-1',
 		dueDate: '2024-01-30'
@@ -47,7 +47,7 @@ const INITIAL_TASKS: Task[] = [
 	{
 		id: 'TASK-4',
 		title: 'Dashboard analytics',
-		status: 'DONE',
+		status: 'Done',
 		priority: 'LOW',
 		projectId: 'PROJ-1',
 		assignee: {
@@ -72,15 +72,15 @@ export function KanbanBoard() {
 	})
 
 	const groupedTask: GroupedTasks = {
-		BACKLOG: { title: 'Backlog', tasks: filteredTasks.filter((t) => t.status === 'BACKLOG'), isExpanded: true },
-		TODO: { title: 'To Do', tasks: filteredTasks.filter((t) => t.status === 'TODO'), isExpanded: true },
-		IN_PROGRESS: {
+		Backlog: { title: 'Backlog', tasks: filteredTasks.filter((t) => t.status === 'Backlog'), isExpanded: true },
+		ToDo: { title: 'To Do', tasks: filteredTasks.filter((t) => t.status === 'ToDo'), isExpanded: true },
+		InProgress: {
 			title: 'In Progress',
-			tasks: filteredTasks.filter((t) => t.status === 'IN_PROGRESS'),
+			tasks: filteredTasks.filter((t) => t.status === 'InProgress'),
 			isExpanded: true
 		},
-		DONE: { title: 'Done', tasks: filteredTasks.filter((t) => t.status === 'DONE'), isExpanded: true },
-		CANCELED: { title: 'Canceled', tasks: filteredTasks.filter((t) => t.status === 'CANCELED'), isExpanded: true }
+		Done: { title: 'Done', tasks: filteredTasks.filter((t) => t.status === 'Done'), isExpanded: true },
+		Cancelled: { title: 'Canceled', tasks: filteredTasks.filter((t) => t.status === 'Cancelled'), isExpanded: true }
 	}
 
 	const handleTaskUpdate = (updatedTask: Task) => {
@@ -98,7 +98,7 @@ export function KanbanBoard() {
 				setSelectedStatuses={setSelectedStatuses}
 			/>
 			{view === 'board' ? (
-				<ScrollArea className='h-full w-full rounded-md border bg-muted/20 p-4'>
+				<ScrollArea className='h-full w-full'>
 					<div className='flex gap-4'>
 						{Object.entries(groupedTask).map(([status, { tasks }]) => (
 							<BoardColumn

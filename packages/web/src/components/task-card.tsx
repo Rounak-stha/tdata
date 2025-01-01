@@ -25,12 +25,14 @@ export function TaskCard({ task, onUpdate }: TaskCardProps) {
 	}
 
 	const handleAssigneeChange = (newAssigneeId: string) => {
-		const newAssignee = newAssigneeId ? { id: newAssigneeId, name: newAssigneeId } : undefined
+		const newAssignee = newAssigneeId
+			? { id: newAssigneeId, name: newAssigneeId, email: 'test@email.com' }
+			: undefined
 		onUpdate({ ...task, assignee: newAssignee })
 	}
 
 	return (
-		<Card className='p-4 cursor-pointer bg-background hover:bg-accent/50 transition-colors border shadow-sm'>
+		<Card className='p-4 cursor-pointer bg-background hover:bg-accent/50 transition-colors border shadow-sm rounded-sm'>
 			<div className='flex items-center justify-between mb-2'>
 				<span className='text-xs text-muted-foreground font-mono'>{task.id}</span>
 				<AssigneeSelect type='icon' assigneeId={task.assignee?.id} onSelect={handleAssigneeChange} />

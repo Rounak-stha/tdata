@@ -122,7 +122,7 @@ export function ListView({ groupedTask: InitialGroupedTask, onUpdate }: ListView
 															<Link href={`/task/${task.id}`}>View Details</Link>
 														</DropdownMenuItem>
 														<DropdownMenuItem
-															onClick={() => onUpdate({ ...task, status: 'DONE' })}
+															onClick={() => onUpdate({ ...task, status: 'Done' })}
 														>
 															Mark as Done
 														</DropdownMenuItem>

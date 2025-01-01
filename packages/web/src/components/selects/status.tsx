@@ -1,28 +1,23 @@
-import { CheckCircle2, CircleDashed, CircleDot, Circle } from 'lucide-react'
+import { CheckCircle2, CircleDashed, CircleDot, Circle, BanIcon } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Status } from '@/types/kanban'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 
 const statusIcons = {
-	BACKLOG: CircleDashed,
-	TODO: Circle,
-	IN_PROGRESS: CircleDot,
-	DONE: CheckCircle2
+	Backlog: CircleDashed,
+	ToDo: Circle,
+	InProgress: CircleDot,
+	Done: CheckCircle2,
+	Cancelled: BanIcon
 }
 
 const statusColors = {
-	BACKLOG: 'text-slate-500',
-	TODO: 'text-blue-500',
-	IN_PROGRESS: 'text-yellow-500',
-	DONE: 'text-green-500'
-}
-
-const StatusMap: Record<Status, string> = {
-	BACKLOG: 'Backlog',
-	TODO: 'To Do',
-	IN_PROGRESS: 'In Progress',
-	DONE: 'Done'
+	Backlog: 'text-slate-500',
+	ToDo: 'text-blue-500',
+	InProgress: 'text-yellow-500',
+	Done: 'text-green-500',
+	Cancelled: 'text-red-500'
 }
 
 interface StatusSelectProps {
@@ -32,7 +27,7 @@ interface StatusSelectProps {
 }
 
 export function StatusSelect({ status: InitialStatus, onChange, type = 'default' }: StatusSelectProps) {
-	const [status, setStatus] = useState<Status>(InitialStatus || 'BACKLOG')
+	const [status, setStatus] = useState<Status>(InitialStatus || 'Backlog')
 	const Icon = statusIcons[status]
 
 	const handleChange = (status: Status) => {
@@ -50,7 +45,7 @@ export function StatusSelect({ status: InitialStatus, onChange, type = 'default'
 				<SelectValue asChild>
 					<p className={cn('flex items-center space-x-2', { 'mr-2': type == 'default' })}>
 						<Icon className={`h-4 w-4 ${statusColors[status]}`} />
-						{type == 'default' && <span className='text-sm'>{StatusMap[status]}</span>}
+						{type == 'default' && <span className='text-sm'>{status}</span>}
 					</p>
 				</SelectValue>
 			</SelectTrigger>
