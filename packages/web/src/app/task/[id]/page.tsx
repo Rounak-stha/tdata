@@ -2,7 +2,7 @@
 
 import { Plus, LinkIcon, Paperclip, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Editor } from '@tdata/editor'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -93,10 +93,7 @@ export default function TaskDetails() {
 										{ type: 'description', time: '9 days ago' }
 									].map((activity, i) => (
 										<div key={i} className='flex items-start space-x-3 text-sm'>
-											<Avatar className='h-6 w-6'>
-												<AvatarImage src='/placeholder.svg' />
-												<AvatarFallback>R</AvatarFallback>
-											</Avatar>
+											<Avatar src='/placeholder.svg' />
 											<div className='flex-1'>
 												<div className='flex items-center space-x-2'>
 													<span className='font-medium'>rsthaofficial</span>
@@ -142,7 +139,7 @@ export default function TaskDetails() {
 						<h3 className='text-sm font-medium'>Properties</h3>
 
 						<div className='space-y-4'>
-							<StatusSelect status='BACKLOG' />
+							<StatusSelect status='Backlog' />
 							<PrioritySelect priority='LOW' />
 							<AssigneeSelect />
 						</div>

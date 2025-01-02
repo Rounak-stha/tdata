@@ -1,7 +1,9 @@
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TaskCard } from './task-card'
-import type { Task } from '../types/kanban'
+import type { Status, Task } from '../types/kanban'
+import { useState } from 'react'
+import { NewTaskPopup } from './new-task-popup'
 
 interface BoardColumnProps {
 	tasks: Task[]
@@ -10,6 +12,7 @@ interface BoardColumnProps {
 }
 
 export function BoardColumn({ tasks, columnName, onTaskUpdate }: BoardColumnProps) {
+	const [newTaskDialogOpen, setNewTaskDialogOpen] = useState(false)
 	return (
 		<div className='w-80 shrink-0'>
 			<div className='mb-3 flex items-center justify-between'>
@@ -17,7 +20,12 @@ export function BoardColumn({ tasks, columnName, onTaskUpdate }: BoardColumnProp
 					<h2 className='text-sm font-medium'>{columnName}</h2>
 					<span className='rounded-full bg-muted px-2 py-0.5 text-xs'>{tasks.length}</span>
 				</div>
-				<Button variant='ghost' size='icon' className='h-8 w-8 hover:bg-accent'>
+				<Button
+					onClick={() => setNewTaskDialogOpen(true)}
+					variant='ghost'
+					size='icon'
+					className='h-8 w-8 hover:bg-accent'
+				>
 					<Plus className='h-4 w-4' />
 					<span className='sr-only'>Add task</span>
 				</Button>
@@ -27,6 +35,7 @@ export function BoardColumn({ tasks, columnName, onTaskUpdate }: BoardColumnProp
 					<TaskCard key={task.id} task={task} onUpdate={onTaskUpdate} />
 				))}
 			</div>
+			<NewTaskPopup status={columnName as Status} open={newTaskDialogOpen} onOpenChange={setNewTaskDialogOpen} />
 		</div>
 	)
 }

@@ -6,34 +6,41 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Editor } from '@tdata/editor'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar } from '@/components/ui/avatar'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { StatusSelect } from './selects/status'
-import { PrioritySelect } from './selects/priority'
-import { AssigneeSelect } from './selects/assignee'
+import { StatusSelect } from '@components/selects/status'
+import { PrioritySelect } from '@components/selects/priority'
+import { AssigneeSelect } from '@components/selects/assignee'
+import { Priority, Status } from '@/types/kanban'
 
 interface NewTaskPopupProps {
 	open: boolean
 	onOpenChange: (open: boolean) => void
-	parentTaskId: string
-	parentTaskTitle: string
+	parentTaskId?: string
+	parentTaskTitle?: string
+	status?: Status
+	priority?: Priority
 }
 
-export function NewTaskPopup({ open, onOpenChange, parentTaskId, parentTaskTitle }: NewTaskPopupProps) {
+export function NewTaskPopup({
+	open,
+	onOpenChange,
+	parentTaskId,
+	parentTaskTitle,
+	status,
+	priority
+}: NewTaskPopupProps) {
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<VisuallyHidden>
 				<DialogTitle>New Task Dialog</DialogTitle>
 			</VisuallyHidden>
-			<DialogContent className='sm:max-w-[800px] bg-[#1E1E1E] border text-gray-100 p-0'>
+			<DialogContent className='sm:max-w-[800px] bg-[#1E1E1E] border p-0'>
 				<div className='flex flex-col h-[90vh]'>
 					<DialogHeader className='p-4 border-b flex-shrink-0'>
 						<div className='flex items-center justify-between'>
 							<div className='flex items-center gap-2'>
-								<Avatar className='h-5 w-5'>
-									<AvatarImage src='/placeholder.svg' />
-									<AvatarFallback>R</AvatarFallback>
-								</Avatar>
+								<Avatar src='/placeholder.svg' />
 								<span className='text-sm font-medium text-gray-100'>Rstha Project</span>
 							</div>
 						</div>
@@ -56,8 +63,8 @@ export function NewTaskPopup({ open, onOpenChange, parentTaskId, parentTaskTitle
 					<div className='flex items-center gap-2 p-4 border-t overflow-x-auto flex-shrink-0'>
 						<ScrollArea className='w-full'>
 							<div className='flex gap-2'>
-								<StatusSelect />
-								<PrioritySelect />
+								<StatusSelect status={status} />
+								<PrioritySelect priority={priority} />
 								<AssigneeSelect />
 								<Button
 									variant='outline'

@@ -24,9 +24,8 @@ export const Header: FC<HeaderProps> = ({
 	setSelectedPriorities,
 	setSelectedStatuses
 }) => {
-	console.log({ selectedPriorities, selectedStatuses })
 	return (
-		<div className='h-full flex-1 flex flex-col p-8 space-y-6'>
+		<div className='h-full flex-1 flex flex-col py-8 space-y-6'>
 			<div className='flex'>
 				<div className='flex-1 flex items-center'>
 					<BreadCrump />
