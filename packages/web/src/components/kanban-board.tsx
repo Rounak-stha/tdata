@@ -88,7 +88,7 @@ export function KanbanBoard() {
 	}
 
 	return (
-		<div className='h-full flex-1 flex-col space-y-8 p-8 md:flex'>
+		<div className='flex flex-col space-y-8 m-4'>
 			<Header
 				view={view}
 				onViewChange={setView}
@@ -98,7 +98,7 @@ export function KanbanBoard() {
 				setSelectedStatuses={setSelectedStatuses}
 			/>
 			{view === 'board' ? (
-				<ScrollArea className='h-full w-full'>
+				<ScrollArea className='pb-6'>
 					<div className='flex gap-4'>
 						{Object.entries(groupedTask).map(([status, { tasks }]) => (
 							<BoardColumn

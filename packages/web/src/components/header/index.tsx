@@ -3,7 +3,6 @@
 import { FC } from 'react'
 import { ViewToggle } from '@components/view-toggle'
 import { Filters } from '@components/filter'
-import { ThemeToggle } from '@components/theme-toggle'
 import type { Priority, Status, ViewType } from '@type/kanban'
 import { BreadCrump } from './breadcrump'
 
@@ -25,21 +24,18 @@ export const Header: FC<HeaderProps> = ({
 	setSelectedStatuses
 }) => {
 	return (
-		<div className='h-full flex-1 flex flex-col py-8 space-y-6'>
-			<div className='flex'>
-				<div className='flex-1 flex items-center'>
-					<BreadCrump />
-				</div>
-				<div className='flex items-center justify-between gap-4'>
-					<ViewToggle view={view} onViewChange={onViewChange} />
-					<Filters
-						selectedPriorities={selectedPriorities}
-						selectedStatuses={selectedStatuses}
-						onPriorityChange={setSelectedPriorities}
-						onStatusChange={setSelectedStatuses}
-					/>
-					<ThemeToggle />
-				</div>
+		<div className='w-full flex'>
+			<div className='flex-1 flex items-center'>
+				<BreadCrump />
+			</div>
+			<div className='flex items-center gap-4'>
+				<ViewToggle view={view} onViewChange={onViewChange} />
+				<Filters
+					selectedPriorities={selectedPriorities}
+					selectedStatuses={selectedStatuses}
+					onPriorityChange={setSelectedPriorities}
+					onStatusChange={setSelectedStatuses}
+				/>
 			</div>
 		</div>
 	)
