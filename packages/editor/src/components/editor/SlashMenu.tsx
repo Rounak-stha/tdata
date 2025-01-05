@@ -34,7 +34,7 @@ export function SlashMenu({ view, position, onClose }: SlashMenuProps) {
 	return (
 		<div
 			className='absolute z-50 bg-background rounded-lg shadow-xl border w-56 max-h-80 overflow-y-auto'
-			style={{ top: position.top + 60, left: position.left + 10 }}
+			style={{ top: position.top, left: position.left }}
 		>
 			<div className='p-1'>
 				{commands.length ? (

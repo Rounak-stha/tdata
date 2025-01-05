@@ -3,12 +3,17 @@ import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { schema } from '../../lib/schema'
 import { getPlugins } from '../../lib/plugins'
-import { MenuBar } from './MenuBar'
+// import { MenuBar } from './MenuBar'
 import { SlashMenu } from './SlashMenu'
 import { slashMenuPluginKey } from '../../lib/plugins/slash-menu'
 import { getMenuPosition } from '../../lib/plugins/slash-menu/utils'
 
-export function Editor() {
+type EditroProps = {
+	content?: string
+	className?: string
+}
+// min-h-[300px]
+export function Editor({ content, className }: EditroProps) {
 	const editorRef = useRef<HTMLDivElement>(null)
 	const viewRef = useRef<EditorView | null>(null)
 	const [slashMenu, setSlashMenu] = useState<{
@@ -20,6 +25,7 @@ export function Editor() {
 		if (!editorRef.current) return
 
 		const state = EditorState.create({
+			doc: content ? schema.nodeFromJSON(JSON.parse(content)) : undefined,
 			schema,
 			plugins: getPlugins()
 		})
@@ -44,7 +50,7 @@ export function Editor() {
 				}
 			},
 			attributes: {
-				class: 'prose prose-lg max-w-none focus:outline-none min-h-[300px]'
+				class: 'prose prose-lg max-w-none focus:outline-none'
 			}
 		})
 
@@ -58,18 +64,12 @@ export function Editor() {
 	}, [])
 
 	return (
-		<div className='w-full'>
-			<div className='bg-inherit rounded-lg shadow-sm border border-border-200 relative'>
-				{viewRef.current && <MenuBar view={viewRef.current} />}
-				<div ref={editorRef} className='p-6' />
-				{slashMenu?.open && viewRef.current && (
-					<SlashMenu
-						view={viewRef.current}
-						position={slashMenu.position}
-						onClose={() => setSlashMenu(null)}
-					/>
-				)}
-			</div>
+		<div className={`bg-inherit w-full relative ${className}`}>
+			{/* {viewRef.current && <MenuBar view={viewRef.current} />} */}
+			<div ref={editorRef} />
+			{slashMenu?.open && viewRef.current && (
+				<SlashMenu view={viewRef.current} position={slashMenu.position} onClose={() => setSlashMenu(null)} />
+			)}
 		</div>
 	)
 }
