@@ -42,19 +42,29 @@ type AvatarProps = {
 	src?: string | null
 	alt?: string
 	size?: 'sm' | 'md' | 'lg'
+	className?: string
 }
 
-const Avatar: React.FC<AvatarProps> = ({ src, alt, size = 'md' }) => {
-	const className = cn({
-		'h-4 w-4': size === 'sm',
-		'h-6 w-6': size === 'md',
-		'h-8 w-8': size == 'lg'
+const Avatar: React.FC<AvatarProps> = ({ src, alt, size = 'md', className: customCn }) => {
+	const className = cn(
+		{
+			'h-4 w-4': size === 'sm',
+			'h-6 w-6': size === 'md',
+			'h-8 w-8': size == 'lg'
+		},
+		customCn
+	)
+
+	const fallbckClassName = cn({
+		'p-0.5': size === 'sm',
+		'p-1': size === 'md',
+		'p-2': size == 'lg'
 	})
 	return (
 		<AvatarRoot className={className}>
 			<AvatarImage src={src || ''} alt={alt} />
-			<AvatarFallback>
-				<UserIcon className={className} />
+			<AvatarFallback className={fallbckClassName}>
+				<UserIcon />
 			</AvatarFallback>
 		</AvatarRoot>
 	)

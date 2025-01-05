@@ -88,7 +88,7 @@ export function KanbanBoard() {
 	}
 
 	return (
-		<div className='flex flex-col space-y-8 m-4'>
+		<div className='flex flex-col space-y-8'>
 			<Header
 				view={view}
 				onViewChange={setView}

@@ -38,7 +38,7 @@ export function AssigneeSelect({ assigneeId, onSelect, type = 'default' }: Assig
 					<TooltipTrigger asChild>
 						<PopoverTrigger asChild>
 							<Button
-								variant='ghost'
+								variant='outline'
 								role='combobox'
 								aria-expanded={open}
 								className='w-fit p-0 px-2 flex items-center justify-center bg-inherit'
@@ -46,19 +46,19 @@ export function AssigneeSelect({ assigneeId, onSelect, type = 'default' }: Assig
 								{selectedAssignee ? (
 									<>
 										<Avatar src={selectedAssignee.avatar} alt={`${selectedAssignee.name} avatar`} />
-										{type == 'default' && <span className='ml-1'>{selectedAssignee.name}</span>}
+										{type == 'default' && <span className='ml-0.5'>{selectedAssignee.name}</span>}
 									</>
 								) : (
 									<>
 										<UserIcon className='h-6 w-6' />
-										{type == 'default' && <span className='ml-1'>Assign</span>}
+										{type == 'default' && <span className='ml-0.5'>Assign</span>}
 									</>
 								)}
 							</Button>
 						</PopoverTrigger>
 					</TooltipTrigger>
 					<TooltipContent>{selectedAssignee ? selectedAssignee.name : 'Assign task'}</TooltipContent>
-					<PopoverContent align='end' className='w-[200px] p-0'>
+					<PopoverContent align='start' className='w-[200px] p-0'>
 						<Command>
 							<CommandInput placeholder='Search assignee...' />
 							<CommandEmpty>No assignee found.</CommandEmpty>
