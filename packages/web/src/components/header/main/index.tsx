@@ -4,19 +4,13 @@ import { Bell, Moon, Sun } from 'lucide-react'
 
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
+
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { useTheme } from 'next-themes'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { UserDropDown } from './userDropDown'
 
 export function Header() {
 	const { setTheme, theme } = useTheme()
@@ -76,21 +70,7 @@ export function Header() {
 					<Sun className='h-4 w-4 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0' />
 					<Moon className='absolute h-4 w-4 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100' />
 				</Button>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant='ghost' className='relative h-8 w-8 rounded-full' aria-label='User menu'>
-							<Avatar />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align='end'>
-						<DropdownMenuLabel>My Account</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>Profile</DropdownMenuItem>
-						<DropdownMenuItem>Settings</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>Log out</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+				<UserDropDown />
 			</div>
 		</header>
 	)

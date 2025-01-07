@@ -1,5 +1,5 @@
 import { KanbanBoard } from '@/components/kanban-board'
 
-export default function Page() {
+export default async function Page() {
 	return <KanbanBoard />
 }

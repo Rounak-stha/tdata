@@ -1,8 +1,9 @@
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-provider'
+import { Toaster } from '@/components/ui/sonner'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 import './globals.css'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 					</ThemeProvider>
 					<ScrollBar orientation='vertical' />
 				</ScrollArea>
+				<Toaster position='top-right' />
 			</body>
 		</html>
 	)
