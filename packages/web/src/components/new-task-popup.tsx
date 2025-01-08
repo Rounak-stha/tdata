@@ -35,13 +35,13 @@ export function NewTaskPopup({
 			<VisuallyHidden>
 				<DialogTitle>New Task Dialog</DialogTitle>
 			</VisuallyHidden>
-			<DialogContent className='sm:max-w-[800px] bg-[#1E1E1E] border p-0'>
-				<div className='flex flex-col h-[90vh]'>
+			<DialogContent className='sm:max-w-[800px] bg-background border p-0'>
+				<div className='flex flex-col h-[80vh]'>
 					<DialogHeader className='p-4 border-b flex-shrink-0'>
 						<div className='flex items-center justify-between'>
 							<div className='flex items-center gap-2'>
 								<Avatar src='/placeholder.svg' />
-								<span className='text-sm font-medium text-gray-100'>Rstha Project</span>
+								<span className='text-sm font-medium'>Rstha Project</span>
 							</div>
 						</div>
 						<div className='flex items-center gap-2 mt-2 text-sm text-gray-400'>
@@ -52,17 +52,14 @@ export function NewTaskPopup({
 
 					<ScrollArea className='flex-grow'>
 						<div className='p-4 space-y-4'>
-							<Input
-								placeholder='Title'
-								className='bg-input border placeholder:text-gray-500 focus-visible:ring-ring'
-							/>
+							<Input placeholder='Title' className='focus-visible:ring-ring' />
 							<Editor />
 						</div>
 					</ScrollArea>
 
-					<div className='flex items-center gap-2 p-4 border-t overflow-x-auto flex-shrink-0'>
+					<div className='flex items-center gap-2 p-3 border-t overflow-x-auto flex-shrink-0'>
 						<ScrollArea className='w-full'>
-							<div className='flex gap-2'>
+							<div className='flex gap-2 p-1'>
 								<StatusSelect status={status} />
 								<PrioritySelect priority={priority} />
 								<AssigneeSelect />

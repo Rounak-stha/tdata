@@ -4,7 +4,7 @@ import * as React from 'react'
 import * as AvatarPrimitive from '@radix-ui/react-avatar'
 
 import { cn } from '@/lib/utils'
-import { UserIcon } from 'lucide-react'
+import { ImageIcon, Loader2Icon, UserIcon } from 'lucide-react'
 
 const AvatarRoot = React.forwardRef<
 	React.ElementRef<typeof AvatarPrimitive.Root>,
@@ -70,4 +70,20 @@ const Avatar: React.FC<AvatarProps> = ({ src, alt, size = 'md', className: custo
 	)
 }
 
-export { Avatar }
+type AvatarUploadProps = {
+	avatar?: string
+	isUploading: boolean
+}
+
+const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatar, isUploading }) => {
+	return (
+		<AvatarRoot className='w-20 h-20'>
+			<AvatarImage src={avatar || ''} />
+			<AvatarFallback className='bg-muted'>
+				{isUploading ? <Loader2Icon className='h-8 w-8 animate-spin' /> : <ImageIcon className='h-8 w-8' />}
+			</AvatarFallback>
+		</AvatarRoot>
+	)
+}
+
+export { Avatar, AvatarUpload }

@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { PathPrefix, Paths } from '@lib/constants'
 
 export async function updateSession(request: NextRequest) {
 	let supabaseResponse = NextResponse.next({
@@ -31,10 +32,21 @@ export async function updateSession(request: NextRequest) {
 		data: { user }
 	} = await supabase.auth.getUser()
 
-	if (!user && (!request.nextUrl.pathname.startsWith('/api/auth') || !request.nextUrl.pathname.startsWith('/auth'))) {
+	if (
+		!user &&
+		!request.nextUrl.pathname.startsWith('/api/auth') &&
+		!request.nextUrl.pathname.startsWith(PathPrefix.auth)
+	) {
 		// no user, potentially respond by redirecting the user to the login page
 		const url = request.nextUrl.clone()
-		url.pathname = '/login'
+		url.pathname = Paths.signin
+		return NextResponse.redirect(url)
+	}
+
+	if (user && !user.user_metadata.onbaorded && !request.nextUrl.pathname.startsWith(Paths.onboarding)) {
+		console.log(JSON.stringify(user, null, 8))
+		const url = request.nextUrl.clone()
+		url.pathname = Paths.onboarding
 		return NextResponse.redirect(url)
 	}
 
