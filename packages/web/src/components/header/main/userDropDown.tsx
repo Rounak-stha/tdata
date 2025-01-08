@@ -9,14 +9,14 @@ import {
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { useUser } from '@/hooks/auth'
-// import { logOut } from '@/lib/actions/auth'
-import { createSupabaseBrowserClient } from '@lib/supabase/browser/client'
+import { signout } from '@/lib/actions/auth'
+import { Paths } from '@/lib/constants'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 export const UserDropDown = () => {
 	const { user } = useUser()
-	console.log('In UserDropdown:', user)
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -38,16 +38,17 @@ export const UserDropDown = () => {
 
 const Signout = () => {
 	const [loading, setLoading] = useState(false)
+	const router = useRouter()
 
 	const handleClick = async () => {
 		try {
-			console.log('logging out')
 			setLoading(true)
-			const client = await createSupabaseBrowserClient()
-			const { error } = await client.auth.signOut({ scope: 'local' })
-			if (error) toast.error('Failed to log out')
-		} catch {
-			toast.error('Failed to log out')
+			const { success } = await signout()
+			if (!success) throw success
+			router.push(Paths.signin)
+		} catch (e) {
+			console.error(e)
+			toast.error(`Failed to log out`)
 		} finally {
 			setLoading(false)
 		}
