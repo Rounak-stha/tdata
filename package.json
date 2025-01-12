@@ -7,7 +7,9 @@
 		"dev:editor": "yarn workspace @tdata/editor dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "next lint"
+		"lint": "next lint",
+		"drizzle:generate": "yarn workspace @tdata/web drizzle:generate",
+		"drizzle:push": "yarn workspace @tdata/web drizzle:push"
 	},
 	"workspaces": [
 		"packages/*"
