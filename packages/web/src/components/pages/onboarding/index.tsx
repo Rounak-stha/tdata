@@ -1,40 +1,45 @@
 'use client'
 
 import { FC, useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+import { User } from '@/types/user'
+import { OnboardingData } from '@/type/auth'
+import { onboardUser } from '@/lib/actions/auth'
+import { Paths } from '@/lib/constants'
+
 import { PersonalInfoStep } from './personal-info-step'
 import { OrganizationStep } from './organization-step'
 import { ProgressIndicator } from './progress-indicator'
-import { User } from '@/types/user'
-
-interface OnboardingData {
-	name: string
-	email: string
-	organizationName: string
-	teamSize: string
-	organizationURL: string
-}
 
 type OnboardingFlowProps = { user: User }
 
 export const OnboardingFlow: FC<OnboardingFlowProps> = ({ user }) => {
 	const [step, setStep] = useState(1)
 	const [data, setData] = useState<Partial<OnboardingData>>({})
+	const router = useRouter()
 	const totalSteps = 2
 
-	const handlePersonalInfoNext = (personalInfo: { name: string; email: string }) => {
+	const handlePersonalInfoNext = (personalInfo: { name: string; email: string; avatar?: string }) => {
 		setData({ ...data, ...personalInfo })
 		setStep(2)
 	}
 
-	const handleOrganizationNext = (orgInfo: {
-		organizationName: string
-		teamSize: string
-		organizationURL: string
-	}) => {
-		setData({ ...data, ...orgInfo })
-		// Here you would typically send the data to your backend
-		console.log('Onboarding completed:', { ...data, ...orgInfo })
-		// Redirect to dashboard or next step
+	const handleOrganizationNext = async (
+		orgInfo: {
+			organizationName: string
+			teamSize: string
+			organizationKey: string
+		},
+		setLoading: (val: boolean) => void
+	) => {
+		setLoading(true)
+		const updatedData = { ...data, ...orgInfo }
+		setData(updatedData)
+		const { success } = await onboardUser(updatedData as OnboardingData)
+		if (success) {
+			router.push(Paths.root)
+		} else setLoading(false)
 	}
 
 	const handleBack = () => {

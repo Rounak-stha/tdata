@@ -1,31 +1,57 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip } from './tooltip'
+import { useDebounce } from '@/hooks'
+import { checkOrganizationKeyAvailability } from '@/lib/actions/auth'
+import { CheckCircleIcon, XCircleIcon } from 'lucide-react'
 
 interface OrganizationStepProps {
-	onNext: (data: { organizationName: string; teamSize: string; organizationURL: string }) => void
+	onNext: (
+		data: { organizationName: string; teamSize: string; organizationKey: string },
+		setLoading: (val: boolean) => void
+	) => void
 	onBack: () => void
 }
 
 export function OrganizationStep({ onNext, onBack }: OrganizationStepProps) {
 	const [organizationName, setOrganizationName] = useState('')
 	const [teamSize, setTeamSize] = useState('')
-	const [organizationURL, setOrganizationURL] = useState('')
+	const [organizationKey, setOrganizationKey] = useState('')
+	const [isKeyAvailable, setIsKeyAvailable] = useState<boolean | null>(null)
+	const [isCheckingUrl, setIsCheckingUrl] = useState(false)
 	const [error, setError] = useState<string | null>(null)
+	const [loading, setLoading] = useState(false)
+
+	const debouncedWorkspaceUrl = useDebounce(organizationKey, 500)
+
+	useEffect(() => {
+		const checkUrl = async () => {
+			if (debouncedWorkspaceUrl) {
+				setIsCheckingUrl(true)
+				const available = await checkOrganizationKeyAvailability(debouncedWorkspaceUrl)
+				setIsKeyAvailable(available)
+				setIsCheckingUrl(false)
+			} else {
+				setIsKeyAvailable(null)
+			}
+		}
+
+		checkUrl()
+	}, [debouncedWorkspaceUrl])
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 		setError(null)
 
-		if (!organizationName.trim() || !teamSize || !organizationURL.trim()) {
+		if (!organizationName.trim() || !teamSize || !organizationKey.trim()) {
 			setError('Please fill in all fields')
 			return
 		}
 
-		onNext({ organizationName, teamSize, organizationURL })
+		onNext({ organizationName, teamSize, organizationKey }, setLoading)
 	}
 
 	return (
@@ -53,18 +79,38 @@ export function OrganizationStep({ onNext, onBack }: OrganizationStepProps) {
 				</div>
 
 				<div className='space-y-2'>
-					<Label htmlFor='organizationURL'>Organization URL</Label>
+					<Label htmlFor='organizationKey'>Organization URL</Label>
 					<div className='flex items-center space-x-2'>
 						<span className='text-muted-foreground'>tdata.app/</span>
-						<Input
-							id='organizationURL'
-							value={organizationURL}
-							onChange={(e) => setOrganizationURL(e.target.value)}
-							placeholder='Organization-name'
-							required
-						/>
+						<div className='relative flex-1'>
+							<Input
+								id='organizationKey'
+								value={organizationKey}
+								onChange={(e) => setOrganizationKey(e.target.value)}
+								placeholder='Organization Key'
+								required
+							/>
+							{isCheckingUrl && (
+								<div className='absolute inset-y-0 right-0 flex items-center pr-3'>
+									<div className='animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full'></div>
+								</div>
+							)}
+							{!isCheckingUrl && isKeyAvailable !== null && (
+								<div className='absolute inset-y-0 right-0 flex items-center pr-3'>
+									{isKeyAvailable ? (
+										<CheckCircleIcon className='h-5 w-5 text-primary' />
+									) : (
+										<XCircleIcon className='h-5 w-5 text-red-500' />
+									)}
+								</div>
+							)}
+						</div>
 					</div>
-					<p className='text-xs text-muted-foreground'>You can only edit the slug of the URL</p>
+					<p className='text-xs text-muted-foreground'>
+						{isKeyAvailable === false
+							? 'This workspace URL is already taken. Please choose another.'
+							: 'You can only edit the slug of the URL'}
+					</p>
 				</div>
 
 				<div className='space-y-2'>
@@ -87,7 +133,7 @@ export function OrganizationStep({ onNext, onBack }: OrganizationStepProps) {
 					<Button type='button' variant='ghost' onClick={onBack}>
 						Back
 					</Button>
-					<Button type='submit' className='flex-1'>
+					<Button type='submit' className='flex-1' disabled={loading}>
 						Continue
 					</Button>
 				</div>

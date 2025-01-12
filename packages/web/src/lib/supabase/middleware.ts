@@ -43,10 +43,15 @@ export async function updateSession(request: NextRequest) {
 		return NextResponse.redirect(url)
 	}
 
-	if (user && !user.user_metadata.onbaorded && !request.nextUrl.pathname.startsWith(Paths.onboarding)) {
-		console.log(JSON.stringify(user, null, 8))
+	if (user && !user.user_metadata.onboarded && !request.nextUrl.pathname.startsWith(Paths.onboarding)) {
 		const url = request.nextUrl.clone()
 		url.pathname = Paths.onboarding
+		return NextResponse.redirect(url)
+	}
+
+	if (user && user.user_metadata.onboarded && request.nextUrl.pathname.startsWith(Paths.onboarding)) {
+		const url = request.nextUrl.clone()
+		url.pathname = Paths.root
 		return NextResponse.redirect(url)
 	}
 

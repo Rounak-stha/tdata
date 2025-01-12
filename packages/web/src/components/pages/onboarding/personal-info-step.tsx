@@ -17,7 +17,7 @@ interface PersonalInfoStepProps {
 export function PersonalInfoStep({ user, onNext }: PersonalInfoStepProps) {
 	const [name, setName] = useState(user.name)
 	const [email, setEmail] = useState(user.email)
-	const [avatar, setAvatar] = useState<string | null>(null)
+	const [avatar, setAvatar] = useState<string | null>(user.avatar)
 	const [jobTitle, setJobTitle] = useState('')
 	const [bio, setBio] = useState('')
 	const [error, setError] = useState<string | null>(null)
