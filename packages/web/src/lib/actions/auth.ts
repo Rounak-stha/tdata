@@ -1,9 +1,12 @@
 'use server'
 
-import OrganizationRepository from '@/repositories/organization'
-import { OnboardingData } from '@/type/auth'
-import { createSupabaseClient } from '@lib/supabase/server/client'
 import { redirect } from 'next/navigation'
+
+import OrganizationRepository from '@/repositories/organization'
+import { OnboardingData } from '@/types/auth'
+import { createSupabaseClient } from '@lib/supabase/server/client'
+
+import type { Session } from '@supabase/supabase-js'
 
 type Provider = 'google'
 
@@ -111,6 +114,13 @@ export const onboardUser = async (data: OnboardingData) => {
 
 export const checkOrganizationKeyAvailability = async (key: string) => {
 	return !(await OrganizationRepository.existsByKey(key))
+}
+
+export const getSession = async (): Promise<{ success: false; data: null } | { success: true; data: Session }> => {
+	const supabase = await createSupabaseClient()
+	const { data, error } = await supabase.auth.getSession()
+	if (error || !data?.session) return { success: false, data: null }
+	return { success: true, data: data.session }
 }
 
 export const signInWithGoogle = signInWith('google')

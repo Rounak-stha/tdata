@@ -6,5 +6,7 @@ export const PathPrefix = {
 export const Paths = {
 	root: '/',
 	signin: `${PathPrefix.auth}/signin`,
-	onboarding: '/onboarding'
+	onboarding: '/onboarding',
+	error: '/error',
+	task: (org: string, taskNumber: string) => `/${org}/task/${taskNumber}`
 } as const
