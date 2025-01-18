@@ -10,7 +10,7 @@ export const PropertiesPanel = () => {
 			<div className='space-y-4'>
 				<div className='space-y-1'>
 					<label className='text-sm text-muted-foreground'>Status</label>
-					<StatusSelect status='Backlog' />
+					<StatusSelect />
 				</div>
 				<div className='space-y-1'>
 					<label className='text-sm text-muted-foreground'>Priority</label>
