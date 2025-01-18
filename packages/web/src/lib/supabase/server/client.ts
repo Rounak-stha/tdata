@@ -2,7 +2,8 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { createServerClient } from '@supabase/ssr'
-import { User } from '@/types/user'
+import { InfantUser } from '@/types/user'
+import { Paths } from '@/lib/constants'
 
 const SUPABASE_URL = process.env.SUPABASE_URL!
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY!
@@ -37,14 +38,14 @@ export async function createSupabaseClient() {
  * if any errors occur, it will redirect to error page
  * @returns User
  */
-export const getUser = async (): Promise<User> => {
+export const getInfantUser = async (): Promise<InfantUser> => {
 	const supabase = await createSupabaseClient()
 	const { data, error } = await supabase.auth.getUser()
-	if (error || !data) redirect('/error')
+	if (error || !data) redirect(Paths.signin)
 	return {
 		id: data.user.id,
 		email: data.user.email!,
 		name: data.user.user_metadata.name,
-		avatar: data.user.user_metadata.avatar_url
+		imageUrl: data.user.user_metadata.avatar_url
 	}
 }
