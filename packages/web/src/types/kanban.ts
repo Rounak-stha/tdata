@@ -1,4 +1,5 @@
 import { TaskDetail } from './task'
+import { WorkflowStatus } from './workflow'
 
 export type Status = 'Backlog' | 'ToDo' | 'InProgress' | 'Done' | 'Cancelled'
 export type Priority = 'LOW' | 'MEDIUM' | 'HIGH'
@@ -27,4 +28,4 @@ export interface Column {
 
 export type ViewType = 'board' | 'list' | 'calendar'
 
-export type GroupedTasks = Record<string, { title: string; tasks: TaskDetail[]; isExpanded: boolean }>
+export type GroupedTasks = Record<string, { status: WorkflowStatus; tasks: TaskDetail[]; isExpanded: boolean }>
