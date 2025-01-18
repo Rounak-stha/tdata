@@ -62,7 +62,8 @@ const Avatar: React.FC<AvatarProps> = ({ src, alt, size = 'md', className: custo
 	})
 	return (
 		<AvatarRoot className={className}>
-			<AvatarImage src={src || ''} alt={alt} />
+			{/*  @ts-expect-error Pass null of no src as an empty string may cause the browser to download the whole page again */}
+			<AvatarImage src={src || null} alt={alt} />
 			<AvatarFallback className={fallbckClassName}>
 				<UserIcon />
 			</AvatarFallback>
@@ -78,7 +79,7 @@ type AvatarUploadProps = {
 const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatar, isUploading }) => {
 	return (
 		<AvatarRoot className='w-20 h-20'>
-			<AvatarImage src={avatar || ''} />
+			<AvatarImage src={avatar} />
 			<AvatarFallback className='bg-muted'>
 				{isUploading ? <Loader2Icon className='h-8 w-8 animate-spin' /> : <ImageIcon className='h-8 w-8' />}
 			</AvatarFallback>
