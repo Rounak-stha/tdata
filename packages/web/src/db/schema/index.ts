@@ -1,4 +1,16 @@
-import { pgTable, uuid, text, boolean, integer, timestamp, uniqueIndex, index, serial } from 'drizzle-orm/pg-core'
+import {
+	pgTable,
+	uuid,
+	text,
+	boolean,
+	integer,
+	timestamp,
+	uniqueIndex,
+	index,
+	serial,
+	pgEnum,
+	varchar
+} from 'drizzle-orm/pg-core'
 
 const timestamps = {
 	updatedAt: timestamp().$onUpdateFn(() => new Date()),
@@ -18,19 +30,33 @@ const workflowId = integer()
 	.references(() => workflows.id)
 	.notNull()
 
-const workflowStageId = integer()
-	.references(() => workflowStages.id)
+const workflowStatusId = integer()
+	.references(() => workflowStatus.id)
 	.notNull()
+
+const userId = uuid()
+	.references(() => users.id)
+	.notNull()
+
+const assigneeId = uuid().references(() => users.id)
 
 const createdBy = uuid()
 	.references(() => users.id)
 	.notNull()
 
+export const Roles = ['Admin', 'Member'] as const
+export const RoleEnum = pgEnum('role', Roles)
+
+export const Priorities = ['LOW', 'MEDIUM', 'HIGH'] as const
+export const PriorityEnum = pgEnum('priority', Priorities)
+
+const KEY_LENGTH = 10
+
 // Tables
 export const users = pgTable('users', {
 	id: uuid().primaryKey(),
-	name: text(),
-	email: text(),
+	name: text().notNull(),
+	email: text().unique().notNull(),
 	imageUrl: text(),
 	active: boolean(),
 	...timestamps
@@ -39,11 +65,22 @@ export const users = pgTable('users', {
 export const organizations = pgTable('organizations', {
 	id: serial().primaryKey(),
 	name: text().notNull(),
-	key: text().unique().notNull(),
-	createdBy,
+	key: varchar({ length: KEY_LENGTH }).unique().notNull(),
 	imageUrl: text(),
+	createdBy,
 	...timestamps
 })
+
+export const organizationMemberships = pgTable(
+	'organization_memberships',
+	{
+		id: serial().primaryKey(),
+		organizationId,
+		userId,
+		role: RoleEnum().default('Member').notNull() // Role directly in the table as enum
+	},
+	(table) => [uniqueIndex('unique_membership').on(table.organizationId, table.userId)]
+)
 
 export const projects = pgTable(
 	'projects',
@@ -51,7 +88,9 @@ export const projects = pgTable(
 		id: serial().primaryKey(),
 		organizationId,
 		name: text().notNull(),
-		key: text().unique().notNull(),
+		key: varchar({ length: KEY_LENGTH }).unique().notNull(),
+		description: text(),
+		workflowId,
 		createdBy,
 		...timestamps
 	},
@@ -63,38 +102,63 @@ export const projects = pgTable(
 )
 
 // Workflows Table
-export const workflows = pgTable('workflows', {
-	id: serial().primaryKey(),
-	organizationId,
-	name: text().notNull(),
-	isActive: boolean().default(false),
-	createdBy,
-	...timestamps
-})
+export const workflows = pgTable(
+	'workflows',
+	{
+		id: serial().primaryKey(),
+		organizationId,
+		name: text().notNull(),
+		description: text(),
+		configured: boolean().default(false).notNull(),
+		isDefault: boolean().default(false).notNull(),
+		isActive: boolean().default(false).notNull(),
+		createdBy,
+		...timestamps
+	},
+	(table) => [index('workflowOrganizationIdIndex').on(table.organizationId)]
+)
 
-// Workflow Stages Table
-export const workflowStages = pgTable('workflow_stages', {
-	id: serial().primaryKey(),
-	organizationId,
-	workflowId,
-	createdBy,
-	name: text().notNull(),
-	order: integer('order').notNull(),
-	...timestamps
-})
+// Workflow Status Table
+export const workflowStatus = pgTable(
+	'workflow_status',
+	{
+		id: serial().primaryKey(),
+		organizationId,
+		workflowId,
+		createdBy,
+		name: text().notNull(),
+		icon: text().notNull(),
+		...timestamps
+	},
+	(table) => [index('wfStatusOrganizationIdIndex').on(table.organizationId)]
+)
 
 // Tasks Table
 export const tasks = pgTable(
 	'tasks',
 	{
 		id: serial().primaryKey(),
+		assigneeId: assigneeId,
 		organizationId,
 		projectId,
 		createdBy,
 		title: text().notNull(),
 		content: text(),
+		priority: PriorityEnum().default('MEDIUM').notNull(),
 		workflowId,
-		stageId: workflowStageId,
+		/**
+		 * We're storing the Status id directly in the task for flexibility, scalability and data integrity
+		 * If the tenant ants to update the Status name, we don't have to update all the tasks
+		 * It also maintains data integrity, as we can't have a task in a Status that doesn't exist
+		 * It also makes it esay to add Custom Rules (Triggering Notifications, Auto-Escalations, Workflow Transitions) (we might do this in the future) attahed to different Statuses
+		 *
+		 * Thus we have centralized control
+		 * We already maintain a Status table which makes the Workflow extensible
+		 *
+		 * CONs: The only dowside is that it adds a slight overhead of joining the Status table to get the Status name
+		 * We already have an index on the WorkflowStatus table which helps in query perforance so this is a small price to pay for the benefits
+		 */
+		statusId: workflowStatusId,
 		taskNumber: text().notNull(),
 		...timestamps
 	},
@@ -110,8 +174,8 @@ export const transitions = pgTable('transitions', {
 	id: serial().primaryKey(),
 	organizationId,
 	workflowId,
-	fromState: workflowStageId,
-	toStage: workflowStageId,
+	fromStatus: workflowStatusId,
+	toStatus: workflowStatusId,
 	...timestamps
 })
 
