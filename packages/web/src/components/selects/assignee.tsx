@@ -4,25 +4,21 @@ import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Avatar } from '@/components/ui/avatar'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@components/ui/tooltip'
-
-const assignees = [
-	{ id: 'USER-1', name: 'Alice', avatar: '/placeholder.svg?height=32&width=32' },
-	{ id: 'USER-2', name: 'Bob', avatar: '/placeholder.svg?height=32&width=32' },
-	{ id: 'USER-3', name: 'Charlie', avatar: '/placeholder.svg?height=32&width=32' }
-]
+import { useOrganizationMembers } from '@/hooks'
+import { User } from '@/types'
 
 interface AssigneeSelectProps {
-	assigneeId?: string
+	assignee?: User
 	onSelect?: (value: string) => void
 	type?: 'icon' | 'default'
 }
 
-export function AssigneeSelect({ assigneeId, onSelect, type = 'default' }: AssigneeSelectProps) {
+export function AssigneeSelect({ assignee, onSelect, type = 'default' }: AssigneeSelectProps) {
 	const [open, setOpen] = useState(false)
-	const initialAssignee = useMemo(() => assignees.find((a) => a.id === assigneeId), [assigneeId])
-	const [selectedAssignee, setSelectedAssignee] = useState(initialAssignee)
+	const assignees = useOrganizationMembers()
+	const [selectedAssignee, setSelectedAssignee] = useState(assignee)
 
 	const handleSelect = (id: string) => {
 		const assignee = assignees.find((a) => a.id === id)
@@ -45,7 +41,10 @@ export function AssigneeSelect({ assigneeId, onSelect, type = 'default' }: Assig
 							>
 								{selectedAssignee ? (
 									<>
-										<Avatar src={selectedAssignee.avatar} alt={`${selectedAssignee.name} avatar`} />
+										<Avatar
+											src={selectedAssignee.imageUrl}
+											alt={`${selectedAssignee.name} avatar`}
+										/>
 										{type == 'default' && <span className='ml-0.5'>{selectedAssignee.name}</span>}
 									</>
 								) : (
@@ -70,7 +69,7 @@ export function AssigneeSelect({ assigneeId, onSelect, type = 'default' }: Assig
 											onSelect={() => handleSelect(assignee.id)}
 											value={assignee.name}
 										>
-											<Avatar src={assignee.avatar} alt={`${assignee.name} avatar`} />
+											<Avatar src={assignee.imageUrl} alt={`${assignee.name} avatar`} />
 											{assignee.name}
 											<CheckIcon
 												className={cn(
