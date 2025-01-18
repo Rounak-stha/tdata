@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { schema } from '../../lib/schema'
@@ -7,19 +7,29 @@ import { getPlugins } from '../../lib/plugins'
 import { SlashMenu } from './SlashMenu'
 import { slashMenuPluginKey } from '../../lib/plugins/slash-menu'
 import { getMenuPosition } from '../../lib/plugins/slash-menu/utils'
-
+import { ContentRefValue } from '@tdata/global'
 type EditroProps = {
 	content?: string
 	className?: string
 }
 // min-h-[300px]
-export function Editor({ content, className }: EditroProps) {
+export const Editor = forwardRef<ContentRefValue, EditroProps>(function Editor({ content, className }, ref) {
 	const editorRef = useRef<HTMLDivElement>(null)
 	const viewRef = useRef<EditorView | null>(null)
 	const [slashMenu, setSlashMenu] = useState<{
 		open: boolean
 		position: { top: number; left: number }
 	} | null>(null)
+
+	useImperativeHandle(ref, () => ({
+		getContent: () => {
+			const json = viewRef?.current?.state.toJSON()
+			if (json) {
+				return JSON.stringify(json)
+			}
+			return ''
+		}
+	}))
 
 	useEffect(() => {
 		if (!editorRef.current) return
@@ -72,4 +82,4 @@ export function Editor({ content, className }: EditroProps) {
 			)}
 		</div>
 	)
-}
+})
