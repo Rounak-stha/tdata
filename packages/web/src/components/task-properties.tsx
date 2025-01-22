@@ -4,9 +4,10 @@ import { PrioritySelect } from './selects/priority'
 import { DatePicker } from './date-picker'
 import { AssigneeSelect } from './selects/assignee'
 import type { Task } from '@/types/kanban'
+import { TaskDetail } from '@/types/task'
 
 interface TaskPropertiesProps {
-	task: Task
+	task: TaskDetail
 	onUpdate: (updates: Partial<Task>) => void
 }
 
@@ -17,16 +18,16 @@ export function TaskProperties({ task, onUpdate }: TaskPropertiesProps) {
 			<div className='space-y-4'>
 				<div className='space-y-2'>
 					<Label className='text-xs text-muted-foreground'>Status</Label>
-					<StatusSelect value={task.status} onChange={(status) => onUpdate({ status })} />
+					<StatusSelect status={task.status} />
 				</div>
 				<div className='space-y-2'>
 					<Label className='text-xs text-muted-foreground'>Priority</Label>
-					<PrioritySelect value={task.priority} onChange={(priority) => onUpdate({ priority })} />
+					<PrioritySelect priority={task.priority} onChange={(priority) => onUpdate({ priority })} />
 				</div>
 				<div className='space-y-2'>
 					<Label className='text-xs text-muted-foreground'>Assignee</Label>
 					<AssigneeSelect
-						value={task.assignee?.id}
+						assignee={task.assignee}
 						onSelect={(assigneeId) => {
 							const newAssignee = assigneeId
 								? { id: assigneeId, name: assigneeId, email: 'test@email.com' }
@@ -37,10 +38,7 @@ export function TaskProperties({ task, onUpdate }: TaskPropertiesProps) {
 				</div>
 				<div className='space-y-2'>
 					<Label className='text-xs text-muted-foreground'>Due Date</Label>
-					<DatePicker
-						date={task.dueDate ? new Date(task.dueDate) : undefined}
-						onSelect={(date) => onUpdate({ dueDate: date?.toISOString() })}
-					/>
+					<DatePicker date={new Date()} onSelect={(date) => onUpdate({ dueDate: date?.toISOString() })} />
 				</div>
 			</div>
 		</div>

@@ -3,16 +3,17 @@
 import { FC, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-import { User } from '@/types/user'
-import { OnboardingData } from '@/type/auth'
 import { onboardUser } from '@/lib/actions/auth'
 import { Paths } from '@/lib/constants'
+
+import { InfantUser } from '@/types/user'
+import { OnboardingData } from '@/types/auth'
 
 import { PersonalInfoStep } from './personal-info-step'
 import { OrganizationStep } from './organization-step'
 import { ProgressIndicator } from './progress-indicator'
 
-type OnboardingFlowProps = { user: User }
+type OnboardingFlowProps = { user: InfantUser }
 
 export const OnboardingFlow: FC<OnboardingFlowProps> = ({ user }) => {
 	const [step, setStep] = useState(1)

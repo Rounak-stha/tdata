@@ -3,7 +3,7 @@
 import { FC } from 'react'
 import { ViewToggle } from '@components/view-toggle'
 import { Filters } from '@components/filter'
-import type { Priority, Status, ViewType } from '@type/kanban'
+import type { Priority, ViewType } from '@type/kanban'
 import { BreadCrump } from './breadcrump'
 
 type HeaderProps = {
@@ -11,8 +11,8 @@ type HeaderProps = {
 	onViewChange: (view: ViewType) => void
 	selectedPriorities: Priority[]
 	setSelectedPriorities: (priorities: Priority[]) => void
-	selectedStatuses: Status[]
-	setSelectedStatuses: (statuses: Status[]) => void
+	selectedStatuses: string[]
+	setSelectedStatuses: (statuses: string[]) => void
 }
 
 export const Header: FC<HeaderProps> = ({

@@ -12,7 +12,6 @@ export const UserSelects: Record<keyof Omit<User, 'role'>, PgColumn> = {
 
 export const TaskSelects: Record<keyof Task, PgColumn> = {
 	id: tasks.id,
-	assigneeId: tasks.assigneeId,
 	content: tasks.content,
 	createdBy: tasks.createdBy,
 	organizationId: tasks.organizationId,
@@ -21,7 +20,7 @@ export const TaskSelects: Record<keyof Task, PgColumn> = {
 	statusId: tasks.statusId,
 	taskNumber: tasks.taskNumber,
 	title: tasks.title,
-	workflowId: tasks.workflowId,
+	properties: tasks.properties,
 	createdAt: users.createdAt
 }
 

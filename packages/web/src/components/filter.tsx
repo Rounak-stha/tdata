@@ -1,19 +1,21 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SlidersHorizontal } from 'lucide-react'
-import { Priority, Status } from '@/types/kanban'
+import { Priority } from '@/types/kanban'
+import { useOrganizationStatus } from '@/hooks'
 
 interface FiltersProps {
 	selectedPriorities: Priority[]
-	selectedStatuses: Status[]
+	selectedStatuses: string[]
 	onPriorityChange: (priorities: Priority[]) => void
-	onStatusChange: (statuses: Status[]) => void
+	onStatusChange: (statuses: string[]) => void
 }
 
 export function Filters({ selectedPriorities, selectedStatuses, onPriorityChange, onStatusChange }: FiltersProps) {
 	const [open, setOpen] = useState(false)
+	const orgStatuses = useOrganizationStatus()
 
 	const priorities: { label: string; value: Priority }[] = [
 		{ label: 'High', value: 'HIGH' },
@@ -21,12 +23,10 @@ export function Filters({ selectedPriorities, selectedStatuses, onPriorityChange
 		{ label: 'Low', value: 'LOW' }
 	]
 
-	const statuses: { label: string; value: Status }[] = [
-		{ label: 'Backlog', value: 'Backlog' },
-		{ label: 'Todo', value: 'ToDo' },
-		{ label: 'In Progress', value: 'InProgress' },
-		{ label: 'Done', value: 'Done' }
-	]
+	const statuses: { label: string; value: string }[] = useMemo(
+		() => orgStatuses.map((s) => ({ label: s.name, value: s.name })),
+		[orgStatuses]
+	)
 
 	const togglePriority = (priority: Priority) => {
 		if (selectedPriorities.includes(priority)) {
@@ -36,7 +36,7 @@ export function Filters({ selectedPriorities, selectedStatuses, onPriorityChange
 		}
 	}
 
-	const toggleStatus = (status: Status) => {
+	const toggleStatus = (status: string) => {
 		if (selectedStatuses.includes(status)) {
 			onStatusChange(selectedStatuses.filter((s) => s !== status))
 		} else {

@@ -6,6 +6,7 @@ export type InsertTaskData = typeof tasks.$inferInsert
 export type Task = Omit<typeof tasks.$inferSelect, 'updatedAt' | 'deletedAt'>
 
 export type TaskDetail = Task & {
-	assignee: User
+	assignee: User[] // Assignee can be multiple; But I am keeping a singular name here
 	status: WorkflowStatus
+	allStatus: WorkflowStatus[]
 }

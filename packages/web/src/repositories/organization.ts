@@ -36,9 +36,6 @@ export class OrganizationRepository {
 					'id', ${workflows.id},
 					'name', ${workflows.name},
 					'description', ${workflows.description},
-					'is_active', ${workflows.isActive},
-					'is_default', ${workflows.isDefault},
-					'configured', ${workflows.configured},
 					'created_by', ${workflows.createdBy},
 					'created_at', ${workflows.createdAt},
 					'updated_at', ${workflows.updatedAt},
@@ -67,7 +64,6 @@ export class OrganizationRepository {
 					'name', ${projects.name},
 					'description', ${projects.description},
 					'key', ${projects.key},
-					'workflow_id', ${projects.workflowId},
 					'created_by', ${projects.createdBy},
 					'created_at', ${projects.createdAt},
 					'updated_at', ${projects.updatedAt}
@@ -77,13 +73,7 @@ export class OrganizationRepository {
 			})
 			.from(organizations)
 			.innerJoin(organizationMemberships, eq(organizations.id, organizationMemberships.organizationId))
-			.leftJoin(
-				workflows,
-				and(
-					eq(workflows.organizationId, organizations.id),
-					eq(workflows.isActive, true) // Only the active workflow
-				)
-			)
+			.leftJoin(workflows, and(eq(workflows.organizationId, organizations.id)))
 			.leftJoin(projects, eq(projects.organizationId, organizations.id))
 			.where(and(eq(organizationMemberships.userId, userId), eq(organizations.key, key)))
 			.groupBy(organizations.id, workflows.id, organizationMemberships.role)

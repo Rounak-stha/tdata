@@ -1,3 +1,7 @@
+### References
+
+-   [EAV vs JSONB](https://coussej.github.io/2016/01/14/Replacing-EAV-with-JSONB-in-PostgreSQL/)
+
 ```SQL
 
 -- SQL used to create the `create_project_sequence` function

@@ -1,3 +1,4 @@
+import { TaskProperty } from '@/types/template'
 import {
 	pgTable,
 	uuid,
@@ -9,7 +10,8 @@ import {
 	index,
 	serial,
 	pgEnum,
-	varchar
+	varchar,
+	jsonb
 } from 'drizzle-orm/pg-core'
 
 const timestamps = {
@@ -37,8 +39,6 @@ const workflowStatusId = integer()
 const userId = uuid()
 	.references(() => users.id)
 	.notNull()
-
-const assigneeId = uuid().references(() => users.id)
 
 const createdBy = uuid()
 	.references(() => users.id)
@@ -90,7 +90,6 @@ export const projects = pgTable(
 		name: text().notNull(),
 		key: varchar({ length: KEY_LENGTH }).unique().notNull(),
 		description: text(),
-		workflowId,
 		createdBy,
 		...timestamps
 	},
@@ -109,14 +108,25 @@ export const workflows = pgTable(
 		organizationId,
 		name: text().notNull(),
 		description: text(),
-		configured: boolean().default(false).notNull(),
-		isDefault: boolean().default(false).notNull(),
-		isActive: boolean().default(false).notNull(),
 		createdBy,
 		...timestamps
 	},
 	(table) => [index('workflowOrganizationIdIndex').on(table.organizationId)]
 )
+
+/**
+ * Predefined Templates created for organizations to choose from
+ */
+export const projectTemplates = pgTable('project_templates', {
+	id: projectId.primaryKey(),
+	name: text().notNull(),
+	description: text(),
+	organizationId,
+	workflowId,
+	multiAssignee: boolean().default(false).notNull(),
+	taskProperties: jsonb().$type<TaskProperty[]>(),
+	...timestamps
+})
 
 // Workflow Status Table
 export const workflowStatus = pgTable(
@@ -138,17 +148,15 @@ export const tasks = pgTable(
 	'tasks',
 	{
 		id: serial().primaryKey(),
-		assigneeId: assigneeId,
 		organizationId,
 		projectId,
 		createdBy,
 		title: text().notNull(),
 		content: text(),
 		priority: PriorityEnum().default('MEDIUM').notNull(),
-		workflowId,
 		/**
 		 * We're storing the Status id directly in the task for flexibility, scalability and data integrity
-		 * If the tenant ants to update the Status name, we don't have to update all the tasks
+		 * If the tenant wants to update the Status name, we don't have to update all the tasks
 		 * It also maintains data integrity, as we can't have a task in a Status that doesn't exist
 		 * It also makes it esay to add Custom Rules (Triggering Notifications, Auto-Escalations, Workflow Transitions) (we might do this in the future) attahed to different Statuses
 		 *
@@ -157,9 +165,14 @@ export const tasks = pgTable(
 		 *
 		 * CONs: The only dowside is that it adds a slight overhead of joining the Status table to get the Status name
 		 * We already have an index on the WorkflowStatus table which helps in query perforance so this is a small price to pay for the benefits
+		 *
+		 * Initially, we added the workflowId directly in the task itself just so we can do a quick lookup of the workflow
+		 * But that would just add storage overhead and we can always get the workflowId from the project
+		 * Each lookup stores the id of the table which is a 4 byte integer
 		 */
 		statusId: workflowStatusId,
 		taskNumber: text().notNull(),
+		properties: jsonb(),
 		...timestamps
 	},
 	(table) => [
