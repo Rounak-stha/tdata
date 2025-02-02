@@ -9,8 +9,11 @@ import {
 	index,
 	serial,
 	pgEnum,
-	varchar
+	varchar,
+	jsonb
 } from 'drizzle-orm/pg-core'
+
+import { TaskActivityMetadata, TaskProperty, TemplateProperty } from '@/types'
 
 const timestamps = {
 	updatedAt: timestamp().$onUpdateFn(() => new Date()),
@@ -18,37 +21,41 @@ const timestamps = {
 	deletedAt: timestamp()
 }
 
-const organizationId = integer()
-	.references(() => organizations.id, { onDelete: 'cascade' })
-	.notNull()
-
-const projectId = integer()
-	.references(() => projects.id, { onDelete: 'cascade' })
-	.notNull()
-
-const workflowId = integer()
-	.references(() => workflows.id)
-	.notNull()
-
-const workflowStatusId = integer()
-	.references(() => workflowStatus.id)
-	.notNull()
-
-const userId = uuid()
-	.references(() => users.id)
-	.notNull()
-
-const assigneeId = uuid().references(() => users.id)
-
-const createdBy = uuid()
-	.references(() => users.id)
-	.notNull()
+/**
+ *********************************************************NOTE*******************************************************************************
+ * NAME: CASCADE DELETE ON ORGANIZATION REFERENCE
+ * 		We have enabled cascade delete on the organization reference as we want to delete all the entities that are associated with the organization
+ * 		For example, if an organization is deleted, we want to delete all the projects, tasks, workflows, etc. that are associated with the organization
+ *
+ * DANGER:
+ * NAME: NO COMMON REFERENCE FOR FIELDS
+ * 		It might be tempting to create a common reference field for all the tables like organizationId, projectId but it's not a good idea
+ * 		But this does not work correctly. I don't know the exact reason why it does not work. May be its how drizzle is implemented.
+ *      t's working fine or timestamps but not for references. I had problem with the Task table where the projectId was not correctly created.
+ *
+ * EXTRA INFO
+ *
+ * NAME: USER SOFT DELETE
+ * 		We have soft delete on users table which is done is db trigger. We need to think thoroighly on how to handle user references in the future.
+ * 		The user is referenced by many tables and we need to handle the case when it references a deleted user
+ */
 
 export const Roles = ['Admin', 'Member'] as const
 export const RoleEnum = pgEnum('role', Roles)
 
 export const Priorities = ['LOW', 'MEDIUM', 'HIGH'] as const
 export const PriorityEnum = pgEnum('priority', Priorities)
+
+export const ActivityActions = [
+	'FIELD_UPDATE',
+	'COMMENT_ADD',
+	'COMMENT_DELETE',
+	'ATTACHMENT_UPLOAD',
+	'ATTACHMENT_DELETE',
+	'TASK_CREATE',
+	'TASK_DELETE'
+] as const
+export const ActivityActionEnum = pgEnum('activity_action', ActivityActions)
 
 const KEY_LENGTH = 10
 
@@ -67,7 +74,9 @@ export const organizations = pgTable('organizations', {
 	name: text().notNull(),
 	key: varchar({ length: KEY_LENGTH }).unique().notNull(),
 	imageUrl: text(),
-	createdBy,
+	createdBy: uuid()
+		.references(() => users.id)
+		.notNull(),
 	...timestamps
 })
 
@@ -75,8 +84,12 @@ export const organizationMemberships = pgTable(
 	'organization_memberships',
 	{
 		id: serial().primaryKey(),
-		organizationId,
-		userId,
+		organizationId: integer()
+			.references(() => organizations.id, { onDelete: 'cascade' })
+			.notNull(),
+		userId: uuid()
+			.references(() => users.id)
+			.notNull(),
 		role: RoleEnum().default('Member').notNull() // Role directly in the table as enum
 	},
 	(table) => [uniqueIndex('unique_membership').on(table.organizationId, table.userId)]
@@ -86,12 +99,15 @@ export const projects = pgTable(
 	'projects',
 	{
 		id: serial().primaryKey(),
-		organizationId,
+		organizationId: integer()
+			.references(() => organizations.id)
+			.notNull(),
 		name: text().notNull(),
 		key: varchar({ length: KEY_LENGTH }).unique().notNull(),
 		description: text(),
-		workflowId,
-		createdBy,
+		createdBy: uuid()
+			.references(() => users.id)
+			.notNull(),
 		...timestamps
 	},
 
@@ -106,28 +122,55 @@ export const workflows = pgTable(
 	'workflows',
 	{
 		id: serial().primaryKey(),
-		organizationId,
+		organizationId: integer()
+			.references(() => organizations.id)
+			.notNull(),
 		name: text().notNull(),
 		description: text(),
-		configured: boolean().default(false).notNull(),
-		isDefault: boolean().default(false).notNull(),
-		isActive: boolean().default(false).notNull(),
-		createdBy,
+		createdBy: uuid()
+			.references(() => users.id)
+			.notNull(),
 		...timestamps
 	},
 	(table) => [index('workflowOrganizationIdIndex').on(table.organizationId)]
 )
+
+/**
+ * Predefined Templates created for organizations to choose from
+ */
+export const projectTemplates = pgTable('project_templates', {
+	id: integer()
+		.references(() => projects.id, { onDelete: 'cascade' })
+		.primaryKey(),
+	name: text().notNull(),
+	description: text(),
+	organizationId: integer()
+		.references(() => organizations.id)
+		.notNull(),
+	workflowId: integer()
+		.references(() => workflows.id)
+		.notNull(),
+	singleAssignee: boolean().default(true).notNull(),
+	taskProperties: jsonb().$type<TemplateProperty[]>(),
+	...timestamps
+})
 
 // Workflow Status Table
 export const workflowStatus = pgTable(
 	'workflow_status',
 	{
 		id: serial().primaryKey(),
-		organizationId,
-		workflowId,
-		createdBy,
-		name: text().notNull(),
+		organizationId: integer()
+			.references(() => organizations.id)
+			.notNull(),
+		createdBy: uuid()
+			.references(() => users.id)
+			.notNull(),
 		icon: text().notNull(),
+		name: text().notNull(),
+		workflowId: integer()
+			.references(() => workflows.id)
+			.notNull(),
 		...timestamps
 	},
 	(table) => [index('wfStatusOrganizationIdIndex').on(table.organizationId)]
@@ -138,17 +181,21 @@ export const tasks = pgTable(
 	'tasks',
 	{
 		id: serial().primaryKey(),
-		assigneeId: assigneeId,
-		organizationId,
-		projectId,
-		createdBy,
+		organizationId: integer()
+			.references(() => organizations.id)
+			.notNull(),
+		projectId: integer()
+			.references(() => projects.id)
+			.notNull(),
+		createdBy: uuid()
+			.references(() => users.id)
+			.notNull(),
 		title: text().notNull(),
 		content: text(),
 		priority: PriorityEnum().default('MEDIUM').notNull(),
-		workflowId,
 		/**
 		 * We're storing the Status id directly in the task for flexibility, scalability and data integrity
-		 * If the tenant ants to update the Status name, we don't have to update all the tasks
+		 * If the tenant wants to update the Status name, we don't have to update all the tasks
 		 * It also maintains data integrity, as we can't have a task in a Status that doesn't exist
 		 * It also makes it esay to add Custom Rules (Triggering Notifications, Auto-Escalations, Workflow Transitions) (we might do this in the future) attahed to different Statuses
 		 *
@@ -157,9 +204,16 @@ export const tasks = pgTable(
 		 *
 		 * CONs: The only dowside is that it adds a slight overhead of joining the Status table to get the Status name
 		 * We already have an index on the WorkflowStatus table which helps in query perforance so this is a small price to pay for the benefits
+		 *
+		 * Initially, we added the workflowId directly in the task itself just so we can do a quick lookup of the workflow
+		 * But that would just add storage overhead and we can always get the workflowId from the project
+		 * Each lookup stores the id of the table which is a 4 byte integer
 		 */
-		statusId: workflowStatusId,
+		statusId: integer()
+			.references(() => workflowStatus.id)
+			.notNull(),
 		taskNumber: text().notNull(),
+		properties: jsonb().$type<TaskProperty>(),
 		...timestamps
 	},
 	(table) => [
@@ -169,13 +223,56 @@ export const tasks = pgTable(
 	]
 )
 
+export const taskActivities = pgTable('task_activities', {
+	id: serial().primaryKey(),
+	organizationId: integer()
+		.references(() => organizations.id)
+		.notNull(),
+	action: ActivityActionEnum().notNull(),
+	taskId: integer()
+		.references(() => tasks.id)
+		.notNull(),
+	metadata: jsonb().$type<TaskActivityMetadata>(),
+	userId: uuid()
+		.references(() => users.id)
+		.notNull(),
+	...timestamps
+})
+
+/**
+ * This is a junction table to relate Task and Users
+ * Each tasks can have multiple assignees and user can add additional relation between these 2 entities and nanem them as they requrie
+ */
+export const tasksUsers = pgTable('tasks_users', {
+	id: serial().primaryKey(),
+	organizationId: integer()
+		.references(() => organizations.id)
+		.notNull(),
+	taskId: integer()
+		.references(() => tasks.id, { onDelete: 'cascade' })
+		.notNull(),
+	userId: uuid()
+		.references(() => users.id, { onDelete: 'cascade' })
+		.notNull(),
+	name: text().notNull(),
+	...timestamps
+})
+
 // Transitions Table
 export const transitions = pgTable('transitions', {
 	id: serial().primaryKey(),
-	organizationId,
-	workflowId,
-	fromStatus: workflowStatusId,
-	toStatus: workflowStatusId,
+	organizationId: integer()
+		.references(() => organizations.id)
+		.notNull(),
+	workflowId: integer()
+		.references(() => workflows.id)
+		.notNull(),
+	fromStatus: integer()
+		.references(() => workflowStatus.id)
+		.notNull(),
+	toStatus: integer()
+		.references(() => workflowStatus.id)
+		.notNull(),
 	...timestamps
 })
 

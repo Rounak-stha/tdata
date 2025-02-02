@@ -7,16 +7,40 @@ import { ChevronDownIcon, ChevronRightIcon, MoreHorizontal, Plus } from 'lucide-
 
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { GroupedTasks, Status, Task } from '@/types/kanban'
+import { GroupedTasks, Status } from '@/types/kanban'
 import { StatusSelect } from '@/components/selects/status'
 import { PrioritySelect } from '@/components/selects/priority'
 import { AssigneeSelect } from '@components/selects/assignee'
 import { DatePicker } from '@/components/date-picker'
+import { TaskDetail } from '@/types/task'
 
 interface ListViewProps {
 	groupedTask: GroupedTasks
-	onUpdate: (task: Task) => void
+	onUpdate: (task: TaskDetail) => void
 }
+
+const statuses = [
+	{
+		id: 1,
+		name: 'ToDo',
+		icon: 'ToDo',
+		createdAt: new Date(),
+		updatedAt: new Date(),
+		createdBy: 'USER-1',
+		organizationId: 1,
+		workflowId: 1
+	},
+	{
+		id: 2,
+		name: 'InProgress',
+		icon: 'InProgress',
+		createdAt: new Date(),
+		updatedAt: new Date(),
+		createdBy: 'USER-1',
+		organizationId: 1,
+		workflowId: 1
+	}
+]
 
 const reducer = (
 	state: GroupedTasks,
@@ -67,7 +91,7 @@ export function ListView({ groupedTask: InitialGroupedTask, onUpdate }: ListView
 								) : (
 									<ChevronRightIcon className='h-4 w-4 text-muted-foreground' />
 								)}
-								<span className='font-medium'>{group.title}</span>
+								<span className='font-medium'>{group.status.name}</span>
 								<span className='text-muted-foreground text-xs'>{group.tasks.length}</span>
 							</button>
 							{group.isExpanded && (
@@ -92,25 +116,20 @@ export function ListView({ groupedTask: InitialGroupedTask, onUpdate }: ListView
 											</div>
 											<div className='flex items-center gap-2'>
 												<StatusSelect
-													type='icon'
+													size='icon'
 													status={task.status}
-													onChange={(status) => onUpdate({ ...task, status })}
+													allStatus={statuses}
+													onChange={(status) =>
+														onUpdate({ ...task, statusId: status.id, status })
+													}
 												/>
 												<PrioritySelect
-													type='icon'
+													size='icon'
 													priority={task.priority}
 													onChange={(priority) => onUpdate({ ...task, priority })}
 												/>
-												<AssigneeSelect type='icon' assigneeId={task.assignee?.id} />
-												{task.dueDate && (
-													<DatePicker
-														date={new Date(task.dueDate)}
-														onSelect={(date) =>
-															onUpdate({ ...task, dueDate: date?.toISOString() })
-														}
-														className='h-8'
-													/>
-												)}
+												<AssigneeSelect size='icon' assignee={task.assignee} />
+												<DatePicker onSelect={() => {}} className='h-8' />
 												<DropdownMenu>
 													<DropdownMenuTrigger asChild>
 														<Button variant='ghost' className='h-8 w-8 p-0'>
@@ -120,11 +139,6 @@ export function ListView({ groupedTask: InitialGroupedTask, onUpdate }: ListView
 													<DropdownMenuContent align='end'>
 														<DropdownMenuItem>
 															<Link href={`/task/${task.id}`}>View Details</Link>
-														</DropdownMenuItem>
-														<DropdownMenuItem
-															onClick={() => onUpdate({ ...task, status: 'Done' })}
-														>
-															Mark as Done
 														</DropdownMenuItem>
 													</DropdownMenuContent>
 												</DropdownMenu>

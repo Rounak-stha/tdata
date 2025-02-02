@@ -3,8 +3,9 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { IconColorMap, IconMap } from '@/lib/constants/icon'
 import { IconType } from '@/types/icon'
-import { useOrganizationStatus } from '@/hooks'
 import { WorkflowStatus } from '@/types/workflow'
+import { LoaderCircleIcon } from 'lucide-react'
+import { ChangeParams } from '@/types'
 
 /**
  * TODO:
@@ -19,37 +20,57 @@ const statusColors = IconColorMap
 
 interface StatusSelectProps {
 	status?: WorkflowStatus
-	onChange?: (status: WorkflowStatus) => void
-	type?: 'icon' | 'default'
+	allStatus: WorkflowStatus[]
+	onChange?: (change: ChangeParams<WorkflowStatus>) => void
+	size?: 'icon' | 'default' | 'full'
+	isLoading?: boolean
 }
 
-export function StatusSelect({ status: InitialStatus, onChange, type = 'default' }: StatusSelectProps) {
-	const organizationStatuses = useOrganizationStatus()
-	const [status, setStatus] = useState(InitialStatus || organizationStatuses[0])
+export function StatusSelect({
+	status: InitialStatus,
+	allStatus,
+	onChange,
+	size = 'default',
+	isLoading
+}: StatusSelectProps) {
+	const [status, setStatus] = useState(InitialStatus || allStatus[0])
 	const Icon = statusIcons[status.icon as IconType]
 
 	const handleChange = (statusId: string) => {
-		const newStatus = organizationStatuses.find((s) => s.id === Number(statusId))!
+		const newStatus = allStatus.find((s) => s.id === Number(statusId))!
 		setStatus(newStatus)
-		if (onChange) onChange(newStatus)
+		if (onChange) onChange({ newValue: newStatus, previousValue: status })
 	}
 	return (
 		<Select value={String(status.id)} onValueChange={handleChange}>
 			<SelectTrigger
-				className={cn('w-fit h-8 p-0 px-2 flex items-center justify-center', {
-					'[&>svg]:mt-0.5': type == 'default',
-					'[&>svg]:hidden': type == 'icon'
+				disabled={isLoading}
+				className={cn('h-10 p-0 px-2', {
+					'w-fit': size == 'default' || size == 'icon',
+					'w-full': size == 'full',
+					'[&>svg]:hidden': isLoading || size == 'icon',
+					'[&>svg]:mt-0.5': !isLoading || size != 'icon'
 				})}
 			>
 				<SelectValue asChild>
-					<p className={cn('flex items-center space-x-2', { 'mr-2': type == 'default' })}>
-						<Icon className={`h-4 w-4 ${statusColors[status.icon as IconType]}`} />
-						{type == 'default' && <span className='text-sm'>{status.name}</span>}
-					</p>
+					{isLoading ? (
+						<span
+							className={cn({
+								'w-16 !flex justify-center': size != 'icon'
+							})}
+						>
+							<LoaderCircleIcon className='animate-spin h-4 w-4' />
+						</span>
+					) : (
+						<p className={cn('flex items-center space-x-2', { 'mr-2': size != 'icon' })}>
+							<Icon className={`h-4 w-4 ${statusColors[status.icon as IconType]}`} />
+							{size != 'icon' && <span className='text-sm'>{status.name}</span>}
+						</p>
+					)}
 				</SelectValue>
 			</SelectTrigger>
 			<SelectContent>
-				{organizationStatuses.map((status) => {
+				{allStatus.map((status) => {
 					const IcomComp = statusIcons[status.icon as IconType]
 					return (
 						<SelectItem key={status.id} value={String(status.id)}>

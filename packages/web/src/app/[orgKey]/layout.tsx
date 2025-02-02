@@ -6,6 +6,7 @@ import { getOrganizationByUserAndKey, getOrganizationMembers } from '@/lib/serve
 import { OrganizationProvider } from '@/components/context/organization'
 import { getUser } from '@/lib/actions/user'
 import { getSession } from '@/lib/server'
+import { SWRProvider } from '@/components/providers'
 
 export default async function Layout({
 	children,
@@ -21,17 +22,19 @@ export default async function Layout({
 	const members = await getOrganizationMembers(organization.id)
 
 	return (
-		<SidebarProvider className='h-full w-full flex flex-col'>
-			<UserProvider initialUser={{ ...user, role }}>
-				<OrganizationProvider initialOrganization={{ ...organization, members }}>
-					<Header />
-					<div className='flex flex-1'>
-						<AppSidebar />
-						{/* NOTE: the class `min-w-0` should not be removed from here as it ensures that the main content width does not exceed than it should */}
-						<main className='flex-1 min-w-0 px-6 py-4'>{children}</main>
-					</div>
-				</OrganizationProvider>
-			</UserProvider>
-		</SidebarProvider>
+		<SWRProvider>
+			<SidebarProvider className='h-full w-full flex flex-col'>
+				<UserProvider initialUser={{ ...user, role }}>
+					<OrganizationProvider initialOrganization={{ ...organization, members }}>
+						<Header />
+						<div className='flex flex-1'>
+							<AppSidebar />
+							{/* NOTE: the class `min-w-0` should not be removed from here as it ensures that the main content width does not exceed than it should */}
+							<main className='flex-1 min-w-0 px-6 py-4'>{children}</main>
+						</div>
+					</OrganizationProvider>
+				</UserProvider>
+			</SidebarProvider>
+		</SWRProvider>
 	)
 }

@@ -1,3 +1,7 @@
+### References
+
+-   [EAV vs JSONB](https://coussej.github.io/2016/01/14/Replacing-EAV-with-JSONB-in-PostgreSQL/)
+
 ```SQL
 
 -- SQL used to create the `create_project_sequence` function
@@ -124,23 +128,7 @@ EXECUTE FUNCTION soft_delete_user();
 -- Create Default Workflow and initial Admin member for Organization after Create
 CREATE OR REPLACE FUNCTION add_organization_defaults()
 RETURNS TRIGGER AS $$
-DECLARE
-    new_workflow_id integer;
 BEGIN
-    -- Insert the default workflow with configured and description
-    INSERT INTO public.workflows (name, organization_id, created_by, is_active, is_default, configured, description)
-    VALUES ('Kanban', NEW.id, NEW.created_by, true, true, true, 'Kanban Workflow')
-    RETURNING id INTO new_workflow_id;
-
-    -- Insert default workflow stages
-    INSERT INTO public.workflow_status (name, organization_id, workflow_id, icon, created_by)
-    VALUES
-        ('Backlog', NEW.id, new_workflow_id, 'Backlog', NEW.created_by),
-        ('ToDo', NEW.id, new_workflow_id, 'ToDo', NEW.created_by),
-        ('InProgress', NEW.id, new_workflow_id, 'InProgress', NEW.created_by),
-        ('InReview', NEW.id, new_workflow_id, 'InReview', NEW.created_by),
-        ('Completed', NEW.id, new_workflow_id, 'Completed', NEW.created_by);
-
     -- Add the organization creator as a member with 'Admin' role in organization_memberships
     INSERT INTO public.organization_memberships (organization_id, user_id, role)
     VALUES (NEW.id, NEW.created_by, 'Admin');

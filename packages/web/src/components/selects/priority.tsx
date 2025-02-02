@@ -5,6 +5,7 @@ import { ArrowDown, ArrowRight, ArrowUp } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Priority } from '@/types/kanban'
 import { cn } from '@/lib/utils'
+import { ChangeParams } from '@/types'
 
 const priorityIcons = {
 	LOW: ArrowDown,
@@ -26,31 +27,39 @@ const priorityMap: Record<Priority, string> = {
 
 interface PrioritySelectProps {
 	priority?: Priority
-	onChange?: (value: Priority) => void
-	type?: 'icon' | 'default'
+	onChange?: (change: ChangeParams<Priority>) => void
+	size?: 'icon' | 'default' | 'full'
+	isLoading?: boolean
 }
 
-export function PrioritySelect({ priority: initialPriority, onChange, type = 'default' }: PrioritySelectProps) {
+export function PrioritySelect({
+	priority: initialPriority,
+	onChange,
+	size = 'default',
+	isLoading
+}: PrioritySelectProps) {
 	const [priority, setPriority] = useState<Priority>(initialPriority || 'LOW')
 	const Icon = priorityIcons[priority]
 
-	const handleChange = (priority: Priority) => {
-		setPriority(priority)
-		if (onChange) onChange(priority)
+	const handleChange = (newValue: Priority) => {
+		setPriority(newValue)
+		if (onChange) onChange({ newValue, previousValue: priority })
 	}
 
 	return (
 		<Select value={priority} onValueChange={handleChange}>
 			<SelectTrigger
-				className={cn('w-fit h-8 p-0 px-2 flex items-center justify-center', {
-					'[&>svg]:mt-0.5': type == 'default',
-					'[&>svg]:hidden': type == 'icon'
+				className={cn('h-10 p-0 px-2', {
+					'w-fit': size == 'default' || size == 'icon',
+					'w-full': size == 'full',
+					'[&>svg]:hidden': isLoading || size == 'icon',
+					'[&>svg]:mt-0.5': !isLoading || size != 'icon'
 				})}
 			>
 				<SelectValue asChild>
-					<p className={cn('flex items-center space-x-2', { 'mr-2': type == 'default' })}>
+					<p className={cn('flex items-center space-x-2', { 'mr-2': size != 'icon' })}>
 						<Icon className={`h-4 w-4 ${priorityColors[priority]}`} />
-						{type == 'default' && <span className='text-sm'>{priorityMap[priority]}</span>}
+						{size != 'icon' && <span className='text-sm'>{priorityMap[priority]}</span>}
 					</p>
 				</SelectValue>
 			</SelectTrigger>

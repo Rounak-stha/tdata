@@ -1,6 +1,8 @@
 import { users } from '@/db/schema'
 import { Role } from './organization'
 
+export type UserId = string
+
 export type InsertUserData = typeof users.$inferInsert
 export type User = Omit<typeof users.$inferSelect, 'active' | 'deletedAt' | 'updatedAt'> & { role: Role }
 

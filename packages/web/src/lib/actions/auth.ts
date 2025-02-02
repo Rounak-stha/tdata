@@ -41,7 +41,10 @@ export const signInWithEmail = async (email: string) => {
 	try {
 		const supabase = await createSupabaseClient()
 
-		const { error } = await supabase.auth.signInWithOtp({ email, options: { data: { name: email.split('@')[0] } } })
+		const { error } = await supabase.auth.signInWithOtp({
+			email,
+			options: { data: { name: email.split('@')[0], email } }
+		})
 
 		if (error) {
 			console.log(error)
@@ -99,15 +102,26 @@ export const onboardUser = async (data: OnboardingData) => {
 	const supabase = await createSupabaseClient()
 	const { data: userData } = await supabase.auth.getUser()
 	if (!userData || !userData.user) return { success: false }
-	const { data: updatedUserData } = await supabase.auth.updateUser({
-		data: { ...userData.user.user_metadata, name: data.name, avatar_url: data.avatar, onboarded: true }
-	})
-	if (!updatedUserData || !updatedUserData.user) return { success: false }
-	await OrganizationRepository.create({
+
+	const organization = await OrganizationRepository.create({
 		name: data.organizationName,
 		key: data.organizationKey,
-		createdBy: updatedUserData.user?.id
+		createdBy: userData.user?.id
 	})
+
+	const { data: updatedUserData } = await supabase.auth.updateUser({
+		data: {
+			...userData.user.user_metadata,
+			name: data.name,
+			avatar_url: data.avatar,
+			onboarded: true,
+			organizationId: organization.id,
+			organizationKey: organization.key
+		}
+	})
+
+	if (!updatedUserData || !updatedUserData.user) return { success: false }
+
 	await supabase.auth.refreshSession()
 	return { success: true }
 }

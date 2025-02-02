@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -25,7 +25,7 @@ export function OrganizationStep({ onNext, onBack }: OrganizationStepProps) {
 	const [error, setError] = useState<string | null>(null)
 	const [loading, setLoading] = useState(false)
 
-	const debouncedWorkspaceUrl = useDebounce(organizationKey, 500)
+	const { debouncedValue: debouncedWorkspaceUrl } = useDebounce(organizationKey, 500)
 
 	useEffect(() => {
 		const checkUrl = async () => {
@@ -54,6 +54,16 @@ export function OrganizationStep({ onNext, onBack }: OrganizationStepProps) {
 		onNext({ organizationName, teamSize, organizationKey }, setLoading)
 	}
 
+	const generateKeyName = useCallback(() => {
+		if (!organizationKey) {
+			const generatedKey = organizationName
+				.split(' ') // Split the name into words
+				.map((word) => word.charAt(0).toUpperCase()) // Get the first letter of each word and convert to uppercase
+				.join('') // Join the letters together to form the initials
+			setOrganizationKey(generatedKey)
+		}
+	}, [organizationKey, organizationName])
+
 	return (
 		<div className='space-y-6'>
 			<div className='space-y-2'>
@@ -73,6 +83,7 @@ export function OrganizationStep({ onNext, onBack }: OrganizationStepProps) {
 						id='organizationName'
 						value={organizationName}
 						onChange={(e) => setOrganizationName(e.target.value)}
+						onBlur={generateKeyName}
 						placeholder='Something familiar and recognizable is always best'
 						required
 					/>
@@ -86,7 +97,7 @@ export function OrganizationStep({ onNext, onBack }: OrganizationStepProps) {
 							<Input
 								id='organizationKey'
 								value={organizationKey}
-								onChange={(e) => setOrganizationKey(e.target.value)}
+								onChange={(e) => setOrganizationKey(e.target.value.toUpperCase())}
 								placeholder='Organization Key'
 								required
 							/>

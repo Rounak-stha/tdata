@@ -14,3 +14,15 @@ export type IconType =
 	| 'Revisit'
 	| 'Start'
 	| 'ToDo'
+	// Task Types
+	| 'Bug'
+	| 'Story'
+	| 'Task'
+	| 'Epic'
+	| 'Improvement'
+
+	// Pirority
+	| 'Low'
+	| 'Medium'
+	| 'High'
+	| 'Urgent'

@@ -1,3 +1,5 @@
+'use client'
+
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
@@ -23,7 +25,7 @@ export const Editor = forwardRef<ContentRefValue, EditroProps>(function Editor({
 
 	useImperativeHandle(ref, () => ({
 		getContent: () => {
-			const json = viewRef?.current?.state.toJSON()
+			const json = viewRef?.current?.state.doc.toJSON()
 			if (json) {
 				return JSON.stringify(json)
 			}

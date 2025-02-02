@@ -26,7 +26,6 @@ export class UserRepository {
 
 		const { user, role } = result[0]
 
-		console.log('In Get User\n', { ...user, role })
 		return { ...user, role }
 	}
 }

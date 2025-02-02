@@ -8,5 +8,5 @@ export const Paths = {
 	signin: `${PathPrefix.auth}/signin`,
 	onboarding: '/onboarding',
 	error: '/error',
-	task: (org: string, taskNumber: string) => `/${org}/task/${taskNumber}`
+	task: (org: string, taskNumber: string) => `/${org}/${taskNumber}`
 } as const

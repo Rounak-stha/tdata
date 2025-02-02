@@ -1,7 +1,10 @@
 'use client'
 
-import { createContext, FC, useState } from 'react'
-import { User } from '@/types/user'
+import { createContext, FC, ReactNode, useState } from 'react'
+import type { User as UserType } from '@/types/user'
+import { Role } from '@/types/organization'
+
+type User = UserType & { role: Role }
 
 type UserContext = {
 	user: User
@@ -16,14 +19,14 @@ type UserContext = {
  * I am not 100% sure if this approach is correct or safe but I find it quite tedious to always perform a null check everywhere I use the hook
  */
 export const UserContext = createContext<UserContext>({
-	user: { id: '', name: '', email: '', avatar: '' },
+	user: { id: '', name: '', email: '', imageUrl: '', role: 'Member', createdAt: new Date() },
 	setUser: (user: User) => {
 		console.log(`${user}\nFunction not initialized`)
 	}
 })
 
 type CurrentUserProviderProps = {
-	children: React.ReactNode
+	children: ReactNode
 	initialUser: User
 }
 

@@ -1,89 +1,181 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ScrollArea, ScrollBar } from '@components/ui/scroll-area'
 import { BoardColumn } from '@components/board-column'
-import type { GroupedTasks, Priority, Status, Task, ViewType } from '@type/kanban'
 import { Header } from '@components/header'
 import { ListView } from './list-view'
 
-const INITIAL_TASKS: Task[] = [
+import type { GroupedTasks, Priority, ViewType } from '@type/kanban'
+import type { TaskDetail } from '@type/task'
+
+const INITIAL_TASKS: TaskDetail[] = [
 	{
-		id: 'TASK-1',
+		id: 1,
 		title: 'Design system implementation',
-		status: 'Backlog',
+		statusId: 1,
+		status: {
+			id: 1,
+			name: 'ToDo',
+			icon: 'ToDo',
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			createdBy: 'USER-1',
+			organizationId: 1,
+			workflowId: 1
+		},
 		priority: 'HIGH',
-		projectId: 'PROJ-1',
-		dueDate: '2024-01-20',
-		assignee: {
-			id: 'USER-1',
-			name: 'Alice',
-			avatar: '/placeholder.svg?height=32&width=32',
-			email: 'tets@email.com'
-		}
+		projectId: 8,
+		assignee: [
+			{
+				id: 'USER-1',
+				name: 'Alice',
+				imageUrl: '',
+				email: 'tets@email.com',
+				createdAt: new Date(),
+				role: 'Member'
+			}
+		],
+
+		allStatus: [
+			{
+				id: 1,
+				name: 'ToDo',
+				icon: 'ToDo',
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				createdBy: 'USER-1',
+				organizationId: 1,
+				workflowId: 1
+			},
+			{
+				id: 2,
+				name: 'InProgress',
+				icon: 'InProgress',
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				createdBy: 'USER-1',
+				organizationId: 1,
+				workflowId: 1
+			}
+		],
+		properties: null,
+		content: 'Design system implementation',
+		createdAt: new Date(),
+		createdBy: 'USER-1',
+		organizationId: 1,
+		taskNumber: 'TASK-1'
 	},
 	{
-		id: 'TASK-2',
-		title: 'API integration',
-		status: 'ToDo',
-		priority: 'MEDIUM',
-		projectId: 'PROJ-1',
-		dueDate: '2024-01-25',
-		assignee: {
-			id: 'USER-2',
-			name: 'Bob',
-			avatar: '/placeholder.svg?height=32&width=32',
-			email: 'tets@email.com'
-		}
-	},
-	{
-		id: 'TASK-3',
-		title: 'User authentication flow',
-		status: 'InProgress',
+		id: 2,
+		title: 'Super App Super Duper App',
+		statusId: 1,
+		status: {
+			id: 1,
+			name: 'InProgress',
+			icon: 'InProgress',
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			createdBy: 'USER-1',
+			organizationId: 1,
+			workflowId: 1
+		},
 		priority: 'HIGH',
-		projectId: 'PROJ-1',
-		dueDate: '2024-01-30'
+		projectId: 8,
+		assignee: [
+			{
+				id: 'USER-1',
+				name: 'Alice',
+				imageUrl: '',
+				email: 'tets@email.com',
+				createdAt: new Date(),
+				role: 'Member'
+			}
+		],
+		properties: null,
+		allStatus: [
+			{
+				id: 1,
+				name: 'ToDo',
+				icon: 'ToDo',
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				createdBy: 'USER-1',
+				organizationId: 1,
+				workflowId: 1
+			},
+			{
+				id: 2,
+				name: 'InProgress',
+				icon: 'InProgress',
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				createdBy: 'USER-1',
+				organizationId: 1,
+				workflowId: 1
+			}
+		],
+		content: 'Design system implementation',
+		createdAt: new Date(),
+		createdBy: 'USER-1',
+		organizationId: 1,
+		taskNumber: 'TASK-1'
+	}
+]
+
+const statuses = [
+	{
+		id: 1,
+		name: 'ToDo',
+		icon: 'ToDo',
+		createdAt: new Date(),
+		updatedAt: new Date(),
+		createdBy: 'USER-1',
+		organizationId: 1,
+		workflowId: 1
 	},
 	{
-		id: 'TASK-4',
-		title: 'Dashboard analytics',
-		status: 'Done',
-		priority: 'LOW',
-		projectId: 'PROJ-1',
-		assignee: {
-			id: 'USER-3',
-			name: 'Charlie',
-			avatar: '/placeholder.svg?height=32&width=32',
-			email: 'tets@email.com'
-		}
+		id: 2,
+		name: 'InProgress',
+		icon: 'InProgress',
+		createdAt: new Date(),
+		updatedAt: new Date(),
+		createdBy: 'USER-1',
+		organizationId: 1,
+		workflowId: 1
 	}
 ]
 
 export function KanbanBoard() {
-	const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
+	const [tasks, setTasks] = useState<TaskDetail[]>(INITIAL_TASKS)
 	const [view, setView] = useState<ViewType>('board')
 	const [selectedPriorities, setSelectedPriorities] = useState<Priority[]>([])
-	const [selectedStatuses, setSelectedStatuses] = useState<Status[]>([])
+	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([])
 
-	const filteredTasks = tasks.filter((task) => {
-		const priorityMatch = selectedPriorities.length === 0 || selectedPriorities.includes(task.priority)
-		const statusMatch = selectedStatuses.length === 0 || selectedStatuses.includes(task.status)
-		return priorityMatch && statusMatch
-	})
+	const filteredTasks = useMemo(
+		() =>
+			tasks.filter((task) => {
+				const priorityMatch = selectedPriorities.length === 0 || selectedPriorities.includes(task.priority)
+				const statusMatch = selectedStatuses.length === 0 || selectedStatuses.includes(task.status.name)
+				return priorityMatch && statusMatch
+			}),
+		[selectedPriorities, selectedStatuses, tasks]
+	)
 
-	const groupedTask: GroupedTasks = {
-		Backlog: { title: 'Backlog', tasks: filteredTasks.filter((t) => t.status === 'Backlog'), isExpanded: true },
-		ToDo: { title: 'To Do', tasks: filteredTasks.filter((t) => t.status === 'ToDo'), isExpanded: true },
-		InProgress: {
-			title: 'In Progress',
-			tasks: filteredTasks.filter((t) => t.status === 'InProgress'),
-			isExpanded: true
-		},
-		Done: { title: 'Done', tasks: filteredTasks.filter((t) => t.status === 'Done'), isExpanded: true },
-		Cancelled: { title: 'Canceled', tasks: filteredTasks.filter((t) => t.status === 'Cancelled'), isExpanded: true }
-	}
+	const groupedTask: GroupedTasks = useMemo(
+		() =>
+			statuses.reduce((a, c) => {
+				a[c.name] = {
+					status: c,
+					tasks: filteredTasks.filter((t) => t.status.name === c.name),
+					isExpanded: true
+				}
+				return a
+			}, {} as GroupedTasks),
+		[statuses, filteredTasks]
+	)
 
-	const handleTaskUpdate = (updatedTask: Task) => {
+	const handleTaskUpdate = (updatedTask: TaskDetail) => {
 		setTasks(tasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)))
 	}
 
@@ -100,10 +192,10 @@ export function KanbanBoard() {
 			{view === 'board' ? (
 				<ScrollArea className='pb-6'>
 					<div className='flex gap-4'>
-						{Object.entries(groupedTask).map(([status, { tasks }]) => (
+						{Object.entries(groupedTask).map(([statusName, { tasks, status }]) => (
 							<BoardColumn
-								key={status}
-								columnName={status}
+								key={statusName}
+								status={status}
 								tasks={tasks}
 								onTaskUpdate={handleTaskUpdate}
 							/>

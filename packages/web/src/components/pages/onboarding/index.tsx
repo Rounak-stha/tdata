@@ -3,16 +3,18 @@
 import { FC, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-import { User } from '@/types/user'
-import { OnboardingData } from '@/type/auth'
 import { onboardUser } from '@/lib/actions/auth'
 import { Paths } from '@/lib/constants'
+
+import { InfantUser } from '@/types/user'
+import { OnboardingData } from '@/types/auth'
 
 import { PersonalInfoStep } from './personal-info-step'
 import { OrganizationStep } from './organization-step'
 import { ProgressIndicator } from './progress-indicator'
+import { toast } from 'sonner'
 
-type OnboardingFlowProps = { user: User }
+type OnboardingFlowProps = { user: InfantUser }
 
 export const OnboardingFlow: FC<OnboardingFlowProps> = ({ user }) => {
 	const [step, setStep] = useState(1)
@@ -33,13 +35,20 @@ export const OnboardingFlow: FC<OnboardingFlowProps> = ({ user }) => {
 		},
 		setLoading: (val: boolean) => void
 	) => {
-		setLoading(true)
-		const updatedData = { ...data, ...orgInfo }
-		setData(updatedData)
-		const { success } = await onboardUser(updatedData as OnboardingData)
-		if (success) {
-			router.push(Paths.root)
-		} else setLoading(false)
+		try {
+			setLoading(true)
+			const updatedData = { ...data, ...orgInfo }
+			setData(updatedData)
+			const { success } = await onboardUser(updatedData as OnboardingData)
+			if (success) {
+				router.push(Paths.root)
+			}
+		} catch (e) {
+			console.log(e)
+			toast.error('Failed to onboard user')
+		} finally {
+			setLoading(false)
+		}
 	}
 
 	const handleBack = () => {

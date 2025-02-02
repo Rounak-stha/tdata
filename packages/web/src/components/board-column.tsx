@@ -1,23 +1,24 @@
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TaskCard } from './task-card'
-import type { Status, Task } from '../types/kanban'
 import { useState } from 'react'
 import { NewTaskPopup } from './new-task-popup'
+import { TaskDetail } from '@/types/task'
+import { WorkflowStatus } from '@/types/workflow'
 
 interface BoardColumnProps {
-	tasks: Task[]
-	columnName: string
-	onTaskUpdate: (updatedTask: Task) => void
+	status: WorkflowStatus
+	tasks: TaskDetail[]
+	onTaskUpdate: (updatedTask: TaskDetail) => void
 }
 
-export function BoardColumn({ tasks, columnName, onTaskUpdate }: BoardColumnProps) {
+export function BoardColumn({ status, tasks, onTaskUpdate }: BoardColumnProps) {
 	const [newTaskDialogOpen, setNewTaskDialogOpen] = useState(false)
 	return (
 		<div className='w-80 shrink-0'>
 			<div className='mb-3 flex items-center justify-between'>
 				<div className='flex items-center gap-2'>
-					<h2 className='text-sm font-medium'>{columnName}</h2>
+					<h2 className='text-sm font-medium'>{status.name}</h2>
 					<span className='rounded-full bg-muted px-2 py-0.5 text-xs'>{tasks.length}</span>
 				</div>
 				<Button
@@ -35,7 +36,9 @@ export function BoardColumn({ tasks, columnName, onTaskUpdate }: BoardColumnProp
 					<TaskCard key={task.id} task={task} onUpdate={onTaskUpdate} />
 				))}
 			</div>
-			<NewTaskPopup status={columnName as Status} open={newTaskDialogOpen} onOpenChange={setNewTaskDialogOpen} />
+			{newTaskDialogOpen && (
+				<NewTaskPopup status={status} open={newTaskDialogOpen} onOpenChange={setNewTaskDialogOpen} />
+			)}
 		</div>
 	)
 }

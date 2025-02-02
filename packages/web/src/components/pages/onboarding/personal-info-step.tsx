@@ -7,17 +7,17 @@ import { Textarea } from '@/components/ui/textarea'
 import { AvatarUpload } from '@/components/ui/avatar'
 import { toast } from 'sonner'
 import { uploadAvatar } from '@/lib/actions/storage'
-import { User } from '@/types/user'
+import { InfantUser } from '@/types/user'
 
 interface PersonalInfoStepProps {
-	user: User
+	user: InfantUser
 	onNext: (data: { name: string; email: string; avatar?: string; jobTitle: string; bio: string }) => void
 }
 
 export function PersonalInfoStep({ user, onNext }: PersonalInfoStepProps) {
 	const [name, setName] = useState(user.name)
 	const [email, setEmail] = useState(user.email)
-	const [avatar, setAvatar] = useState<string | null>(user.avatar)
+	const [avatar, setAvatar] = useState<string | null>(user.imageUrl)
 	const [jobTitle, setJobTitle] = useState('')
 	const [bio, setBio] = useState('')
 	const [error, setError] = useState<string | null>(null)
@@ -82,8 +82,7 @@ export function PersonalInfoStep({ user, onNext }: PersonalInfoStepProps) {
 						<div className='space-y-2'>
 							<Button
 								type='button'
-								variant='outline'
-								className='border-0 bg-muted'
+								variant='default'
 								onClick={() => document.getElementById('avatar-upload')?.click()}
 								disabled={isUploading}
 							>

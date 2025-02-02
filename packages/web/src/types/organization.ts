@@ -1,13 +1,13 @@
 import { organizations, Roles } from '@/db/schema'
 import { WorkflowDetail } from './workflow'
-import { Project } from './project'
+import { ProjectDetail } from './project'
 import { User } from './user'
 
 export type InsertOrganizationData = typeof organizations.$inferInsert
 export type Organization = Omit<typeof organizations.$inferSelect, 'deletedAt' | 'updatedAt'>
 
 export type OrganizationDetail = Organization & {
-	projects: Project[]
+	projects: ProjectDetail[]
 	members: User[]
 	workflow: WorkflowDetail
 }

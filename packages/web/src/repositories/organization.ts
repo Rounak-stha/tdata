@@ -1,7 +1,15 @@
-import { organizationMemberships, organizations, projects, users, workflows, workflowStatus } from '@/db/schema'
+import {
+	organizationMemberships,
+	organizations,
+	projects,
+	projectTemplates,
+	users,
+	workflows,
+	workflowStatus
+} from '@/db/schema'
 import { User } from '@/types'
 import { InsertOrganizationData, Organization, OrganizationDetail, Role } from '@/types/organization'
-import { Project } from '@/types/project'
+import { ProjectDetail } from '@/types/project'
 import { WorkflowDetail } from '@/types/workflow'
 import { db } from '@db'
 import { and, eq, sql } from 'drizzle-orm'
@@ -11,6 +19,13 @@ export class OrganizationRepository {
 	static async existsByKey(key: string): Promise<boolean> {
 		const org = await db.select().from(organizations).where(eq(organizations.key, key)).limit(1).execute()
 		return org.length > 0
+	}
+
+	static async getByKey(key: string): Promise<Organization | null> {
+		const organization = await db.select().from(organizations).where(eq(organizations.key, key)).limit(1).execute()
+
+		if (!organization.length) return null
+		else return organization[0]
 	}
 
 	static async create(data: InsertOrganizationData): Promise<Organization> {
@@ -36,9 +51,6 @@ export class OrganizationRepository {
 					'id', ${workflows.id},
 					'name', ${workflows.name},
 					'description', ${workflows.description},
-					'is_active', ${workflows.isActive},
-					'is_default', ${workflows.isDefault},
-					'configured', ${workflows.configured},
 					'created_by', ${workflows.createdBy},
 					'created_at', ${workflows.createdAt},
 					'updated_at', ${workflows.updatedAt},
@@ -59,7 +71,7 @@ export class OrganizationRepository {
 						WHERE ${workflowStatus.workflowId} = ${workflows.id}
 						AND ${workflowStatus.organizationId} = ${organizations.id}
 					))`.as('workflow'),
-				projects: sql<Project[]>`
+				projects: sql<ProjectDetail[]>`
 				array_agg(
 					jsonb_build_object(
 					'id', ${projects.id},
@@ -67,7 +79,22 @@ export class OrganizationRepository {
 					'name', ${projects.name},
 					'description', ${projects.description},
 					'key', ${projects.key},
-					'workflow_id', ${projects.workflowId},
+					'template', (
+						SELECT jsonb_agg(
+							jsonb_build_object(
+								'id', ${projectTemplates.id},
+								'name', ${projectTemplates.name},
+								'description', ${projectTemplates.description},
+								'workflowId', ${projectTemplates.workflowId},
+								'singleAssignee', ${projectTemplates.singleAssignee},
+								'taskProperties', ${projectTemplates.taskProperties},
+								'created_at', ${projectTemplates.createdAt},
+								'updated_at', ${projectTemplates.updatedAt}
+							)
+						)
+						FROM ${projectTemplates}
+						WHERE ${projectTemplates.id} = ${projects.id}
+					),
 					'created_by', ${projects.createdBy},
 					'created_at', ${projects.createdAt},
 					'updated_at', ${projects.updatedAt}
@@ -77,13 +104,7 @@ export class OrganizationRepository {
 			})
 			.from(organizations)
 			.innerJoin(organizationMemberships, eq(organizations.id, organizationMemberships.organizationId))
-			.leftJoin(
-				workflows,
-				and(
-					eq(workflows.organizationId, organizations.id),
-					eq(workflows.isActive, true) // Only the active workflow
-				)
-			)
+			.leftJoin(workflows, and(eq(workflows.organizationId, organizations.id)))
 			.leftJoin(projects, eq(projects.organizationId, organizations.id))
 			.where(and(eq(organizationMemberships.userId, userId), eq(organizations.key, key)))
 			.groupBy(organizations.id, workflows.id, organizationMemberships.role)
