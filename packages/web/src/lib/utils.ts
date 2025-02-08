@@ -1,6 +1,8 @@
-import { TaskActivityUserSubtype, User } from '@/types'
 import { clsx, type ClassValue } from 'clsx'
+import { jwtDecode, type JwtPayload } from 'jwt-decode'
 import { twMerge } from 'tailwind-merge'
+
+import { TaskActivityUserSubtype, User } from '@/types'
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs))
@@ -16,4 +18,13 @@ export function calcUserDiff(prevUsers: User[], newUser: User[]) {
 	})
 
 	return { action, diff }
+}
+
+export function decodeJWT(accessToken: string) {
+	try {
+		return jwtDecode<JwtPayload & { role: string }>(accessToken)
+	} catch (error) {
+		console.log(error)
+		return { role: 'anon' } as JwtPayload & { role: string }
+	}
 }

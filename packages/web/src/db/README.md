@@ -1,6 +1,6 @@
 ### References
 
--   [EAV vs JSONB](https://coussej.github.io/2016/01/14/Replacing-EAV-with-JSONB-in-PostgreSQL/)
+- [EAV vs JSONB](https://coussej.github.io/2016/01/14/Replacing-EAV-with-JSONB-in-PostgreSQL/)
 
 ```SQL
 
@@ -141,4 +141,54 @@ CREATE TRIGGER after_organization_create
 AFTER INSERT ON public.organizations
 FOR EACH ROW
 EXECUTE FUNCTION add_organization_defaults();
+
+
+-- Grant Access on Public Schema to Authenticated User Role
+-- https://stackoverflow.com/questions/67551593/supabase-client-permission-denied-for-schema-public
+
+grant usage on schema "public" to authenticated;
+GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA "public" TO authenticated;
+
+-- I had to Grant access to the id sequence for comments table separately
+-- May be because it was created after I granted access to all tables but I ran it again and it did not work
+-- Had to specifica;;y grant access to it
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE public.task_comments_id_seq TO authenticated;
+
+-- ROW LEVEL SECURITY (RLS)
+
+ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Org Members can Operate on Org Tasks" ON public.tasks;
+
+CREATE POLICY "Org Members can Operate on Org Tasks"
+ON public.tasks
+FOR All
+TO authenticated
+USING (
+    EXISTS (
+        SELECT 1
+        FROM public.organization_memberships
+        WHERE
+            (organization_memberships.user_id = auth.uid()) AND
+            (organization_memberships.organization_id = tasks.organization_id)
+    )
+);
+
+ALTER TABLE public.task_activities ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Org Members can Operate on Org Task Activities" ON public.task_activities;
+
+CREATE POLICY "Org Members can Operate on Org Task Activities"
+ON public.task_activities
+FOR All
+TO authenticated
+USING (
+    EXISTS (
+        SELECT 1
+        FROM public.organization_memberships
+        WHERE
+            (organization_memberships.user_id = auth.uid()) AND
+            (organization_memberships.organization_id = task_activities.organization_id)
+    )
+);
 ```
