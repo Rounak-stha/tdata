@@ -5,7 +5,6 @@ import { ProjectRepository } from '@/repositories'
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
 	try {
-		console.log('=================In Get Project Template Route===========================')
 		const projectId = parseInt((await params).projectId)
 
 		if (isNaN(projectId)) {
