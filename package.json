@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "yarn workspace @tdata/web dev",
 		"dev:editor": "yarn workspace @tdata/editor dev",
-		"build": "next build",
+		"build": "yarn workspace @tdata/web build",
 		"start": "next start",
 		"lint": "next lint",
 		"drizzle:generate": "yarn workspace @tdata/web drizzle:generate",
