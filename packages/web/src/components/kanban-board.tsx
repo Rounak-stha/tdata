@@ -1,5 +1,5 @@
-'use client'
-
+"use client";
+/* 
 import { useMemo, useState } from 'react'
 import { ScrollArea, ScrollBar } from '@components/ui/scroll-area'
 import { BoardColumn } from '@components/board-column'
@@ -7,147 +7,11 @@ import { Header } from '@components/header'
 import { ListView } from './list-view'
 
 import type { GroupedTasks, Priority, ViewType } from '@type/kanban'
-import type { TaskDetail } from '@type/task'
-
-const INITIAL_TASKS: TaskDetail[] = [
-	{
-		id: 1,
-		title: 'Design system implementation',
-		statusId: 1,
-		status: {
-			id: 1,
-			name: 'ToDo',
-			icon: 'ToDo',
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			createdBy: 'USER-1',
-			organizationId: 1,
-			workflowId: 1
-		},
-		priority: 'HIGH',
-		projectId: 8,
-		assignee: [
-			{
-				id: 'USER-1',
-				name: 'Alice',
-				imageUrl: '',
-				email: 'tets@email.com',
-				createdAt: new Date(),
-				role: 'Member'
-			}
-		],
-
-		allStatus: [
-			{
-				id: 1,
-				name: 'ToDo',
-				icon: 'ToDo',
-				createdAt: new Date(),
-				updatedAt: new Date(),
-				createdBy: 'USER-1',
-				organizationId: 1,
-				workflowId: 1
-			},
-			{
-				id: 2,
-				name: 'InProgress',
-				icon: 'InProgress',
-				createdAt: new Date(),
-				updatedAt: new Date(),
-				createdBy: 'USER-1',
-				organizationId: 1,
-				workflowId: 1
-			}
-		],
-		properties: null,
-		content: 'Design system implementation',
-		createdAt: new Date(),
-		createdBy: 'USER-1',
-		organizationId: 1,
-		taskNumber: 'TASK-1'
-	},
-	{
-		id: 2,
-		title: 'Super App Super Duper App',
-		statusId: 1,
-		status: {
-			id: 1,
-			name: 'InProgress',
-			icon: 'InProgress',
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			createdBy: 'USER-1',
-			organizationId: 1,
-			workflowId: 1
-		},
-		priority: 'HIGH',
-		projectId: 8,
-		assignee: [
-			{
-				id: 'USER-1',
-				name: 'Alice',
-				imageUrl: '',
-				email: 'tets@email.com',
-				createdAt: new Date(),
-				role: 'Member'
-			}
-		],
-		properties: null,
-		allStatus: [
-			{
-				id: 1,
-				name: 'ToDo',
-				icon: 'ToDo',
-				createdAt: new Date(),
-				updatedAt: new Date(),
-				createdBy: 'USER-1',
-				organizationId: 1,
-				workflowId: 1
-			},
-			{
-				id: 2,
-				name: 'InProgress',
-				icon: 'InProgress',
-				createdAt: new Date(),
-				updatedAt: new Date(),
-				createdBy: 'USER-1',
-				organizationId: 1,
-				workflowId: 1
-			}
-		],
-		content: 'Design system implementation',
-		createdAt: new Date(),
-		createdBy: 'USER-1',
-		organizationId: 1,
-		taskNumber: 'TASK-1'
-	}
-]
-
-const statuses = [
-	{
-		id: 1,
-		name: 'ToDo',
-		icon: 'ToDo',
-		createdAt: new Date(),
-		updatedAt: new Date(),
-		createdBy: 'USER-1',
-		organizationId: 1,
-		workflowId: 1
-	},
-	{
-		id: 2,
-		name: 'InProgress',
-		icon: 'InProgress',
-		createdAt: new Date(),
-		updatedAt: new Date(),
-		createdBy: 'USER-1',
-		organizationId: 1,
-		workflowId: 1
-	}
-]
+import type { TaskDetail } from '@type/task' */
 
 export function KanbanBoard() {
-	const [tasks, setTasks] = useState<TaskDetail[]>(INITIAL_TASKS)
+  return <div>Coming soon</div>;
+  /* const [tasks, setTasks] = useState<TaskDetail[]>([])
 	const [view, setView] = useState<ViewType>('board')
 	const [selectedPriorities, setSelectedPriorities] = useState<Priority[]>([])
 	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([])
@@ -211,5 +75,5 @@ export function KanbanBoard() {
 				</div>
 			)}
 		</div>
-	)
+	) */
 }
