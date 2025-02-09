@@ -10,4 +10,7 @@ export const Paths = {
   error: "/error",
   org: (org: string) => `/${org}`,
   task: (org: string, taskNumber: string) => `/${org}/${taskNumber}`,
+  projects: (org: string) => `/${org}/projects`,
+  newProject: (org: string) => `/${org}/project/create`,
+  myTasks: (org: string) => `/${org}/my-tasks`,
 } as const;

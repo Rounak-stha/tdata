@@ -1,6 +1,7 @@
 import { tasks, taskActivities, taskComments } from "@/db/schema";
 import { User, UserId } from "./user";
 import { ProjectTemplateDetail } from "./project";
+import { WorkflowStatus } from "./workflow";
 
 export type TaskUserRelations = Record<string, User[]>;
 export type TaskUserRelationMinimal = Record<string, UserId[]>;
@@ -8,8 +9,17 @@ export type TaskPropertyValue = string | string[];
 export type TaskProperty = Record<string, TaskPropertyValue>;
 
 export type Task = Omit<typeof tasks.$inferSelect, "updatedAt" | "deletedAt">;
+export type TaskDetailMinimal = Task & { status: WorkflowStatus };
 export type TaskActivity = Omit<typeof taskActivities.$inferSelect, "updatedAt" | "deletedAt">;
 export type Comment = Omit<typeof taskComments.$inferSelect, "deletedAt">;
+
+export type TaskGrouped<T> = {
+  id: unknown;
+  name: string;
+  tasks: T[];
+};
+
+export type TaskMinimalGroupedByStatus = TaskGrouped<TaskDetailMinimal>;
 
 export type TaskDetail = Task & {
   projectTemplate: ProjectTemplateDetail;

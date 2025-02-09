@@ -1,80 +1,54 @@
-'use client'
-import {
-	SidebarContent as _SidebarContent,
-	SidebarGroup,
-	SidebarGroupContent,
-	SidebarMenu,
-	SidebarMenuAction,
-	SidebarMenuButton,
-	SidebarMenuItem
-} from '@components/ui/sidebar'
-import { BoxesIcon, CalendarIcon, HomeIcon, InboxIcon, PlusIcon, SearchIcon, SettingsIcon } from 'lucide-react'
-import { useState } from 'react'
-import { NewProjectPopup } from '../new-project-popup'
+"use client";
+import { SidebarContent as _SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem } from "@components/ui/sidebar";
+import { BoxesIcon, HomeIcon, PlusIcon } from "lucide-react";
+import { useOrganizations } from "@/hooks";
+import { Paths } from "@/lib/constants";
+import { useRouter } from "next/navigation";
 
 // Menu items.
 const items = [
-	{
-		title: 'Home',
-		url: '#',
-		icon: HomeIcon
-	},
-	{
-		title: 'Inbox',
-		url: '#',
-		icon: InboxIcon
-	},
-	{
-		title: 'Projects',
-		url: '/projects',
-		icon: BoxesIcon
-	},
-	{
-		title: 'Calendar',
-		url: '#',
-		icon: CalendarIcon
-	},
-	{
-		title: 'Search',
-		url: '#',
-		icon: SearchIcon
-	},
-	{
-		title: 'Settings',
-		url: '#',
-		icon: SettingsIcon
-	}
-]
+  {
+    title: "My Tasks",
+    url: (orgKey: string) => Paths.myTasks(orgKey),
+    icon: HomeIcon,
+  },
+  {
+    title: "Projects",
+    url: (orgKey: string) => Paths.projects(orgKey),
+    icon: BoxesIcon,
+  },
+];
 
 export const SidebarContent = () => {
-	const [newProjectPopupOpen, setNewProjectPopupOpen] = useState(false)
-	return (
-		<>
-			<_SidebarContent>
-				<SidebarGroup>
-					{/* <SidebarGroupLabel>Application</SidebarGroupLabel> */}
-					<SidebarGroupContent>
-						<SidebarMenu>
-							{items.map((item) => (
-								<SidebarMenuItem key={item.title}>
-									<SidebarMenuButton asChild>
-										<a href={item.url}>
-											<item.icon />
-											<span>{item.title}</span>
-										</a>
-									</SidebarMenuButton>
-									{item.title === 'Projects' && (
-										<SidebarMenuAction onClick={() => setNewProjectPopupOpen(true)}>
-											<PlusIcon /> <span className='sr-only'>Add Project</span>
-										</SidebarMenuAction>
-									)}
-								</SidebarMenuItem>
-							))}
-						</SidebarMenu>
-					</SidebarGroupContent>
-				</SidebarGroup>
-			</_SidebarContent>
-			<NewProjectPopup open={newProjectPopupOpen} onOpenChange={setNewProjectPopupOpen} />
-		</>
-	)
-}
+  const { organization } = useOrganizations();
+  const router = useRouter();
+
+  return (
+    <>
+      <_SidebarContent>
+        <SidebarGroup>
+          {/* <SidebarGroupLabel>Application</SidebarGroupLabel> */}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <a href={item.url(organization.key)}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                  {item.title === "Projects" && (
+                    <SidebarMenuAction onClick={() => router.push(Paths.newProject(organization.key))}>
+                      <PlusIcon /> <span className="sr-only">Add Project</span>
+                    </SidebarMenuAction>
+                  )}
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </_SidebarContent>
+    </>
+  );
+};

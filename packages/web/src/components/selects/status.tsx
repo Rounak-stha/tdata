@@ -1,11 +1,11 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useState } from 'react'
-import { cn } from '@/lib/utils'
-import { IconColorMap, IconMap } from '@/lib/constants/icon'
-import { IconType } from '@/types/icon'
-import { WorkflowStatus } from '@/types/workflow'
-import { LoaderCircleIcon } from 'lucide-react'
-import { ChangeParams } from '@/types'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { IconColorMap, IconMap } from "@/lib/constants/icon";
+import { IconType } from "@/types/icon";
+import { WorkflowStatus } from "@/types/workflow";
+import { LoaderCircleIcon } from "lucide-react";
+import { ChangeParams } from "@/types";
 
 /**
  * TODO:
@@ -14,74 +14,69 @@ import { ChangeParams } from '@/types'
  * Also, we want to provide a default set of icons for the user to choose from
  * Currently, we don;t have the ability to add custom icons
  */
-const statusIcons = IconMap
+const statusIcons = IconMap;
 
-const statusColors = IconColorMap
+const statusColors = IconColorMap;
 
 interface StatusSelectProps {
-	status?: WorkflowStatus
-	allStatus: WorkflowStatus[]
-	onChange?: (change: ChangeParams<WorkflowStatus>) => void
-	size?: 'icon' | 'default' | 'full'
-	isLoading?: boolean
+  status?: WorkflowStatus;
+  allStatus: WorkflowStatus[];
+  onChange?: (change: ChangeParams<WorkflowStatus>) => void;
+  size?: "icon" | "default" | "full";
+  isLoading?: boolean;
+  displayOnly?: boolean;
 }
 
-export function StatusSelect({
-	status: InitialStatus,
-	allStatus,
-	onChange,
-	size = 'default',
-	isLoading
-}: StatusSelectProps) {
-	const [status, setStatus] = useState(InitialStatus || allStatus[0])
-	const Icon = statusIcons[status.icon as IconType]
+export function StatusSelect({ status: InitialStatus, allStatus, onChange, size = "default", isLoading, displayOnly }: StatusSelectProps) {
+  const [status, setStatus] = useState(InitialStatus || allStatus[0]);
+  const Icon = statusIcons[status.icon as IconType];
 
-	const handleChange = (statusId: string) => {
-		const newStatus = allStatus.find((s) => s.id === Number(statusId))!
-		setStatus(newStatus)
-		if (onChange) onChange({ newValue: newStatus, previousValue: status })
-	}
-	return (
-		<Select value={String(status.id)} onValueChange={handleChange}>
-			<SelectTrigger
-				disabled={isLoading}
-				className={cn('h-10 p-0 px-2', {
-					'w-fit': size == 'default' || size == 'icon',
-					'w-full': size == 'full',
-					'[&>svg]:hidden': isLoading || size == 'icon',
-					'[&>svg]:mt-0.5': !isLoading || size != 'icon'
-				})}
-			>
-				<SelectValue asChild>
-					{isLoading ? (
-						<span
-							className={cn({
-								'w-16 !flex justify-center': size != 'icon'
-							})}
-						>
-							<LoaderCircleIcon className='animate-spin h-4 w-4' />
-						</span>
-					) : (
-						<p className={cn('flex items-center space-x-2', { 'mr-2': size != 'icon' })}>
-							<Icon className={`h-4 w-4 ${statusColors[status.icon as IconType]}`} />
-							{size != 'icon' && <span className='text-sm'>{status.name}</span>}
-						</p>
-					)}
-				</SelectValue>
-			</SelectTrigger>
-			<SelectContent>
-				{allStatus.map((status) => {
-					const IcomComp = statusIcons[status.icon as IconType]
-					return (
-						<SelectItem key={status.id} value={String(status.id)}>
-							<div className='flex items-center'>
-								<IcomComp className={`mr-2 h-4 w-4 ${statusColors[status.icon as IconType]}`} />
-								{status.name.charAt(0) + status.name.slice(1).toLowerCase().replace('_', ' ')}
-							</div>
-						</SelectItem>
-					)
-				})}
-			</SelectContent>
-		</Select>
-	)
+  const handleChange = (statusId: string) => {
+    const newStatus = allStatus.find((s) => s.id === Number(statusId))!;
+    setStatus(newStatus);
+    if (onChange) onChange({ newValue: newStatus, previousValue: status });
+  };
+  return (
+    <Select value={String(status.id)} onValueChange={handleChange}>
+      <SelectTrigger
+        disabled={isLoading || displayOnly}
+        className={cn("h-10 p-0 px-2", {
+          "w-fit": size == "default" || size == "icon",
+          "w-full": size == "full",
+          "[&>svg]:hidden": isLoading || size == "icon",
+          "[&>svg]:mt-0.5": !isLoading || size != "icon",
+        })}
+      >
+        <SelectValue asChild>
+          {isLoading ? (
+            <span
+              className={cn({
+                "w-16 !flex justify-center": size != "icon",
+              })}
+            >
+              <LoaderCircleIcon className="animate-spin h-4 w-4" />
+            </span>
+          ) : (
+            <p className={cn("flex items-center space-x-2", { "mr-2": size != "icon" })}>
+              <Icon className={`h-4 w-4 ${statusColors[status.icon as IconType]}`} />
+              {size != "icon" && <span className="text-sm">{status.name}</span>}
+            </p>
+          )}
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent>
+        {allStatus.map((status) => {
+          const IcomComp = statusIcons[status.icon as IconType];
+          return (
+            <SelectItem key={status.id} value={String(status.id)}>
+              <div className="flex items-center">
+                <IcomComp className={`mr-2 h-4 w-4 ${statusColors[status.icon as IconType]}`} />
+                {status.name.charAt(0) + status.name.slice(1).toLowerCase().replace("_", " ")}
+              </div>
+            </SelectItem>
+          );
+        })}
+      </SelectContent>
+    </Select>
+  );
 }

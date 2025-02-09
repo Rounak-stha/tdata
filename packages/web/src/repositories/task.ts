@@ -1,12 +1,24 @@
 import { createDrizzleSupabaseClient, db } from "@db";
 
-import { taskActivities, taskComments, tasks, tasksUsers, users } from "@/db/schema";
-import { InsertCommentData, InsertTaskActivityData, InsertTaskData, Task, TaskActivitySectionData, TaskDetail, TaskStandardFieldUpdateKeys, TaskUpdateData } from "@/types/task";
+import { taskActivities, taskComments, tasks, tasksUsers, users, workflowStatus } from "@/db/schema";
+import {
+  InsertCommentData,
+  InsertTaskActivityData,
+  InsertTaskData,
+  Task,
+  TaskActivitySectionData,
+  TaskDetail,
+  TaskDetailMinimal,
+  TaskMinimalGroupedByStatus,
+  TaskStandardFieldUpdateKeys,
+  TaskUpdateData,
+} from "@/types/task";
 import { and, eq, sql } from "drizzle-orm";
-import { TaskSelects } from "./selects";
+import { TaskSelects, WorkflowStatusSelects } from "./selects";
 import ProjectRepository from "./project";
 import { PagintionMeta, User } from "@/types";
 import { unionAll } from "drizzle-orm/pg-core";
+import { AssigneeFieldName } from "@/lib/constants";
 
 export class TaskRepository {
   static async create(data: InsertTaskData): Promise<Task> {
@@ -258,5 +270,36 @@ export class TaskRepository {
       return insertedComment[0];
     });
     return comment;
+  }
+
+  static async getAssignedTasks(userId: string, organizationId: number): Promise<TaskMinimalGroupedByStatus[]> {
+    const db = await createDrizzleSupabaseClient();
+    const result: TaskDetailMinimal[] = await db.rls(async (tx) => {
+      const data = await tx
+        .select({
+          ...TaskSelects,
+          status: WorkflowStatusSelects,
+        })
+        .from(tasks)
+        .innerJoin(tasksUsers, and(eq(tasksUsers.taskId, tasks.id), eq(tasksUsers.name, AssigneeFieldName), eq(tasksUsers.userId, userId)))
+        .leftJoin(workflowStatus, eq(workflowStatus.id, tasks.statusId))
+        .where(and(eq(tasks.organizationId, organizationId)));
+      return data;
+    });
+
+    const groupedTasks = Object.values(
+      result.reduce((a, c) => {
+        if (!a[c.statusId]) {
+          a[c.statusId] = {
+            id: c.statusId,
+            name: c.status.name,
+            tasks: [],
+          };
+        }
+        a[c.statusId].tasks.push(c);
+        return a;
+      }, {} as Record<number, TaskMinimalGroupedByStatus>)
+    );
+    return groupedTasks;
   }
 }
