@@ -14,7 +14,7 @@
 	],
 	"main": "index.ts",
 	"dependencies": {
-		"lucide-react": "^0.344.0",
+		"lucide-react": "^0.475.0",
 		"prismjs": "^1.29.0",
 		"prosemirror-commands": "^1.5.2",
 		"prosemirror-dropcursor": "^1.8.1",

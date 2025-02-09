@@ -2799,7 +2799,7 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^5.1.0-rc.0"
     eslint-plugin-react-refresh: "npm:^0.4.11"
     globals: "npm:^15.9.0"
-    lucide-react: "npm:^0.344.0"
+    lucide-react: "npm:^0.475.0"
     postcss: "npm:^8.4.35"
     prismjs: "npm:^1.29.0"
     prosemirror-commands: "npm:^1.5.2"
@@ -2869,7 +2869,7 @@ __metadata:
     eslint: "npm:^9"
     eslint-config-next: "npm:15.1.2"
     jwt-decode: "npm:^4.0.0"
-    lucide-react: "npm:^0.469.0"
+    lucide-react: "npm:^0.475.0"
     next: "npm:15.1.2"
     next-themes: "npm:^0.4.4"
     postcss: "npm:^8"
@@ -5908,21 +5908,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lucide-react@npm:^0.344.0":
-  version: 0.344.0
-  resolution: "lucide-react@npm:0.344.0"
-  peerDependencies:
-    react: ^16.5.1 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/f54c715459c190aab0fad8df2f76e06a6bf5be1b37d5d13f0ecfb2133dccda763b8b03b40463075fc93b2a754ad1b8d85adf3b880bf6da5f791dd17fcb788a37
-  languageName: node
-  linkType: hard
-
-"lucide-react@npm:^0.469.0":
-  version: 0.469.0
-  resolution: "lucide-react@npm:0.469.0"
+"lucide-react@npm:^0.475.0":
+  version: 0.475.0
+  resolution: "lucide-react@npm:0.475.0"
   peerDependencies:
     react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/0ee78d110550579b848a01446a440f733fd17e1bf1850aa01551b61f415e03e5f5ab7f26b56f1c648edc93856177f5476ff9f8f6f5d80e8fe45913d208f49961
+  checksum: 10c0/9cb17bd4e70da4db104874b6b2e9d9c7e2be9438e9d1c0b2565df0c4d0bdd1add41b7dff3cb60840699ecbd29870c453878b42b69a7c46480def0c9370a852a9
   languageName: node
   linkType: hard
 
