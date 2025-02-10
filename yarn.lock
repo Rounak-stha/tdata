@@ -2052,6 +2052,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@radix-ui/react-progress@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "@radix-ui/react-progress@npm:1.1.2"
+  dependencies:
+    "@radix-ui/react-context": "npm:1.1.1"
+    "@radix-ui/react-primitive": "npm:2.0.2"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/6aa52b17b0d0858fd7346817f23912fb6a516c3c1aa3b4c3d6f9ed1e9790ccf3529f079eaecb4d9c4ff487f1cc296b6d164941261e124085585746b862cccfc0
+  languageName: node
+  linkType: hard
+
 "@radix-ui/react-roving-focus@npm:1.1.1":
   version: 1.1.1
   resolution: "@radix-ui/react-roving-focus@npm:1.1.1"
@@ -2845,6 +2865,7 @@ __metadata:
     "@radix-ui/react-dropdown-menu": "npm:^2.1.4"
     "@radix-ui/react-label": "npm:^2.1.1"
     "@radix-ui/react-popover": "npm:^1.1.4"
+    "@radix-ui/react-progress": "npm:^1.1.2"
     "@radix-ui/react-scroll-area": "npm:^1.2.2"
     "@radix-ui/react-select": "npm:^2.1.4"
     "@radix-ui/react-separator": "npm:^1.1.1"
