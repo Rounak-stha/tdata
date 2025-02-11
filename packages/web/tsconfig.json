@@ -25,7 +25,8 @@
 			"@type/*": ["./src/types/*"],
 			"@db/*": ["./src/db/*"],
 			"@db": ["./src/db/index"]
-		}
+    },
+    "types": ["vitest/globals"]
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
 	"exclude": ["node_modules"]

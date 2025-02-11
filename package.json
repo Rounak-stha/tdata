@@ -9,10 +9,24 @@
 		"start": "next start",
 		"lint": "next lint",
 		"drizzle:generate": "yarn workspace @tdata/web drizzle:generate",
-		"drizzle:push": "yarn workspace @tdata/web drizzle:push"
+		"drizzle:push": "yarn workspace @tdata/web drizzle:push",
+		"test": "vitest",
+		"test:web": "vitest --root packages/web --run",
+		"test:web:watch": "vitest --root packages/web",
+		"test:web:ui": "vitest --ui --root packages/web"
 	},
 	"workspaces": [
 		"packages/*"
 	],
-	"packageManager": "yarn@4.5.3"
+	"packageManager": "yarn@4.5.3",
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.0",
+		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/react": "^16.2.0",
+		"@vitejs/plugin-react": "^4.3.4",
+		"@vitest/ui": "^3.0.5",
+		"jsdom": "^26.0.0",
+		"vite-tsconfig-paths": "^5.1.4",
+		"vitest": "^3.0.5"
+	}
 }

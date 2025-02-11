@@ -179,6 +179,7 @@ export const MultiAssigneeSelect: FC<MultiAssigneeSelecProps> = ({ assignee, onC
 													<Avatar src={user.imageUrl} alt={user.name} />
 													{isHovering && (
 														<div
+                            data-testid={`assignee-remove-btn-${user.id}`}
 															onClick={(e) => removeUser(user.id, e)}
 															className='absolute -top-1.5 -right-1.5 rounded-full bg-destructive border border-input h-4 w-4 flex items-center justify-center cursor-pointer transition-colors'
 														>

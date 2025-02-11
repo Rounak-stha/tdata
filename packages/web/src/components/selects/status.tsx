@@ -71,7 +71,7 @@ export function StatusSelect({ status: InitialStatus, allStatus, onChange, size 
             <SelectItem key={status.id} value={String(status.id)}>
               <div className="flex items-center">
                 <IcomComp className={`mr-2 h-4 w-4 ${statusColors[status.icon as IconType]}`} />
-                {status.name.charAt(0) + status.name.slice(1).toLowerCase().replace("_", " ")}
+                {status.name}
               </div>
             </SelectItem>
           );
