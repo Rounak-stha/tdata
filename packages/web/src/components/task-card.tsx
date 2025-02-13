@@ -16,7 +16,7 @@ export function TaskCard({ task }: TaskCardProps) {
   return (
     <Card className="p-4 cursor-pointer bg-background hover:bg-accent/50 transition-colors border shadow-sm rounded-sm">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-muted-foreground font-mono">{task.id}</span>
+        <span className="text-xs text-muted-foreground font-mono">{task.taskNumber}</span>
         <AssigneeSelect size="icon" assignee={task.userRelations[AssigneeFieldName]} />
       </div>
       <Link href={`/task/${task.id}`} className="block">

@@ -291,8 +291,10 @@ export class TaskRepository {
       result.reduce((a, c) => {
         if (!a[c.statusId]) {
           a[c.statusId] = {
-            id: c.statusId,
-            name: c.status.name,
+            group: {
+              id: c.statusId,
+              name: c.status.name,
+            },
             tasks: [],
           };
         }

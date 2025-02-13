@@ -16,12 +16,12 @@ type MyTaskPageProps = {
 export const MyTaskPage: FC<MyTaskPageProps> = ({ tasks }) => {
   const { organization } = useOrganizations();
   return (
-    <div>
+    <div className=" px-6 py-4">
       <Heading4 text="My Tasks" />
       <div className="flex flex-col gap-2 mt-4">
         {tasks.map((t) => (
-          <div key={t.id as string}>
-            <TextSmall className="font-bold text-muted-foreground" text={t.name} />
+          <div key={t.group.id}>
+            <TextSmall className="font-bold text-muted-foreground" text={t.group.name} />
             {t.tasks.map((task) => (
               <div key={task.id} className="group flex items-center gap-4 hover:bg-accent rounded-sm">
                 <div className="flex-1 min-w-0">

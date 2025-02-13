@@ -1,7 +1,7 @@
 import { tasks, taskActivities, taskComments } from "@/db/schema";
 import { User, UserId } from "./user";
 import { ProjectTemplateDetail } from "./project";
-import { WorkflowStatus } from "./workflow";
+import { Workflow, WorkflowStatus } from "./workflow";
 
 export type TaskUserRelations = Record<string, User[]>;
 export type TaskUserRelationMinimal = Record<string, UserId[]>;
@@ -13,18 +13,19 @@ export type TaskDetailMinimal = Task & { status: WorkflowStatus };
 export type TaskActivity = Omit<typeof taskActivities.$inferSelect, "updatedAt" | "deletedAt">;
 export type Comment = Omit<typeof taskComments.$inferSelect, "deletedAt">;
 
-export type TaskGrouped<T> = {
-  id: unknown;
-  name: string;
-  tasks: T[];
-};
-
-export type TaskMinimalGroupedByStatus = TaskGrouped<TaskDetailMinimal>;
-
 export type TaskDetail = Task & {
   projectTemplate: ProjectTemplateDetail;
   userRelations: TaskUserRelations;
 };
+
+// If we're gouping by assignees, then the id will be a string as userId is a uuid field
+export type TaskGrouped<T, U> = {
+  group: T;
+  tasks: U[];
+};
+
+export type TaskMinimalGroupedByStatus = TaskGrouped<Pick<Workflow, "id" | "name">, TaskDetailMinimal>;
+export type TaskGroupedByStatus = TaskGrouped<WorkflowStatus, TaskDetail>;
 
 export type TaskActivityDetail = TaskActivity & {
   user: User;

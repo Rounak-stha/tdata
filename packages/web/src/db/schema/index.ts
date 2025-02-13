@@ -155,6 +155,9 @@ export const workflowStatus = pgTable(
     organizationId: integer()
       .references(() => organizations.id)
       .notNull(),
+    projectId: integer()
+      .references(() => projects.id, { onDelete: "cascade" })
+      .notNull(),
     createdBy: uuid()
       .references(() => users.id)
       .notNull(),

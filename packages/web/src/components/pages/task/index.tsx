@@ -16,7 +16,7 @@ type TaskPageProps = {
 };
 export const TaskPage: FC<TaskPageProps> = ({ task }) => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen px-6 py-4">
       <div className="text-sm text-gray-500 mb-4">{task.taskNumber}</div>
 
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_200px] lg:grid-cols-[minmax(0,1fr)_300px] gap-6">

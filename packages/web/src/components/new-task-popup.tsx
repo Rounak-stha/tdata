@@ -35,7 +35,7 @@ interface NewTaskPopupProps {
   onOpenChange: (open: boolean) => void;
   parentTaskId?: string;
   parentTaskTitle?: string;
-  status?: WorkflowStatus;
+  status: WorkflowStatus;
   priority?: Priority;
   project?: Project;
 }
@@ -126,7 +126,6 @@ export function NewTaskPopup({ open, onOpenChange, parentTaskId, parentTaskTitle
       [{}, {}] as [TaskProperty, TaskUserRelationMinimal]
     );
 
-    console.log({ assignee });
     if (assignee) {
       userRelations["assignee"] = assignee;
     }
