@@ -1,10 +1,10 @@
-import { organizations, projects, projectTemplates, tasks, workflows, workflowStatus } from "@/db/schema";
+import { organizations, projects, projectTemplates, tasks, users, workflows, workflowStatus } from "@/db/schema";
 import { TaskGroupedByStatus, User, WorkflowDetail } from "@/types";
 import { TransactionDb } from "@/types/db";
-import { InsertProjectData, InsertProjectTemplate, Project, ProjectTemplate, ProjectTemplateDetail } from "@/types/project";
+import { InsertProjectData, InsertProjectTemplate, Project, ProjectDetailMinimal, ProjectTemplate, ProjectTemplateDetail } from "@/types/project";
 import { createDrizzleSupabaseClient, db } from "@db";
 import { and, eq, sql } from "drizzle-orm";
-import { ProjectSelects } from "./selects";
+import { ProjectSelects, ProjectTemplateMinimalSelects, UserSelects } from "./selects";
 
 export class ProjectRepository {
   // Static method to get a user by ID
@@ -162,6 +162,31 @@ export class ProjectRepository {
 
     return parsedResult as TaskGroupedByStatus[];
   }
+
+  static getProjects = async (organizationId: number): Promise<ProjectDetailMinimal[]> => {
+    const db = await createDrizzleSupabaseClient();
+    const result: ProjectDetailMinimal[] = await db.rls(async (tx) => {
+      const data = await tx
+        .select({
+          id: projects.id,
+          name: projects.name,
+          description: projects.description,
+          key: projects.key,
+          organizationId: projects.organizationId,
+          createdAt: projects.createdAt,
+          updatedAt: projects.updatedAt,
+          createdBy: UserSelects,
+          template: ProjectTemplateMinimalSelects,
+        })
+        .from(projects)
+        .leftJoin(users, eq(users.id, projects.createdBy))
+        .leftJoin(projectTemplates, eq(projectTemplates.id, projects.id))
+        .where(eq(projects.organizationId, organizationId))
+        .execute();
+      return data;
+    });
+    return result;
+  };
 }
 
 export default ProjectRepository;

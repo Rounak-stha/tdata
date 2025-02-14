@@ -13,3 +13,8 @@ export async function getProjectBoardData(projectId: number) {
   if (!project) throw new CustomError("404 - Project Not Found");
   return project;
 }
+
+export async function getProjects(organizationId: number) {
+  const project = await ProjectRepository.getProjects(organizationId);
+  return project;
+}

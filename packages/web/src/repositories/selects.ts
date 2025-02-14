@@ -1,5 +1,5 @@
-import { projects, tasks, users, workflowStatus } from "@/db/schema";
-import { Project, Task, User, WorkflowStatus } from "@/types";
+import { projects, projectTemplates, tasks, users, workflowStatus } from "@/db/schema";
+import { Project, ProjectTemplateMinimal, Task, User, WorkflowStatus } from "@/types";
 import { PgColumn } from "drizzle-orm/pg-core";
 
 export const UserSelects: Record<keyof Omit<User, "role">, PgColumn> = {
@@ -8,6 +8,12 @@ export const UserSelects: Record<keyof Omit<User, "role">, PgColumn> = {
   imageUrl: users.imageUrl,
   name: users.name,
   createdAt: users.createdAt,
+};
+
+export const ProjectTemplateMinimalSelects: Record<keyof ProjectTemplateMinimal, PgColumn> = {
+  id: projectTemplates.id,
+  name: projectTemplates.name,
+  description: projectTemplates.description,
 };
 
 export const TaskSelects: Record<keyof Task, PgColumn> = {
