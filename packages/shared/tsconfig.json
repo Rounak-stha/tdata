@@ -12,7 +12,7 @@
     "declaration": true,
     "declarationMap": true,
     "resolveJsonModule": true,
-    "rootDir": "./src",
+    "baseUrl": ".",
     "isolatedModules": true,
     "incremental": true,
     "paths": {
@@ -20,6 +20,6 @@
       "@types": ["./src/types"]
     }
   },
-  "include": ["src/"],
+  "include": ["src/**/*", "src/**/*.json"],
   "exclude": ["node_modules", "dist"]
 }
