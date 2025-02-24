@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "build": "tsc && tsc-alias && node src/scripts/generate-exports.js",
-    "drizzle:generate": "npx drizzle-kit generate --config=db/drizzle.config.ts",
+    "drizzle:generate": "npx drizzle-kit generate --config=src/db/drizzle.config.ts",
+    "drizzle:generate:both": "npx drizzle-kit generate --config=src/db/drizzle.config.ts && npx drizzle-kit generate --config=src/db/drizzle.config.automate.ts",
+    "drizzle:generate:automate": "npx drizzle-kit generate --config=src/db/drizzle.config.automate.ts",
     "drizzle:push": "npx drizzle-kit push"
   },
   "exports": {
@@ -30,6 +32,7 @@
     "drizzle-orm": "^0.38.3"
   },
   "devDependencies": {
+    "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.1",
     "tsc-alias": "^1.8.10",
     "typescript": "^5"

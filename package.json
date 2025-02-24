@@ -10,6 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "drizzle:generate": "yarn workspace @tdata/shared drizzle:generate",
+    "drizzle:generate:both": "yarn workspace @tdata/shared drizzle:generate:both",
+    "drizzle:generate:automate": "yarn workspace @tdata/shared drizzle:generate:automate",
     "drizzle:push": "yarn workspace @tdata/shared drizzle:push",
     "test": "vitest",
     "test:web": "vitest --root packages/web --run",

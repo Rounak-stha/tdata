@@ -3013,10 +3013,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@tdata/shared@npm:*, @tdata/shared@workspace:*, @tdata/shared@workspace:packages/shared":
+"@tdata/shared@npm:*, @tdata/shared@workspace:packages/shared":
   version: 0.0.0-use.local
   resolution: "@tdata/shared@workspace:packages/shared"
   dependencies:
+    dotenv: "npm:^16.4.7"
     drizzle-kit: "npm:^0.30.1"
     drizzle-orm: "npm:^0.38.3"
     tsc-alias: "npm:^1.8.10"
@@ -3051,7 +3052,7 @@ __metadata:
     "@radix-ui/react-visually-hidden": "npm:^1.1.1"
     "@supabase/ssr": "npm:^0.5.2"
     "@supabase/supabase-js": "npm:^2.47.10"
-    "@tdata/shared": "workspace:*"
+    "@tdata/shared": "npm:*"
     "@types/node": "npm:^20"
     "@types/react": "npm:^19.0.7"
     "@types/react-dom": "npm:^19.0.3"
@@ -4559,6 +4560,13 @@ __metadata:
     "@babel/runtime": "npm:^7.8.7"
     csstype: "npm:^3.0.2"
   checksum: 10c0/f735074d66dd759b36b158fa26e9d00c9388ee0e8c9b16af941c38f014a37fc80782de83afefd621681b19ac0501034b4f1c4a3bff5caa1b8667f0212b5e124c
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.4.7":
+  version: 16.4.7
+  resolution: "dotenv@npm:16.4.7"
+  checksum: 10c0/be9f597e36a8daf834452daa1f4cc30e5375a5968f98f46d89b16b983c567398a330580c88395069a77473943c06b877d1ca25b4afafcdd6d4adb549e8293462
   languageName: node
   linkType: hard
 

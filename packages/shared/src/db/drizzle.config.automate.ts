@@ -3,7 +3,7 @@ import { defineConfig } from "drizzle-kit";
 import "dotenv/config";
 
 export default defineConfig({
-  out: "src/db/drizzle",
+  out: "../../apps/automate/db/migrations",
   schema: "src/db/schema",
   dialect: "postgresql",
   casing: "snake_case",
