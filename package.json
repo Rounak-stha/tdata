@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "yarn workspace @tdata/web dev",
     "dev:editor": "yarn workspace @tdata/editor dev",
-    "build": "yarn workspace @tdata/web build",
+    "build": "turbo run build --filter=@tdata/web",
     "build:shared": "yarn workspace @tdata/shared build",
     "start": "next start",
     "lint": "next lint",
