@@ -1,0 +1,1 @@
+ALTER TABLE "organization_memberships" ADD COLUMN "test" text;

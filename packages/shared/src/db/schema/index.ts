@@ -1,6 +1,6 @@
 import { pgTable, uuid, text, boolean, integer, timestamp, uniqueIndex, index, serial, pgEnum, varchar, jsonb } from "drizzle-orm/pg-core";
 
-import { ProjectTemplateProperty, TaskActivityMetadata, TaskProperty } from "@globaltypes";
+import { ProjectTemplateProperty, TaskActivityMetadata, TaskProperty } from "../../types";
 
 const timestamps = {
   updatedAt: timestamp().$onUpdateFn(() => new Date()),
@@ -86,8 +86,9 @@ export const organizationMemberships = pgTable(
       .references(() => users.id)
       .notNull(),
     role: RoleEnum().default("Member").notNull(), // Role directly in the table as enum
+    test: text(),
   },
-  (table) => [uniqueIndex("unique_membership").on(table.organizationId, table.userId)],
+  (table) => [uniqueIndex("unique_membership").on(table.organizationId, table.userId)]
 );
 
 export const projects = pgTable(
@@ -106,7 +107,7 @@ export const projects = pgTable(
     ...timestamps,
   },
 
-  (table) => [uniqueIndex("unique_project_key_per_organization").on(table.organizationId, table.key), index("organizationIdIndex").on(table.organizationId)],
+  (table) => [uniqueIndex("unique_project_key_per_organization").on(table.organizationId, table.key), index("organizationIdIndex").on(table.organizationId)]
 );
 
 // Workflows Table
@@ -124,7 +125,7 @@ export const workflows = pgTable(
       .notNull(),
     ...timestamps,
   },
-  (table) => [index("workflowOrganizationIdIndex").on(table.organizationId)],
+  (table) => [index("workflowOrganizationIdIndex").on(table.organizationId)]
 );
 
 /**
@@ -165,7 +166,7 @@ export const workflowStatus = pgTable(
       .notNull(),
     ...timestamps,
   },
-  (table) => [index("wfStatusOrganizationIdIndex").on(table.organizationId)],
+  (table) => [index("wfStatusOrganizationIdIndex").on(table.organizationId)]
 );
 
 // Tasks Table
@@ -211,7 +212,7 @@ export const tasks = pgTable(
   (table) => [
     // We will always be filtering by organization, so apart from the constraint added by the folloing index, we will also get the performance benefit of the index
     uniqueIndex("unique_task_number_per_organization").on(table.organizationId, table.taskNumber),
-  ],
+  ]
 );
 
 export const taskActivities = pgTable(TableNames.taskActivities, {

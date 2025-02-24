@@ -12,14 +12,14 @@
     "declaration": true,
     "declarationMap": true,
     "resolveJsonModule": true,
-    "rootDir": ".",
+    "rootDir": "./src",
     "isolatedModules": true,
     "incremental": true,
     "paths": {
-      "@db/*": ["./db/*"],
-      "@globaltypes": ["./types"]
+      "@db/*": ["./src/db/*"],
+      "@types": ["./src/types"]
     }
   },
-  "include": ["./**/*.ts", "./types"],
+  "include": ["src/"],
   "exclude": ["node_modules", "dist"]
 }

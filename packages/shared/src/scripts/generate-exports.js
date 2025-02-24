@@ -1,8 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const DIST_CONFIG_DIR = path.resolve(__dirname, "../dist/configs"); // Adjust based on output
-const PACKAGE_JSON_PATH = path.resolve(__dirname, "../package.json");
+const DIST_CONFIG_DIR = path.resolve(__dirname, "../../dist/configs"); // Adjust based on output
+const PACKAGE_JSON_PATH = path.resolve(__dirname, "../../package.json");
 
 // Function to generate the correct export paths
 function getConfigExports() {

@@ -2,7 +2,7 @@
   "name": "@tdata/shared",
   "version": "1.0.0",
   "scripts": {
-    "build": "tsc && tsc-alias && node scripts/generate-exports.js",
+    "build": "tsc && tsc-alias && node src/scripts/generate-exports.js",
     "drizzle:generate": "npx drizzle-kit generate --config=db/drizzle.config.ts",
     "drizzle:push": "npx drizzle-kit push"
   },
