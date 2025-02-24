@@ -1,0 +1,8 @@
+@import "@tdata/shared/styles";
+
+/**
+  NOTE: The editor package also uses tailwind 
+  and the component styles are parsed by tailwind as tailwind is configures to parse the classes in the editor components
+  As for the import below, the css file contains the styles for different nodes in the editor like heading, code blocks, blockquote.
+*/
+@import "@tdata/editor/src/styles/editor.css";

@@ -1,26 +1,26 @@
-import { EditorState } from 'prosemirror-state'
-import { EditorView } from 'prosemirror-view'
+import { EditorState } from "prosemirror-state";
+import { EditorView } from "prosemirror-view";
 
-export type CommandFunction = (state: EditorState, dispatch?: EditorView['dispatch']) => boolean
+export type CommandFunction = (state: EditorState, dispatch?: EditorView["dispatch"]) => boolean;
 
 export type SlashMenuPluginState = {
-	open: boolean
-	filter: string
-	commands: Command[]
-	shouldExecute: boolean
-	selectedIndex: number
-	position: number | null
-	slashPos: number | null
-}
+  open: boolean;
+  filter: string;
+  commands: Command[];
+  shouldExecute: boolean;
+  selectedIndex: number;
+  position: number | null;
+  slashPos: number | null;
+};
 
-type SlashMetaTypes = 'NextItem' | 'PrevItem' | 'execute'
+type SlashMetaTypes = "NextItem" | "PrevItem" | "execute";
 
 export type SlashMenuMeta = {
-	type: SlashMetaTypes
-}
+  type: SlashMetaTypes;
+};
 
 export interface Command {
-	title: string
-	icon: React.ElementType
-	execute: (state: EditorState, dispatch?: EditorView['dispatch']) => boolean
+  title: string;
+  icon: React.ElementType;
+  execute: (state: EditorState, dispatch?: EditorView["dispatch"]) => boolean;
 }

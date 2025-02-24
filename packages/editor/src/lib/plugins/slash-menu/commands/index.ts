@@ -1,2 +1,2 @@
-export * from './slash'
-export * from '../types'
+export * from "./slash";
+export * from "../types";

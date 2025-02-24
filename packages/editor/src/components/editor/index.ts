@@ -1,2 +1,2 @@
-export { Editor } from './Editor'
-export { MenuBar } from './MenuBar'
+export { Editor } from "./Editor";
+export { MenuBar } from "./MenuBar";

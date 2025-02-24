@@ -1,32 +1,35 @@
 {
-	"name": "tdata",
-	"version": "0.1.0",
-	"private": true,
-	"scripts": {
-		"dev": "yarn workspace @tdata/web dev",
-		"dev:editor": "yarn workspace @tdata/editor dev",
-		"build": "yarn workspace @tdata/web build",
-		"start": "next start",
-		"lint": "next lint",
-		"drizzle:generate": "yarn workspace @tdata/web drizzle:generate",
-		"drizzle:push": "yarn workspace @tdata/web drizzle:push",
-		"test": "vitest",
-		"test:web": "vitest --root packages/web --run",
-		"test:web:watch": "vitest --root packages/web",
-		"test:web:ui": "vitest --ui --root packages/web"
-	},
-	"workspaces": [
-		"packages/*"
-	],
-	"packageManager": "yarn@4.5.3",
-	"devDependencies": {
-		"@testing-library/dom": "^10.4.0",
-		"@testing-library/jest-dom": "^6.6.3",
-		"@testing-library/react": "^16.2.0",
-		"@vitejs/plugin-react": "^4.3.4",
-		"@vitest/ui": "^3.0.5",
-		"jsdom": "^26.0.0",
-		"vite-tsconfig-paths": "^5.1.4",
-		"vitest": "^3.0.5"
-	}
+  "name": "tdata",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "yarn workspace @tdata/web dev",
+    "dev:editor": "yarn workspace @tdata/editor dev",
+    "build": "turbo run build --filter=@tdata/web",
+    "build:shared": "yarn workspace @tdata/shared build",
+    "start": "next start",
+    "lint": "next lint",
+    "drizzle:generate": "yarn workspace @tdata/shared drizzle:generate",
+    "drizzle:push": "yarn workspace @tdata/shared drizzle:push",
+    "test": "vitest",
+    "test:web": "vitest --root packages/web --run",
+    "test:web:watch": "vitest --root packages/web",
+    "test:web:ui": "vitest --ui --root packages/web"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "yarn@4.5.3",
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/ui": "^3.0.5",
+    "jsdom": "^26.0.0",
+    "turbo": "^2.4.2",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.0.5"
+  }
 }
