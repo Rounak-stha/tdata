@@ -6,7 +6,7 @@
     "drizzle:generate": "npx drizzle-kit generate --config=src/db/drizzle.config.ts",
     "drizzle:generate:both": "npx drizzle-kit generate --config=src/db/drizzle.config.ts && npx drizzle-kit generate --config=src/db/drizzle.config.automate.ts",
     "drizzle:generate:automate": "npx drizzle-kit generate --config=src/db/drizzle.config.automate.ts",
-    "drizzle:push": "npx drizzle-kit push"
+    "drizzle:push": "npx drizzle-kit push --config=src/db/drizzle.config.ts"
   },
   "exports": {
     "./db": {
