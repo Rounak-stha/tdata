@@ -1,6 +1,6 @@
 import { pgTable, uuid, text, boolean, integer, timestamp, uniqueIndex, index, serial, pgEnum, varchar, jsonb } from "drizzle-orm/pg-core";
 
-import { ProjectTemplateProperty, TaskActivityMetadata, TaskProperty } from "../../types";
+import { ProjectTemplateProperty, TaskActivityMetadata, TaskProperty } from "@types";
 
 const timestamps = {
   updatedAt: timestamp().$onUpdateFn(() => new Date()),
@@ -50,6 +50,9 @@ export const PriorityEnum = pgEnum("priority", Priorities);
 
 export const ActivityActions = ["FIELD_UPDATE", "COMMENT_ADD", "COMMENT_DELETE", "ATTACHMENT_UPLOAD", "ATTACHMENT_DELETE", "TASK_CREATE", "TASK_DELETE"] as const;
 export const ActivityActionEnum = pgEnum("activity_action", ActivityActions);
+
+export const AutomationTriggerTypes = ["TASK_CREATED", "TASK_UPDATED"] as const;
+export const TriggerTypeEnum = pgEnum("automation_trigger_type", AutomationTriggerTypes);
 
 const KEY_LENGTH = 10;
 
@@ -292,9 +295,7 @@ export const workflowTemplates = pgTable(TableNames.workflowTemplates, {
 });
 
 // AUTOMATION TABLES
-export const AutomationTriggerTypes = ["TASK_CREATED", "TASK_UPDATED"] as const;
 
-const TriggerTypeEnum = pgEnum("trigger_type", ["TASK_CREATED", "TASK_UPDATED"]);
 export const automations = pgTable("automations", {
   id: serial().primaryKey(),
   organizationId: integer()
@@ -309,14 +310,21 @@ export const automations = pgTable("automations", {
 
 export const automationTrigger = pgTable("automation_trigger", {
   id: serial().primaryKey(),
+  organizationId: integer()
+    .references(() => organizations.id)
+    .notNull(),
   automationId: integer()
     .references(() => automations.id)
     .notNull(),
   triggerType: TriggerTypeEnum().notNull(),
+  ...timestamps,
 });
 
 export const automationNodes = pgTable("automation_nodes", {
   id: serial().primaryKey(),
+  organizationId: integer()
+    .references(() => organizations.id)
+    .notNull(),
   automationId: integer()
     .references(() => automations.id)
     .notNull(),
@@ -326,6 +334,12 @@ export const automationNodes = pgTable("automation_nodes", {
 
 export const automationNodeLinks = pgTable("automation_node_links", {
   id: serial().primaryKey(),
+  organizationId: integer()
+    .references(() => organizations.id)
+    .notNull(),
+  automationId: integer()
+    .references(() => automations.id)
+    .notNull(),
   fromNodeId: integer()
     .references(() => automationNodes.id)
     .notNull(),
