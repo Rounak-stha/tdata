@@ -1,14 +1,18 @@
 CREATE TYPE "public"."activity_action" AS ENUM('FIELD_UPDATE', 'COMMENT_ADD', 'COMMENT_DELETE', 'ATTACHMENT_UPLOAD', 'ATTACHMENT_DELETE', 'TASK_CREATE', 'TASK_DELETE');--> statement-breakpoint
 CREATE TYPE "public"."priority" AS ENUM('LOW', 'MEDIUM', 'HIGH');--> statement-breakpoint
 CREATE TYPE "public"."role" AS ENUM('Admin', 'Member');--> statement-breakpoint
+CREATE TYPE "public"."automation_trigger_type" AS ENUM('TASK_CREATED', 'TASK_UPDATED');--> statement-breakpoint
 CREATE TABLE "automation_node_links" (
 	"id" serial PRIMARY KEY NOT NULL,
+	"organization_id" integer NOT NULL,
+	"automation_id" integer NOT NULL,
 	"from_node_id" integer NOT NULL,
 	"to_node_id" integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "automation_nodes" (
 	"id" serial PRIMARY KEY NOT NULL,
+	"organization_id" integer NOT NULL,
 	"automation_id" integer NOT NULL,
 	"node_type" text NOT NULL,
 	"updated_at" timestamp,
@@ -17,8 +21,11 @@ CREATE TABLE "automation_nodes" (
 --> statement-breakpoint
 CREATE TABLE "automation_trigger" (
 	"id" serial PRIMARY KEY NOT NULL,
+	"organization_id" integer NOT NULL,
 	"automation_id" integer NOT NULL,
-	"trigger_type" "trigger_type" NOT NULL
+	"trigger_type" "automation_trigger_type" NOT NULL,
+	"updated_at" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "automations" (
@@ -34,7 +41,8 @@ CREATE TABLE "organization_memberships" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"organization_id" integer NOT NULL,
 	"user_id" uuid NOT NULL,
-	"role" "role" DEFAULT 'Member' NOT NULL
+	"role" "role" DEFAULT 'Member' NOT NULL,
+	"test" text
 );
 --> statement-breakpoint
 CREATE TABLE "organizations" (
@@ -169,9 +177,13 @@ CREATE TABLE "workflows" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+ALTER TABLE "automation_node_links" ADD CONSTRAINT "automation_node_links_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "automation_node_links" ADD CONSTRAINT "automation_node_links_automation_id_automations_id_fk" FOREIGN KEY ("automation_id") REFERENCES "public"."automations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "automation_node_links" ADD CONSTRAINT "automation_node_links_from_node_id_automation_nodes_id_fk" FOREIGN KEY ("from_node_id") REFERENCES "public"."automation_nodes"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "automation_node_links" ADD CONSTRAINT "automation_node_links_to_node_id_automation_nodes_id_fk" FOREIGN KEY ("to_node_id") REFERENCES "public"."automation_nodes"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "automation_nodes" ADD CONSTRAINT "automation_nodes_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "automation_nodes" ADD CONSTRAINT "automation_nodes_automation_id_automations_id_fk" FOREIGN KEY ("automation_id") REFERENCES "public"."automations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "automation_trigger" ADD CONSTRAINT "automation_trigger_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "automation_trigger" ADD CONSTRAINT "automation_trigger_automation_id_automations_id_fk" FOREIGN KEY ("automation_id") REFERENCES "public"."automations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "automations" ADD CONSTRAINT "automations_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "automations" ADD CONSTRAINT "automations_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

@@ -1,6 +1,6 @@
 {
-  "id": "50378e7f-bccf-430f-9e9d-9a0e64310d82",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "8c911566-e2e0-4a3a-84dc-f719f7a43aaa",
+  "prevId": "ee42cec5-0dbc-43d0-8121-8a84aa0da616",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -12,6 +12,18 @@
           "name": "id",
           "type": "serial",
           "primaryKey": true,
+          "notNull": true
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "automation_id": {
+          "name": "automation_id",
+          "type": "integer",
+          "primaryKey": false,
           "notNull": true
         },
         "from_node_id": {
@@ -29,6 +41,32 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "automation_node_links_organization_id_organizations_id_fk": {
+          "name": "automation_node_links_organization_id_organizations_id_fk",
+          "tableFrom": "automation_node_links",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "automation_node_links_automation_id_automations_id_fk": {
+          "name": "automation_node_links_automation_id_automations_id_fk",
+          "tableFrom": "automation_node_links",
+          "tableTo": "automations",
+          "columnsFrom": [
+            "automation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "automation_node_links_from_node_id_automation_nodes_id_fk": {
           "name": "automation_node_links_from_node_id_automation_nodes_id_fk",
           "tableFrom": "automation_node_links",
@@ -72,6 +110,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "automation_id": {
           "name": "automation_id",
           "type": "integer",
@@ -100,6 +144,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "automation_nodes_organization_id_organizations_id_fk": {
+          "name": "automation_nodes_organization_id_organizations_id_fk",
+          "tableFrom": "automation_nodes",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "automation_nodes_automation_id_automations_id_fk": {
           "name": "automation_nodes_automation_id_automations_id_fk",
           "tableFrom": "automation_nodes",
@@ -130,6 +187,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "automation_id": {
           "name": "automation_id",
           "type": "integer",
@@ -138,14 +201,40 @@
         },
         "trigger_type": {
           "name": "trigger_type",
-          "type": "trigger_type",
+          "type": "automation_trigger_type",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
+        "automation_trigger_organization_id_organizations_id_fk": {
+          "name": "automation_trigger_organization_id_organizations_id_fk",
+          "tableFrom": "automation_trigger",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "automation_trigger_automation_id_automations_id_fk": {
           "name": "automation_trigger_automation_id_automations_id_fk",
           "tableFrom": "automation_trigger",
@@ -1586,6 +1675,14 @@
       "values": [
         "Admin",
         "Member"
+      ]
+    },
+    "public.automation_trigger_type": {
+      "name": "automation_trigger_type",
+      "schema": "public",
+      "values": [
+        "TASK_CREATED",
+        "TASK_UPDATED"
       ]
     }
   },
