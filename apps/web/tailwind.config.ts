@@ -7,6 +7,7 @@ export default {
   content: [
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/automation-ui/**/*.{js,ts,jsx,tsx}",
     /**
      * The icons fie should be scanned s well as it contains color classes for icons
      */

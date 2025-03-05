@@ -18,3 +18,8 @@ export async function getProjects(organizationId: number) {
   const project = await ProjectRepository.getProjects(organizationId);
   return project;
 }
+
+export async function getProjectTemplate(projectId: number) {
+  const project = await ProjectRepository.getProjectTemplate(projectId);
+  return project;
+}

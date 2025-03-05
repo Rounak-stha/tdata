@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} h-svh w-svh overflow-auto`}>
         <ScrollArea className="h-full w-full">
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="kanban-theme">
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true} storageKey="kanban-theme">
             {children}
           </ThemeProvider>
           <ScrollBar orientation="vertical" />
