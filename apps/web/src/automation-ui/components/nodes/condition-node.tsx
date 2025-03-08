@@ -1,152 +1,86 @@
-import { memo, useState } from "react";
-import { Handle, Position } from "@xyflow/react";
-import { GitBranch, Settings, Variable } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@components/ui/form";
-import { useForm } from "react-hook-form";
-import { Input } from "@/components/ui/input";
-import type { VariableReference } from "../../types";
-import { NodeDeleteButton } from "./delete-button";
+import { useEffect, FC, useReducer } from "react";
+import { Handle, Node, NodeProps, Position, XYPosition } from "@xyflow/react";
+import { LucideGitBranch } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ConditionNodeData, FlowOperator, FlowValue, FlowVariable } from "@/automation-ui/types";
+import { FlowCondition } from "../common/flow-condition";
+import { ConditionChangeHandler } from "@/automation-ui/types/components";
+import { useFlowStore } from "@/automation-ui/store/flow";
+import { Tooltip } from "@/components/common/tooltip";
 
-interface ConditionNodeData {
-  label: string;
-  leftOperand?: VariableReference;
-  operator?: string;
-  rightOperand?: string;
-}
+type ConditionNodeAction =
+  | { type: "SET_LABEL"; payload: string }
+  | { type: "SET_FIELD"; payload: FlowVariable | null }
+  | { type: "SET_OPERATOR"; payload: FlowOperator | null }
+  | { type: "SET_VALUE"; payload: FlowValue | null };
 
-const operators = [
-  { value: "equals", label: "Equals" },
-  { value: "not_equals", label: "Not Equals" },
-  { value: "contains", label: "Contains" },
-  { value: "in", label: "In" },
-  { value: "not_in", label: "Not In" },
-];
+const conditionNodeReducer = (state: ConditionNodeData, action: ConditionNodeAction): ConditionNodeData => {
+  switch (action.type) {
+    case "SET_LABEL":
+      return { ...state, label: action.payload };
 
-export const ConditionNode = memo(function ConditionNode({ data, id }: { data: ConditionNodeData; id: string }) {
-  const form = useForm({
-    defaultValues: {
-      leftOperand: data.leftOperand || { variableName: "", path: [] },
-      operator: data.operator || "equals",
-      rightOperand: data.rightOperand || "",
-    },
-  });
-  const [isHovering, setIsHovering] = useState(false);
-  const [isDeleteHovering, setIsDeleteHovering] = useState(false);
+    case "SET_FIELD":
+      return { ...state, condition: { ...state.condition, field: action.payload } };
 
-  const availableVariables = [
-    { name: "trigger_task", type: "system", systemType: "trigger_record" },
-    { name: "current_user", type: "system", systemType: "current_user" },
-    { name: "matching_tasks", type: "query" },
-    { name: "custom_var", type: "user", dataType: "string" },
-  ];
+    case "SET_OPERATOR":
+      return { ...state, condition: { ...state.condition, operator: action.payload } };
+
+    case "SET_VALUE":
+      return { ...state, condition: { ...state.condition, value: action.payload } };
+
+    default:
+      return state;
+  }
+};
+
+type ConditionNodeProps = NodeProps<Node<ConditionNodeData, "ConditionNode">>;
+
+export const ConditionNode: FC<ConditionNodeProps> = ({ id, data, selected }) => {
+  const { updateNodeData } = useFlowStore();
+  const [nodeData, dispatchNodeDataAction] = useReducer(conditionNodeReducer, data);
+
+  const handleConditionChange: ConditionChangeHandler = (key, value) => {
+    if (key === "field") {
+      dispatchNodeDataAction({ type: "SET_FIELD", payload: value as FlowVariable });
+    } else if (key === "operator") {
+      dispatchNodeDataAction({ type: "SET_OPERATOR", payload: value as FlowOperator });
+    } else if (key === "value") {
+      dispatchNodeDataAction({ type: "SET_VALUE", payload: value as FlowValue });
+    }
+  };
+
+  // Update node data when form changes
+  useEffect(() => {
+    updateNodeData(id, nodeData);
+  }, [nodeData, updateNodeData, id]);
 
   return (
-    <div
-      className={`px-4 py-2 shadow-lg rounded-lg border-2 min-w-[200px] relative transition-colors ${
-        isDeleteHovering ? "border-destructive bg-destructive/5" : "border-yellow-500"
-      }`}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-    >
-      <div className="flex items-center gap-2">
-        <GitBranch className="w-4 h-4 text-yellow-500" />
-        <input type="text" defaultValue={data.label} className="text-sm font-medium bg-transparent border-none focus:outline-none w-full" />
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-yellow-500 dark:hover:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-950">
-              <Settings className="h-4 w-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 p-0" align="start">
-            <div className="space-y-4 max-h-[500px] overflow-y-auto">
-              <div className="p-4 border-b">
-                <h4 className="font-medium text-sm">Configure Condition</h4>
-              </div>
-
-              <Form {...form}>
-                <form className="space-y-4 p-4">
-                  <FormField
-                    control={form.control}
-                    name="leftOperand.variableName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Variable</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select variable" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {availableVariables.map((variable) => (
-                              <SelectItem key={variable.name} value={variable.name}>
-                                <div className="flex items-center gap-2">
-                                  <Variable className="h-4 w-4" />
-                                  <span>{variable.name}</span>
-                                  <span className="text-xs text-gray-500">({variable.type})</span>
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="operator"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Operator</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select operator" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {operators.map((op) => (
-                              <SelectItem key={op.value} value={op.value}>
-                                {op.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="rightOperand"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Value</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter value" value={String(field.value)} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
-            </div>
-          </PopoverContent>
-        </Popover>
+    <div className={cn("w-[280px] rounded-sm bg-background border", { "border-[#FF8800]": selected })}>
+      <div className="px-4 h-12 flex items-center border-b">
+        <div className="flex-1 flex items-center gap-1">
+          <div className="w-6 h-6 rounded-full flex items-center justify-center bg-[#FFF3EA]">
+            <LucideGitBranch className="w-3 h-3 text-[#FF8800]" />
+          </div>
+          <span className="font-medium text-sm">Check Condition</span>
+        </div>
+        <Tooltip content="This node evaluates your condition and runs the associated action based on the condition." />
       </div>
 
-      {isHovering && <NodeDeleteButton nodeId={id} onMouseEnter={() => setIsDeleteHovering(true)} onMouseLeave={() => setIsDeleteHovering(false)} />}
+      <div className="p-3">
+        <FlowCondition field={data.condition.field} operator={data.condition.operator} value={data.condition.value} onChange={handleConditionChange} />
+      </div>
 
-      {/* Target handle at the top */}
-      <Handle type="target" position={Position.Top} className="!bg-yellow-500 hover:!h-3 hover:!w-3" />
+      {/* <button className="w-full mt-2 py-1.5 px-3 bg-orange-50 text-orange-600 rounded-md text-sm font-medium hover:bg-orange-100 transition-colors" onClick={validateCondition}>
+        Validate Condition
+      </button> */}
+      <div className="flex justify-around text-xs mb-2">
+        <div className="text-[#22C55E]">True ↓</div>
+        <div className="text-[#EF4444]">↓ False</div>
+      </div>
 
-      {/* Single source handle that connects to both paths */}
-      <Handle type="source" position={Position.Bottom} className="!bg-yellow-500 hover:!h-3 hover:!w-3" />
-      <Handle type="source" position={Position.Bottom} className="!bg-yellow-500 hover:!h-3 hover:!w-3" />
+      <Handle type="target" position={Position.Top} className="w-3 h-3 bg-[#FF8800] border-2 border-white" />
+      <Handle type="source" position={Position.Bottom} id="true" className="!w-3 !h-3 !bg-[#22C55E] !border-2 !border-white !left-[30%]" />
+      <Handle type="source" position={Position.Bottom} id="false" className="!w-3 !h-3 !bg-[#EF4444] !border-2 !border-white !left-[70%]" />
     </div>
   );
-});
+};

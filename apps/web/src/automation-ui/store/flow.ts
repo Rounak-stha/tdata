@@ -2,49 +2,59 @@ import { create } from "zustand";
 import { addEdge, applyNodeChanges, applyEdgeChanges } from "@xyflow/react";
 import type { Edge, Node } from "@xyflow/react";
 
-import {
-  calculateNewNodePosition,
-  canDeleteNode,
-  calculatePlaceholderNodePosition,
-  generateNodeId,
-  generateEdgeId,
-  getPlaceholderNodeAndedges,
-  createPlaceholderNode,
-  isValidConnection,
-} from "@/automation-ui/utils";
-import type { AppState, NodeType } from "@/automation-ui/types";
+import { canDeleteNode, getPlaceholderNodeAndedges, isValidConnection, createNode, createEdge } from "@/automation-ui/utils";
+import type { AppState, FlowVariable, NodeType } from "@/automation-ui/types";
 import { ProjectDetail } from "@tdata/shared/types";
 
-const InitialTriggerNode = {
-  id: generateNodeId("TriggerNode"),
-  type: "TriggerNode",
-  position: { x: 250, y: 100 },
-  data: { label: "Trigger" },
-};
-
-const InitialPlaceholderNode = {
-  id: generateNodeId("PlaceholderNode"),
-  type: "PlaceholderNode",
-  position: calculatePlaceholderNodePosition(InitialTriggerNode),
-  data: { label: "Placeholder Node", parentId: InitialTriggerNode.id },
-};
+const InitialTriggerNode = createNode("TriggerNode");
+const InitialPlaceholderNode = createNode("PlaceholderNode", InitialTriggerNode, { label: "Placeholder Node", parentId: InitialTriggerNode.id });
 
 export const InitialNodes = [InitialTriggerNode, InitialPlaceholderNode];
 
-export const InitialEdges = [
-  {
-    id: generateEdgeId(),
-    source: InitialTriggerNode.id,
-    target: InitialPlaceholderNode.id,
-    animated: true,
-  },
-];
+export const InitialEdges = [createEdge(InitialTriggerNode, InitialPlaceholderNode)];
 
 export const useFlowStore = create<AppState>((set, get) => ({
   nodes: InitialNodes,
   edges: InitialEdges,
   invalidConnection: false,
   project: {} as ProjectDetail,
+  variables: { system: [] as FlowVariable[], custom: [] as FlowVariable[] },
+  getFlow: () => {
+    return { nodes: get().nodes, edges: get().edges };
+  },
+  setVariables: (variables) => {
+    set({ variables });
+  },
+  setCustomVariable: (variable) => {
+    const variables = get().variables;
+    variables.custom.push(variable);
+    set({ variables });
+  },
+  deleteCustomVariable: (id) => {
+    // NOTE: We also need to check if the variable is used somewhere in the flow before actually deleting it
+    const variables = get().variables;
+    variables.custom = variables.custom.filter((variable) => variable.id !== id);
+    set({ variables });
+  },
+  updateCustomVariable: (id, newVariable) => {
+    const variables = get().variables;
+    variables.custom = variables.custom.map((variable) => (variable.id === id ? newVariable : variable));
+    set({ variables });
+  },
+  getVariables: () => {
+    return [...get().variables.system, ...get().variables.custom];
+  },
+  getSystemVariables: () => {
+    return get().variables.system;
+  },
+  getCustomVariables: () => {
+    return get().variables.custom;
+  },
+  removeCustomVariable: (id) => {
+    const variables = get().variables;
+    variables.custom = variables.custom.filter((variable) => variable.id !== id);
+    set({ variables });
+  },
   setProject: (project) => {
     set({ project });
   },
@@ -59,6 +69,13 @@ export const useFlowStore = create<AppState>((set, get) => ({
       get().setInvalidConnection(true);
     }
     return isValid;
+  },
+  updateNodeData: (nodeId, data) => {
+    const nodes = get().nodes;
+    const node = nodes.find((node) => node.id === nodeId);
+    if (!node) return;
+    node.data = { ...node.data, ...data };
+    set({ nodes });
   },
   onDragLeave: (e) => {
     console.log("onDragLeave");
@@ -82,25 +99,8 @@ export const useFlowStore = create<AppState>((set, get) => ({
     if (!sourceNode) return;
 
     // create new node and edge
-    const position = calculateNewNodePosition(nodes, edges, sourceNodeId);
-    if (!position) return null;
-    const newNodeId = `${type}-${Date.now()}`;
-
-    const newNode: Node = {
-      id: newNodeId,
-      type,
-      position,
-      data: { label: type === "ActionNode" ? "Action" : "Condition" },
-    };
-
-    const newEdge = {
-      id: `edge-${Date.now()}`,
-      source: sourceNodeId,
-      target: newNodeId,
-      sourceHandle: handleId,
-      animated: true,
-    };
-
+    const newNode = createNode(type, sourceNode, { label: type === "ActionNode" ? "Action" : "Condition" });
+    const newEdge = createEdge(sourceNode, newNode);
     const placeholderNodesAndEdges = getPlaceholderNodeAndedges(newNode);
 
     get().setNodes([...nodes, newNode, ...placeholderNodesAndEdges.nodes]);
@@ -137,7 +137,7 @@ export const useFlowStore = create<AppState>((set, get) => ({
       if (edge.target === nodeId) {
         const parentNode = nodes.find((n) => n.id === edge.source);
         if (parentNode) {
-          const placeholderNode = createPlaceholderNode(parentNode);
+          const placeholderNode = createNode("PlaceholderNode", parentNode);
           newPlaceholderNodes.push(placeholderNode);
           edge.target = placeholderNode.id;
         }
@@ -184,36 +184,23 @@ export const useFlowStore = create<AppState>((set, get) => ({
   replaceNode: (nodeId, newNodeType) => {
     const nodes = get().nodes;
     const edges = get().edges;
+    const nodeToReplace = nodes.find((node) => node.id === nodeId);
 
-    const node = nodes.find((node) => node.id === nodeId);
-    if (!node) return;
+    if (!nodeToReplace) return;
 
-    if (node?.type !== ("PlaceholderNode" as NodeType)) {
+    if (nodeToReplace?.type !== ("PlaceholderNode" as NodeType)) {
       console.warn("No a placeholder node");
       console.warn(`Cannot replace node with ${newNodeType} due to existing node type restrictions`);
     }
 
-    const sourceNodeId = node.data.parentId as string;
-    const position = node.position;
+    const parentId = nodeToReplace.data.parentId;
+    const parentNode = nodes.find((node) => node.id === parentId);
+    if (!parentNode) return;
 
-    const edge = edges.find((edge) => edge.source === sourceNodeId && edge.target === nodeId);
+    const newNode: Node = createNode(newNodeType, parentNode, { label: newNodeType === "ActionNode" ? "Action" : "Condition" });
+    newNode.position = nodeToReplace.position;
 
-    if (!edge) return;
-
-    const newNodeId = `${newNodeType}-${Date.now()}`;
-    const newNode: Node = {
-      id: newNodeId,
-      type: newNodeType,
-      position,
-      data: { label: newNodeType === "ActionNode" ? "Action" : "Condition" },
-    };
-    const newEdge: Edge = {
-      id: `edge-${Date.now()}`,
-      source: sourceNodeId,
-      target: newNodeId,
-      sourceHandle: edge.sourceHandle,
-      animated: true,
-    };
+    const newEdge: Edge = createEdge(parentNode, newNode);
 
     // remove the placeholder node and edge and the new node and edge
     const newNodes = nodes.filter((node) => node.id !== nodeId);

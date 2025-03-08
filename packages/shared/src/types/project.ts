@@ -10,7 +10,7 @@ export type ProjectTemplate = Omit<typeof projectTemplates.$inferSelect, "delete
 export type ProjectTemplateMinimal = Pick<ProjectTemplate, "id" | "name" | "description">;
 
 export type ProjectDetail = Project & {
-  template: ProjectTemplate;
+  template: ProjectTemplateDetail;
 };
 
 export type ProjectDetailMinimal = Project & {

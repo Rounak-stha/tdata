@@ -1,18 +1,96 @@
-import { Node, Edge, Connection } from "@xyflow/react";
-import { VERTICAL_SPACING, HORIZONTAL_OFFSET, SIBLING_DISTANCE } from "@/automation-ui/lib/constants";
-import { NodeType } from "@/automation-ui/types";
+import { Node, Edge, Connection, MarkerType } from "@xyflow/react";
+import { VERTICAL_SPACING, SIBLING_DISTANCE, NODE_WIDTH } from "@/automation-ui/lib/constants";
+import { ActionNodeData, ConditionNodeData, FlowNode, NodeType, TriggerNodeData, PlaceholderNodeData } from "@/automation-ui/types";
+import { nanoid } from "nanoid";
+
+export const createNode = (type: NodeType, parent?: FlowNode, data?: Record<string, unknown>) => {
+  const position = parent ? calculateNewNodePosition(parent) : { x: 250, y: 100 };
+  let nodeData = getInitialNodeData(type);
+  nodeData = data ? { ...nodeData, ...data } : nodeData;
+  return {
+    id: generateNodeId(),
+    type,
+    position,
+    data: nodeData,
+  };
+};
+
+export const createEdge = (sourceNode: FlowNode, targetNode: FlowNode, sourceHandle?: string, targetHandle?: string): Edge => {
+  const isSourceConditionNode = sourceNode.type === ("ConditionNode" as NodeType);
+
+  let edgeStyle = { stroke: "#AAA", strokeWidth: 1.5 };
+
+  if (isSourceConditionNode && sourceHandle) {
+    if (sourceHandle == "true") {
+      edgeStyle = { stroke: "#22C55E", strokeWidth: 1.5 };
+    } else if (sourceHandle === "false") {
+      edgeStyle = { stroke: "#EF4444", strokeWidth: 1.5 };
+    }
+  }
+
+  const markerEnd = {
+    type: MarkerType.ArrowClosed,
+    width: 15,
+    height: 15,
+    color: edgeStyle.stroke,
+  };
+
+  return {
+    id: generateEdgeId(),
+    source: sourceNode.id,
+    target: targetNode.id,
+    sourceHandle: sourceHandle,
+    targetHandle: targetHandle,
+    style: edgeStyle,
+    markerEnd,
+    animated: true,
+  };
+};
+
+function getInitialNodeData(nodeType: NodeType): ActionNodeData | ConditionNodeData | TriggerNodeData | PlaceholderNodeData {
+  switch (nodeType) {
+    case "ActionNode":
+      return {
+        label: "",
+        action: "Update_Task",
+        payload: {},
+      };
+    case "ConditionNode":
+      return {
+        label: "Condition",
+        condition: {
+          field: null,
+          operator: null,
+          value: null,
+        },
+      };
+    case "TriggerNode":
+      return {
+        label: "Trigger",
+        type: "Task_Update",
+        condition: {
+          field: null,
+          operator: null,
+          value: null,
+        },
+      };
+    case "PlaceholderNode":
+      return {
+        label: "Placeholder",
+        parentId: "",
+      };
+    default:
+      throw new Error(`Unhandled node type: ${nodeType}`);
+  }
+}
 
 export const getChildNodes = (nodes: Node[], edges: Edge[], sourceNodeId: string): Node[] => {
   return nodes.filter((node) => edges.some((edge) => edge.source === sourceNodeId && edge.target === node.id));
 };
 
-export const calculateNewNodePosition = (nodes: Node[], edges: Edge[], sourceNodeId: string) => {
-  const sourceNode = nodes.find((node) => node.id === sourceNodeId);
-  if (!sourceNode) return null;
-
-  const baseX = sourceNode.position.x;
-  // Add extra spacing to account for the add button and its connecting line
-  const baseY = sourceNode.position.y + VERTICAL_SPACING + 30;
+export const calculateNewNodePosition = (parent: FlowNode) => {
+  const baseX = parent.position.x;
+  const baseY = parent.position.y + VERTICAL_SPACING;
 
   // For regular nodes, standard positioning below
   return { x: baseX, y: baseY };
@@ -23,78 +101,50 @@ export const canDeleteNode = (node: Node): boolean => {
 };
 
 /**
- * A placeholder node will always have a parent that may not already be on the Flow state (e.g. a new node)
- * This function calculates the position of the placeholder node based on the parent node
- * @param parentNode - The parent node of the placeholder node
+ * Method to get position of n sibling nodes for a parent node
  */
-export const calculatePlaceholderNodePosition = (parentNode: Node, idx?: number) => {
-  const baseX = parentNode.position.x + HORIZONTAL_OFFSET + (idx ? idx : 0) * SIBLING_DISTANCE;
-  const baseY = parentNode.position.y + VERTICAL_SPACING;
-  return { x: baseX, y: baseY };
+export const getSiblingNodesPosition = (parentNode: Node, siblingCount: number) => {
+  const positions = [];
+  const parentX = parentNode.position.x + NODE_WIDTH / 2;
+  const parentY = parentNode.position.y;
+
+  for (let i = 0; i < siblingCount; i++) {
+    const siblingX = parentX + (i - (siblingCount - 1) / 2) * SIBLING_DISTANCE;
+    const siblingY = parentY + VERTICAL_SPACING;
+    positions.push({ x: siblingX, y: siblingY });
+  }
+  return positions;
 };
 
-export const generateNodeId = (type: NodeType, postfix?: string | number): string => {
-  return `${type.replace("Node", "")}-${Date.now()}` + (postfix ? `-${postfix}` : "");
+export const generateNodeId = (): string => {
+  return nanoid();
 };
 
 export const generateEdgeId = (postfix?: string | number): string => {
-  return `edge-${Date.now()}` + (postfix ? `-${postfix}` : "");
+  return nanoid();
 };
 
 /**
  * This method is used to get Placeholderr Nodes and Edges for a given node.
  */
-export function getPlaceholderNodeAndedges(node: Node): { nodes: Node[]; edges: Edge[] } {
-  let nodeAndEdgeCount = 0;
-  const newNodeId = node.id;
-  const nodeType = node.type;
+export function getPlaceholderNodeAndedges(parent: Node): { nodes: Node[]; edges: Edge[] } {
+  const nodes = [];
+  const edges: Edge[] = [];
 
-  const nodes: Node[] = [
-    {
-      id: generateNodeId("PlaceholderNode", ++nodeAndEdgeCount),
-      type: "PlaceholderNode" as NodeType,
-      position: calculatePlaceholderNodePosition(node, 0),
-      data: { label: "True Path", parentId: newNodeId },
-    },
-  ];
-
-  const edges: Edge[] = [
-    {
-      id: generateEdgeId(++nodeAndEdgeCount),
-      source: newNodeId,
-      target: nodes[0].id,
-      animated: true,
-    },
-  ];
-
-  if (nodeType == "ConditionNode") {
-    nodes.push({
-      id: generateNodeId("PlaceholderNode", ++nodeAndEdgeCount),
-      type: "PlaceholderNode" as NodeType,
-      position: calculatePlaceholderNodePosition(node, 1),
-      data: { label: "False Path", parentId: newNodeId },
+  if (parent.type == "ConditionNode") {
+    const placeholderNodes = [createNode("PlaceholderNode", parent, { parentId: parent.id }), createNode("PlaceholderNode", parent, { parentId: parent.id })];
+    const placeholderNodePositions = getSiblingNodesPosition(parent, placeholderNodes.length);
+    placeholderNodes.forEach((node, index) => {
+      node.position = placeholderNodePositions[index];
     });
-    edges.push({
-      id: generateEdgeId(++nodeAndEdgeCount),
-      source: newNodeId,
-      target: nodes[1].id,
-      animated: true,
-    });
+    nodes.push(...placeholderNodes);
+    edges.push(createEdge(parent, placeholderNodes[0], "true"), createEdge(parent, placeholderNodes[1], "false"));
+  } else {
+    nodes.push(createNode("PlaceholderNode", parent, { parentId: parent.id }));
+    edges.push(createEdge(parent, nodes[0]));
   }
 
   return { nodes, edges };
-}
-
-/**
- * This method is used to create a placeholder node
- */
-export function createPlaceholderNode(parent: Node) {
-  return {
-    id: generateNodeId("PlaceholderNode"),
-    type: "PlaceholderNode" as NodeType,
-    position: calculatePlaceholderNodePosition(parent),
-    data: { parentId: parent.id },
-  };
 }
 
 /**

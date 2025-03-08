@@ -13,6 +13,7 @@ import {
   CircleIcon,
   CirclePauseIcon,
   ConstructionIcon,
+  DatabaseIcon,
   EyeIcon,
   GoalIcon,
   HammerIcon,
@@ -51,6 +52,7 @@ export const IconMap: Record<IconType, LucideIcon> = {
   Medium: LucideSignalMedium,
   High: ArrowBigUpDashIcon,
   Urgent: ShieldAlertIcon,
+  Database: DatabaseIcon,
 };
 
 /**
@@ -83,4 +85,5 @@ export const IconColorMap: Record<IconType, string> = {
   Medium: "text-blue-500", // Balanced and noticeable color for medium priority
   High: "text-orange-500", // Alert color for high priority
   Urgent: "text-red-600", // Bold and urgent color for critical priority
+  Database: "text-blue-500",
 };

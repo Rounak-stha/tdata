@@ -1,13 +1,10 @@
-import { CustomProperty, CustomUserProperty } from "@/components/common/custom-property";
-import { AssigneeSelect, PrioritySelect, StatusSelect } from "@/components/selects";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
 import { ProjectTemplateDetail, ProjectTemplateProperty } from "@tdata/shared/types";
 import { FC, useMemo, useState } from "react";
-import { useFlowStore } from "../store/flow";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { useFlowStore } from "@/automation-ui/store/flow";
+import { FlowValue } from "@/automation-ui/types";
+import { FlowValueComponent } from "./flow-value-component";
 
 const StandardFields = new Set(["Title", "Assignee", "Status", "Priority"]);
 
@@ -16,7 +13,11 @@ const StandardFields = new Set(["Title", "Assignee", "Status", "Priority"]);
 // user will select the fields that they want to update
 // the value input type will be based on the type of the field
 
-export const UpdateTask: FC = () => {
+type ActionNodeUpdateTaskActionProps = {
+  onChange: (key: string, value: FlowValue) => void;
+};
+
+export const ActionNodeUpdateTaskAction: FC<ActionNodeUpdateTaskActionProps> = ({ onChange }) => {
   const { project } = useFlowStore();
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const projectTemplate = project.template as ProjectTemplateDetail;
@@ -51,57 +52,35 @@ export const UpdateTask: FC = () => {
       <div className="flex flex-col gap-2">
         {selectedFields.map((fieldName) => {
           if (StandardFields.has(fieldName)) {
-            return <StandardField key={fieldName} fieldName={fieldName} template={projectTemplate} />;
+            return <StandardField key={fieldName} fieldName={fieldName} onChange={onChange} />;
           }
           const field = customFieldMap[fieldName];
-          return <CustomField key={fieldName} template={field} />;
+          return <FlowValueComponent key={field.name} valueFor={fieldName} type={field.type} label={fieldName} onChange={(value) => onChange(fieldName, value)} />;
         })}
       </div>
     </div>
   );
 };
 
-function StandardField({ fieldName, template }: { fieldName: string; template: ProjectTemplateDetail }) {
+type StandardFieldProps = {
+  fieldName: string;
+  onChange: (key: string, value: FlowValue) => void;
+};
+
+const StandardField: FC<StandardFieldProps> = ({ fieldName, onChange }) => {
   if (fieldName === "Status") {
-    return (
-      <div>
-        <Label className="peer text-muted-foreground">{fieldName}</Label>
-        <StatusSelect size="full" allStatus={template.workflow.statuses} />
-      </div>
-    );
+    return <FlowValueComponent type="status" label="Status" onChange={(value) => onChange("status", value)} />;
   }
   if (fieldName === "Priority") {
-    return (
-      <div>
-        <Label className="peer text-muted-foreground">{fieldName}</Label>
-        <PrioritySelect size="full" />
-      </div>
-    );
+    return <FlowValueComponent type="priority" label="Priority" onChange={(value) => onChange("priority", value)} />;
   }
   if (fieldName === "Assignee") {
-    return (
-      <div>
-        <Label className="peer text-muted-foreground">{fieldName}</Label>
-        <AssigneeSelect size="full" singleUser={template.singleAssignee} />
-      </div>
-    );
+    return <FlowValueComponent type="user" label="Assignee" onChange={(value) => onChange("assignee", value)} />;
   }
 
   if (fieldName == "Title") {
-    return (
-      <div>
-        <Label className="peer text-muted-foreground">{fieldName}</Label>
-        <Input />
-      </div>
-    );
+    return <FlowValueComponent type="text" label="Title" onChange={(value) => onChange("title", value)} />;
   }
 
   return null;
-}
-
-function CustomField({ template }: { template: ProjectTemplateProperty }) {
-  if (template.type === "user") {
-    return <CustomUserProperty size="full" name={template.name} required={template.required} />;
-  }
-  return <CustomProperty name={template.name} type={template.type} required={template.required} />;
-}
+};

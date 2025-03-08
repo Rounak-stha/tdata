@@ -25,4 +25,7 @@ export type IconType =
   | "Low"
   | "Medium"
   | "High"
-  | "Urgent";
+  | "Urgent"
+
+  // variable
+  | "Database";
