@@ -5,8 +5,9 @@ import { PrioritySelect } from "@components/selects/priority";
 import { AssigneeSelect } from "@components/selects/assignee";
 import type { TaskDetail } from "@tdata/shared/types";
 import Link from "next/link";
-import { AssigneeFieldName } from "@/lib/constants";
+import { AssigneeFieldName, Paths } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { useOrganizations } from "@/hooks";
 
 interface TaskCardProps {
   task: TaskDetail;
@@ -15,6 +16,7 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task, disabled = false }: TaskCardProps) {
+  const { organization } = useOrganizations();
   return (
     <Card
       className={cn("p-4 cursor-pointer transition-colors border shadow-sm rounded-sm", {
@@ -26,7 +28,7 @@ export function TaskCard({ task, disabled = false }: TaskCardProps) {
         <span className="text-xs text-muted-foreground font-mono">{task.taskNumber}</span>
         <AssigneeSelect size="icon" assignee={task.userRelations[AssigneeFieldName]} />
       </div>
-      <Link href={`/task/${task.id}`} className="block">
+      <Link href={Paths.task(organization.key, task.taskNumber)} className="block">
         <h3 className="text-sm font-medium leading-none mb-3 hover:underline">{task.title}</h3>
       </Link>
       <div className="flex items-center gap-2">

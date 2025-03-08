@@ -9,7 +9,7 @@ export const Paths = {
   onboarding: "/onboarding",
   error: "/error",
   org: (org: string) => `/${org}`,
-  task: (org: string, taskNumber: string) => `/${org}/${taskNumber}`,
+  task: (org: string, taskNumber: string) => `/${org}/task/${taskNumber}`,
   projects: (org: string) => `/${org}/projects`,
   project: (orgKey: string, projectKey: string) => `/${orgKey}/projects/${projectKey}`,
   newProject: (org: string) => `/${org}/projects/create`,
