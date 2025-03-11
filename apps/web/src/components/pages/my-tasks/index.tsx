@@ -7,6 +7,7 @@ import { TaskDetailMinimal, TaskMinimalGroupedByStatus } from "@tdata/shared/typ
 import { TextSmall } from "@/components/typography";
 import { Paths } from "@/lib/constants";
 import { useOrganizations } from "@/hooks";
+import { PrioritySelect, StatusSelect } from "@/components/selects";
 
 type MyTaskPageProps = {
   tasks: TaskMinimalGroupedByStatus[];
