@@ -8,7 +8,7 @@ export type taskProperties = TemplateProperty[]; // List of task attributes
 export type ProjectTemplateTaskType = { name: string; icon: IconType };
 export type ProjectTemplateWorkflow = { name: string; icon: IconType };
 export type ProjectTemplatePriority = { name: string; icon: IconType };
-export type ProjectTemplateAssignee = { multiple: boolean };
+export type ProjectTemplateAssignee = { single: boolean };
 export type TaskPropertyTypes = "text" | "number" | "date" | "select" | "multiSelect" | "user";
 
 export type TemplateProperty = {

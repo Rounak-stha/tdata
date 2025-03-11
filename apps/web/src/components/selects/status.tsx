@@ -39,9 +39,9 @@ export function StatusSelect({ status: InitialStatus, allStatus, onChange, size 
     <Select value={String(status.id)} onValueChange={handleChange}>
       <SelectTrigger
         disabled={isLoading || displayOnly}
-        className={cn("h-10 p-0 px-2", {
-          "w-fit": size == "default" || size == "icon",
-          "w-full": size == "full",
+        className={cn("p-0 px-2 hover:bg-muted", {
+          "h-8 w-8 border-none": size == "default" || size == "icon",
+          "h-10 w-full": size == "full",
           "[&>svg]:hidden": isLoading || size == "icon",
           "[&>svg]:mt-0.5": !isLoading || size != "icon",
         })}

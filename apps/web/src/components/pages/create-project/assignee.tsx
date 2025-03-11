@@ -15,8 +15,8 @@ export const EditAssignee: FC<EditAssigneeProps> = ({ assignee, setAssignee }) =
     <div>
       <h3 className="text-sm font-medium mb-2">Assignee</h3>
       <div className="flex items-center gap-2">
-        <Switch checked={assignee.multiple} onCheckedChange={(check) => setAssignee({ ...assignee, multiple: check })} />
-        <Label className="text-xs text-muted-foreground">Multiple?</Label>
+        <Switch checked={assignee.single} onCheckedChange={(check) => setAssignee({ ...assignee, single: check })} />
+        <Label className="text-xs text-muted-foreground">Single?</Label>
       </div>
     </div>
   );

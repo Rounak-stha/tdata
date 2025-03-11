@@ -50,7 +50,7 @@ const templates: ProjectTemplateUI[] = [
       { name: "High", icon: "High" },
       { name: "Urgent", icon: "Urgent" },
     ],
-    assignee: { multiple: false },
+    assignee: { single: true },
     taskProperties: [
       { name: "Due Date", type: "date", required: false },
       { name: "Story Points", type: "number", required: true },
@@ -92,7 +92,7 @@ const templates: ProjectTemplateUI[] = [
       { name: "High", icon: "High" },
       { name: "Urgent", icon: "Urgent" },
     ],
-    assignee: { multiple: false },
+    assignee: { single: true },
     taskProperties: [{ name: "Due Date", type: "date", required: true }],
     recommendedFor: ["Teams that prefer a continuous flow of work", "Support and maintenance teams"],
   },

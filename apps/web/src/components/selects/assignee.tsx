@@ -1,4 +1,4 @@
-import { CheckIcon, ChevronsUpDownIcon, XIcon, UserIcon } from "lucide-react";
+import { CheckIcon, ChevronsUpDownIcon, XIcon, UserIcon, CircleUserRoundIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -56,9 +56,9 @@ const SingleAssigneeSelect: FC<SingleAssigneeSelectProps> = ({ assignee, onChang
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
-                className={cn("h-10 p-0 px-2 flex items-center justify-start bg-inherit hover:bg-inherit", {
-                  "w-fit": size == "default" || size == "icon",
-                  "w-full": size == "full",
+                className={cn("p-0 px-2 flex items-center justify-start bg-inherit hover:bg-inherit", {
+                  "h-8 w-8 border-none": size == "default" || size == "icon",
+                  "h-10 w-full": size == "full",
                 })}
               >
                 {selectedAssignee ? (
@@ -133,13 +133,13 @@ export const MultiAssigneeSelect: FC<MultiAssigneeSelecProps> = ({ assignee, onC
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "h-10 flex items-center border justify-between rounded-md bg-inherit py-2 text-sm ring-offset-background",
+            "flex items-center border rounded-md bg-inherit py-2 text-sm ring-offset-background",
             "placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-            "hover:bg-accent/40",
+            "hover:bg-accent",
             {
               "px-2": selectedUsers.length == 0,
-              "w-fit": size == "default" || size == "icon",
-              "w-full": size == "full",
+              "h-8 w-8 border-none justify-center [&>svg]:hidden": size == "default" || size == "icon",
+              "h-10 w-full justify-between": size == "full",
             }
           )}
           onMouseEnter={() => setIsHovering(true)}
@@ -183,7 +183,10 @@ export const MultiAssigneeSelect: FC<MultiAssigneeSelecProps> = ({ assignee, onC
               )}
             </div>
           ) : (
-            "Select assignees"
+            <span className="flex items-center">
+              <UserIcon size={16} />
+              {size != "icon" && <span className="ml-2">Select assignees</span>}
+            </span>
           )}
           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </div>

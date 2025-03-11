@@ -5,5 +5,5 @@ export default async function ProjectPage({ params }: { params: Promise<{ orgKey
   const { orgKey, projectKey } = await params;
   const project = await getProjectByKey(projectKey, orgKey);
 
-  return <_ProjectPage project={project} />;
+  return <_ProjectPage project={project} orgKey={orgKey} />;
 }

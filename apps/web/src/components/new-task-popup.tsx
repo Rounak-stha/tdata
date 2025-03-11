@@ -90,6 +90,18 @@ export function NewTaskPopup({
   const { data: projectTemplate, isLoading: isLoadingProjectTemplate } = useProjectTemplate(project.id);
   const { user } = useUser();
 
+  useEffect(() => {
+    // Get the valid property names for the current project
+    const validPropertyNames = new Set(projectTemplate?.taskProperties?.map((p) => p.name));
+
+    // Remove refs that are not part of the new project
+    Object.keys(dynamicFormItemRefs.current).forEach((key) => {
+      if (!validPropertyNames.has(key)) {
+        delete dynamicFormItemRefs.current[key]; // Remove stale refs
+      }
+    });
+  }, [projectTemplate]);
+
   if (!organization.projects.length) {
     toast.error("No projects found in the organization. Create a project to create a task");
     onOpenChange(false);
@@ -222,7 +234,7 @@ export function NewTaskPopup({
       <VisuallyHidden>
         <DialogTitle>New Task Dialog</DialogTitle>
       </VisuallyHidden>
-      <DialogContent className="sm:max-w-[800px] bg-muted border p-0">
+      <DialogContent className="sm:max-w-[800px] bg-background border p-0">
         <div className="flex flex-col h-[80vh]">
           <DialogHeader className="p-4 border-b flex-shrink-0">
             <div className="flex items-center gap-2">
@@ -501,7 +513,6 @@ const SelectAssigneeFormItem = forwardRef<FormItemContentRefValue<FormItemValue[
   }));
 
   const handleAssigneeChange = (change: ChangeParams<User[]>) => {
-    console.log(change);
     setAssignee(change.newValue);
   };
   return (
@@ -555,6 +566,7 @@ const CustomPropertyFormItem = forwardRef<DynamicFormItemContentRefValue<TaskPro
     type: props.type,
     validate: () => {
       if (props.required && !value) {
+        console.log(props.name, " xaina");
         setShowError(true);
         return false;
       }
@@ -597,6 +609,7 @@ const CustomUserPropertyFormItem = forwardRef<DynamicFormItemContentRefValue<Use
     type: "user" as TaskPropertyTypes,
     validate: () => {
       if (props.required && !users.length) {
+        console.log(props.name, " xaina");
         setShowError(true);
         return false;
       }

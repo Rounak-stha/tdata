@@ -46,9 +46,9 @@ export function PrioritySelect({ priority: initialPriority, onChange, size = "de
     <Select value={priority} onValueChange={handleChange}>
       <SelectTrigger
         disabled={displayOnly}
-        className={cn("h-10 p-0 px-2", {
-          "w-fit": size == "default" || size == "icon",
-          "w-full": size == "full",
+        className={cn("p-0 px-2 hover:bg-muted", {
+          "h-8 w-8 border-none": size == "default" || size == "icon",
+          "w-full h-10": size == "full",
           "[&>svg]:hidden": isLoading || size == "icon",
           "[&>svg]:mt-0.5": !isLoading || size != "icon",
         })}

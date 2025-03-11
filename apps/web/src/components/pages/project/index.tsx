@@ -8,12 +8,13 @@ import { ProjectList } from "./list";
 
 type ProjectPageProps = {
   project: Project;
+  orgKey: string;
 };
 
-export const ProjectPage: FC<ProjectPageProps> = ({ project }) => {
+export const ProjectPage: FC<ProjectPageProps> = ({ project, orgKey }) => {
   return (
     <div>
-      <ProjectPageHeader project={project} />
+      <ProjectPageHeader project={project} orgKey={orgKey} />
       <Suspense fallback={<BoardSkeleton />}>
         <ProjectBoard projectId={project.id} />
       </Suspense>

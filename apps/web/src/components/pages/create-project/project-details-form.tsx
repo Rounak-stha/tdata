@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -11,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { createProject } from "@/lib/actions/project";
 import { ProjectTemplateUI } from "@types";
+import { Paths } from "@/lib/constants";
 
 interface ProjectDetailsFormProps {
   template: ProjectTemplateUI;
@@ -29,6 +31,7 @@ export function ProjectDetailsForm({ template, onBack }: ProjectDetailsFormProps
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const { organization } = useOrganizations();
   const { user } = useUser();
@@ -65,7 +68,7 @@ export function ProjectDetailsForm({ template, onBack }: ProjectDetailsFormProps
     try {
       if (validateForm()) {
         setLoading(true);
-        await createProject(
+        const createdProject = await createProject(
           {
             name,
             key,
@@ -78,8 +81,7 @@ export function ProjectDetailsForm({ template, onBack }: ProjectDetailsFormProps
         resetForm();
 
         toast.success("Project created successfully");
-        // Navigate to the new project
-        // router.push(`/project/${key}`)
+        router.push(Paths.project(organization.key, createdProject.key));
       }
     } catch (error) {
       console.error(error);
