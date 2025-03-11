@@ -19,7 +19,7 @@ export const ProjectPageHeader: FC<ProjectPageHeaderProps> = ({ project, orgKey 
       <Heading3 text={project.name} />
       <div className="flex items-center gap-2">
         <Button asChild variant="ghost" size="sm">
-          <Link href={Paths.projectAutomation(orgKey, project.key)}>
+          <Link href="/automation">
             <ZapIcon className="h-4 w-4 text-orange-400 dark:text-orange-300" />
           </Link>
         </Button>
