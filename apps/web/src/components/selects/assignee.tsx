@@ -24,7 +24,7 @@ export const AssigneeSelect: FC<AssigneeSelectProps> = ({ singleUser, ...rest })
   return <MultiAssigneeSelect {...rest} />;
 };
 
-type SingleAssigneeSelectProps = Omit<AssigneeSelectProps, "multiple">;
+type SingleAssigneeSelectProps = Omit<AssigneeSelectProps, "singleUser">;
 
 const SingleAssigneeSelect: FC<SingleAssigneeSelectProps> = ({ assignee, onChange, size = "default" }) => {
   const [open, setOpen] = useState(false);
@@ -105,7 +105,7 @@ const SingleAssigneeSelect: FC<SingleAssigneeSelectProps> = ({ assignee, onChang
   );
 };
 
-type MultiAssigneeSelecProps = Omit<AssigneeSelectProps, "multiple">;
+type MultiAssigneeSelecProps = Omit<AssigneeSelectProps, "singleUser">;
 
 export const MultiAssigneeSelect: FC<MultiAssigneeSelecProps> = ({ assignee, onChange, size = "default" }) => {
   const [open, setOpen] = useState(false);

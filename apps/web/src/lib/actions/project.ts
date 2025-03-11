@@ -29,7 +29,7 @@ export const createProject = async (data: InsertProjectData, template: ProjectTe
           ...projectTemplateData,
           id: project.id,
           workflowId: workflow.id,
-          singleAssignee: template.assignee.multiple,
+          singleAssignee: template.assignee.single,
           taskProperties: template.taskProperties,
         },
         tx
