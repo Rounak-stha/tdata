@@ -1,6 +1,8 @@
 import { pgTable, uuid, text, boolean, integer, timestamp, uniqueIndex, index, serial, pgEnum, varchar, jsonb } from "drizzle-orm/pg-core";
 
 import { ProjectTemplateProperty, TaskActivityMetadata, TaskProperty } from "@types";
+import { AutomationFlow, FlowVariable } from "src/types/automation";
+import { sql } from "drizzle-orm";
 
 const timestamps = {
   updatedAt: timestamp().$onUpdateFn(() => new Date()),
@@ -297,53 +299,25 @@ export const workflowTemplates = pgTable(TableNames.workflowTemplates, {
 // AUTOMATION TABLES
 
 export const automations = pgTable("automations", {
-  id: serial().primaryKey(),
+  /**
+   * We're using uuid as the primary key for automations as we'll be using it in the URL and it's better than an integer id to be used in the URL
+   */
+  id: uuid()
+    .primaryKey()
+    .default(sql`uuid_generate_v4()`),
   organizationId: integer()
     .references(() => organizations.id)
     .notNull(),
+  projectId: integer()
+    .references(() => projects.id)
+    .notNull(),
   name: text("name").notNull(),
+  description: text("description"),
+  triggerType: TriggerTypeEnum().notNull(),
+  flow: jsonb().$type<AutomationFlow>().notNull(),
+  variables: jsonb().$type<FlowVariable[]>(),
   createdBy: uuid()
     .references(() => users.id)
     .notNull(),
   ...timestamps,
-});
-
-export const automationTrigger = pgTable("automation_trigger", {
-  id: serial().primaryKey(),
-  organizationId: integer()
-    .references(() => organizations.id)
-    .notNull(),
-  automationId: integer()
-    .references(() => automations.id)
-    .notNull(),
-  triggerType: TriggerTypeEnum().notNull(),
-  ...timestamps,
-});
-
-export const automationNodes = pgTable("automation_nodes", {
-  id: serial().primaryKey(),
-  organizationId: integer()
-    .references(() => organizations.id)
-    .notNull(),
-  automationId: integer()
-    .references(() => automations.id)
-    .notNull(),
-  nodeType: text().notNull(),
-  ...timestamps,
-});
-
-export const automationNodeLinks = pgTable("automation_node_links", {
-  id: serial().primaryKey(),
-  organizationId: integer()
-    .references(() => organizations.id)
-    .notNull(),
-  automationId: integer()
-    .references(() => automations.id)
-    .notNull(),
-  fromNodeId: integer()
-    .references(() => automationNodes.id)
-    .notNull(),
-  toNodeId: integer()
-    .references(() => automationNodes.id)
-    .notNull(),
 });

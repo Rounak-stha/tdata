@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ThemeProvider>
           <ScrollBar orientation="vertical" />
         </ScrollArea>
-        <Toaster position="top-right" />
+        <Toaster position="top-right" expand richColors />
       </body>
     </html>
   );

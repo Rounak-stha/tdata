@@ -8,6 +8,7 @@ import { useFlowStore } from "@/automation-ui/store/flow";
 import { extractValueFromFlowValue } from "@/automation-ui/utils/variables";
 import { FlowTaskStatus } from "@/automation-ui/types";
 import { Label } from "@/components/ui/label";
+import { TrashIcon } from "lucide-react";
 
 const statusIcons = IconMap;
 const statusColors = IconColorMap;
@@ -15,7 +16,7 @@ const statusColors = IconColorMap;
 /**
  * The value of the select component is the id of one of the WorkflowStatus.
  */
-export const FlowValueStatusComponent: FC<FlowValueComponentBaseProps> = ({ type, value, onChange, className, label }) => {
+export const FlowValueStatusComponent: FC<FlowValueComponentBaseProps> = ({ type, value, onChange, className, label, deletable = false, onDelete }) => {
   invariant(type == "status", "Status Select can only be used with status fields");
   const { project, getVariables } = useFlowStore();
   const workflowStatuses: FlowTaskStatus[] = useMemo(() => {
@@ -48,10 +49,19 @@ export const FlowValueStatusComponent: FC<FlowValueComponentBaseProps> = ({ type
     }
   };
 
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete();
+    }
+  };
+
   const SelectedStatusIcon = status ? statusIcons[status.icon as IconType] : null;
   return (
     <div className={className}>
-      <Label className="block text-xs font-medium text-muted-foreground mb-1">{label ? label : "value"}</Label>
+      <div className="flex items-center">
+        <label className="flex-1 block text-xs font-medium text-gray-500 mb-1">{label ? label : "Value"}</label>
+        {deletable && <TrashIcon size={14} onClick={handleDelete} className="hover:text-destructive cursor-pointer" />}
+      </div>
       <Select value={String(status?.id)} onValueChange={handleChange}>
         <SelectTrigger className="h-8 p-0 px-2 [&>svg]:mt-0.5 w-full">
           <SelectValue asChild>

@@ -11,7 +11,8 @@ import { useFlowStore } from "@/automation-ui/store/flow";
 type ActionNodeReducerAction<T extends ActionType = ActionType> =
   | { type: "SET_LABEL"; payload: { label: string } }
   | { type: "SET_ACTION"; payload: { action: ActionType } }
-  | { type: "UPDATE_PAYLOAD"; payload: { key: string | keyof ActionPayloadMap[T]; value: ActionPayloadMap[T][keyof ActionPayloadMap[T]] } };
+  | { type: "ADD_TO_PAYLOAD"; payload: { key: string | keyof ActionPayloadMap[T]; value: ActionPayloadMap[T][keyof ActionPayloadMap[T]] } }
+  | { type: "REMOVE_FROM_PAYLOAD"; payload: { key: string | keyof ActionPayloadMap[T] } };
 
 function actionNodeReducer<T extends ActionType>(state: ActionNodeData<T>, action: ActionNodeReducerAction<T>): ActionNodeData<T> {
   switch (action.type) {
@@ -24,11 +25,17 @@ function actionNodeReducer<T extends ActionType>(state: ActionNodeData<T>, actio
         action: action.payload.action,
       } as ActionNodeData<T>;
 
-    case "UPDATE_PAYLOAD":
+    case "ADD_TO_PAYLOAD":
       return {
         ...state,
         payload: { ...state.payload, [action.payload.key]: action.payload.value },
       };
+    case "REMOVE_FROM_PAYLOAD":
+      const { [action.payload.key]: _, ...newPayload } = state.payload;
+      return {
+        ...state,
+        payload: newPayload,
+      } as ActionNodeData<T>;
 
     default:
       return state;
@@ -39,7 +46,7 @@ type ActionNodeProps<T extends ActionType = ActionType> = NodeProps<Node<ActionN
 
 export const ActionNode: FC<ActionNodeProps<ActionType>> = ({ id, data, selected }) => {
   const { updateNodeData } = useFlowStore();
-  const [nodeData, dispaychNodeDataAction] = useReducer(actionNodeReducer, data);
+  const [nodeData, dispatchNodeDataAction] = useReducer(actionNodeReducer, data);
 
   useEffect(() => {
     updateNodeData(id, nodeData);
@@ -47,11 +54,15 @@ export const ActionNode: FC<ActionNodeProps<ActionType>> = ({ id, data, selected
 
   // Handle action type change
   const handleActionTypeChange = (type: ActionType) => {
-    dispaychNodeDataAction({ type: "SET_ACTION", payload: { action: type } });
+    dispatchNodeDataAction({ type: "SET_ACTION", payload: { action: type } });
   };
 
-  const handlePayloadChange = (key: string | keyof ActionPayloadMap[ActionType], value: ActionPayloadMap[ActionType][keyof ActionPayloadMap[ActionType]]) => {
-    dispaychNodeDataAction({ type: "UPDATE_PAYLOAD", payload: { key, value } });
+  const handleAddToPayload = (key: string | keyof ActionPayloadMap[ActionType], value: ActionPayloadMap[ActionType][keyof ActionPayloadMap[ActionType]]) => {
+    dispatchNodeDataAction({ type: "ADD_TO_PAYLOAD", payload: { key, value } });
+  };
+
+  const onRemovePayloadItem = (key: string | keyof ActionPayloadMap[ActionType]) => {
+    dispatchNodeDataAction({ type: "REMOVE_FROM_PAYLOAD", payload: { key } });
   };
 
   return (
@@ -76,7 +87,7 @@ export const ActionNode: FC<ActionNodeProps<ActionType>> = ({ id, data, selected
       </div>
 
       <div className="px-4 py-3 space-y-3">
-        {nodeData.action && <ActionForm action={nodeData.action} onChange={handlePayloadChange} />}
+        {nodeData.action && <ActionForm action={nodeData.action} onChange={handleAddToPayload} onRemove={onRemovePayloadItem} />}
         {!nodeData.action && <p className="text-muted-foreground text-sm">Select an action</p>}
       </div>
 
@@ -89,10 +100,11 @@ export const ActionNode: FC<ActionNodeProps<ActionType>> = ({ id, data, selected
 const ActionForm: FC<{
   action: ActionType;
   onChange: (key: string | keyof ActionPayloadMap[ActionType], value: ActionPayloadMap[ActionType][keyof ActionPayloadMap[ActionType]]) => void;
-}> = ({ action, onChange }) => {
+  onRemove: (key: string | keyof ActionPayloadMap[ActionType]) => void;
+}> = ({ action, onChange, onRemove }) => {
   switch (action) {
     case "Update_Task":
-      return <ActionNodeUpdateTaskAction onChange={onChange} />;
+      return <ActionNodeUpdateTaskAction onChange={onChange} onRemove={onRemove} />;
     case "Add_Comment":
       return <div>Add Comment Form</div>;
     default:

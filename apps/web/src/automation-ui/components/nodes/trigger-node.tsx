@@ -77,10 +77,10 @@ export const TriggerNode: FC<NodeProps<Node<TriggerNodeData, "TriggerNode">>> = 
               <SelectValue placeholder="When" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem className="disabled:cursor-not-allowed opacity-90" value={"Task_Create" as TriggerType}>
+              <SelectItem className="disabled:cursor-not-allowed opacity-90" value={"TASK_CREATED" as TriggerType}>
                 Task is created
               </SelectItem>
-              <SelectItem className="disabled:cursor-not-allowed opacity-90" value={"Task_Updated" as TriggerType}>
+              <SelectItem className="disabled:cursor-not-allowed opacity-90" value={"TASK_UPDATED" as TriggerType}>
                 Task is updated
               </SelectItem>
             </SelectContent>

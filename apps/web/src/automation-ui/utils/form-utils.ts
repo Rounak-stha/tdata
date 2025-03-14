@@ -1,5 +1,6 @@
+import { FlowVariableType } from "@tdata/shared/types";
 import { FlowOperators } from "../lib/constants";
-import { FlowOperator, FlowOperatorValue, FlowVariableType } from "@/automation-ui/types";
+import { FlowOperator, FlowOperatorValue } from "@/automation-ui/types";
 
 const TemplateValueRegex = /{{\s*(\w+)\s*/;
 
@@ -15,7 +16,7 @@ export const createVariablePlaceholder = (variable: string): string => {
 const OperatorCompatibility: Record<FlowVariableType, FlowOperatorValue[]> = {
   boolean: ["eq", "neq"],
   number: ["eq", "neq", "gt", "gte", "lt", "lte"],
-  text: ["eq", "neq", "contains", "starts_with", "ends_with"],
+  text: ["eq", "neq"],
   date: ["eq", "neq", "gt", "gte", "lt", "lte"],
   status: ["eq", "neq"],
   priority: ["eq", "neq"],

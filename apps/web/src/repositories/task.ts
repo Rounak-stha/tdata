@@ -34,7 +34,7 @@ export class TaskRepository {
         .values({ ...task, taskNumber: "o" })
         .returning();
 
-      const insertData = Object.entries(userRelations).flatMap(([name, userIds]) =>
+      const taskUsersInsertData = Object.entries(userRelations).flatMap(([name, userIds]) =>
         userIds.map((userId) => ({
           taskId: newTask[0].id,
           userId,
@@ -43,7 +43,7 @@ export class TaskRepository {
         }))
       );
 
-      await tx.insert(tasksUsers).values(insertData);
+      if (taskUsersInsertData.length) await tx.insert(tasksUsers).values(taskUsersInsertData);
       await tx.insert(taskActivities).values({
         organizationId: newTask[0].organizationId,
         action: "TASK_CREATE",

@@ -11,6 +11,156 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getAutomationByEvent = `-- name: GetAutomationByEvent :many
+SELECT id, organization_id, name, created_by, updated_at, created_at, project_id, description, trigger_type, flow, variables FROM Automations WHERE trigger_type = $1
+`
+
+func (q *Queries) GetAutomationByEvent(ctx context.Context, triggerType AutomationTriggerType) ([]Automation, error) {
+	rows, err := q.db.Query(ctx, getAutomationByEvent, triggerType)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Automation
+	for rows.Next() {
+		var i Automation
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrganizationID,
+			&i.Name,
+			&i.CreatedBy,
+			&i.UpdatedAt,
+			&i.CreatedAt,
+			&i.ProjectID,
+			&i.Description,
+			&i.TriggerType,
+			&i.Flow,
+			&i.Variables,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAutomationById = `-- name: GetAutomationById :one
+SELECT id, organization_id, name, created_by, updated_at, created_at, project_id, description, trigger_type, flow, variables FROM Automations WHERE id = $1
+`
+
+func (q *Queries) GetAutomationById(ctx context.Context, id pgtype.UUID) (Automation, error) {
+	row := q.db.QueryRow(ctx, getAutomationById, id)
+	var i Automation
+	err := row.Scan(
+		&i.ID,
+		&i.OrganizationID,
+		&i.Name,
+		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.ProjectID,
+		&i.Description,
+		&i.TriggerType,
+		&i.Flow,
+		&i.Variables,
+	)
+	return i, err
+}
+
+const getTaskDetail = `-- name: GetTaskDetail :one
+SELECT 
+    tasks.id, tasks.organization_id, tasks.project_id, tasks.created_by, tasks.title, tasks.content, tasks.priority, tasks.status_id, tasks.task_number, tasks.properties, tasks.updated_at, tasks.created_at, 
+    COALESCE(
+        JSON_OBJECT_AGG(
+            relation_name, 
+            user_data
+        ), '{}' -- Return an empty object if no relations found
+    ) AS "userRelations",
+    COALESCE(
+        ROW_TO_JSON(project_templates)::jsonb || jsonb_build_object(
+            'workflow', ROW_TO_JSON(workflows)::jsonb || jsonb_build_object(
+                'statuses', COALESCE(
+                    jsonb_agg(
+                        jsonb_build_object(
+                            'id', workflow_status.id,
+                            'workflow_id', workflow_status.workflow_id,
+                            'organization_id', workflow_status.organization_id,
+                            'created_by', workflow_status.created_by,
+                            'name', workflow_status.name,
+                            'icon', workflow_status.icon,
+                            'created_at', workflow_status.created_at,
+                            'updated_at', workflow_status.updated_at
+                        )
+                    ), '[]'
+                )
+            )
+        ), '{}' -- Combine project_template and workflow with statuses into one JSON object
+    ) AS "project_template"
+FROM 
+    tasks
+LEFT JOIN (
+    SELECT 
+        tasks_users.task_id AS task_id,
+        tasks_users.name AS relation_name,
+        JSON_AGG(ROW_TO_JSON(users)) AS user_data
+    FROM 
+        tasks_users
+    LEFT JOIN users ON users.id = tasks_users.user_id
+    GROUP BY 
+        tasks_users.task_id, tasks_users.name
+) AS user_relations ON tasks.id = user_relations.task_id
+INNER JOIN project_templates ON project_templates.id = tasks.project_id
+INNER JOIN workflows ON workflows.id = project_templates.workflow_id
+LEFT JOIN workflow_status ON workflow_status.workflow_id = workflows.id
+AND workflow_status.organization_id = project_templates.organization_id
+WHERE 
+    tasks.id = $1
+GROUP BY 
+    tasks.id, project_templates.id, workflows.id
+`
+
+type GetTaskDetailRow struct {
+	ID              int32
+	OrganizationID  int32
+	ProjectID       int32
+	CreatedBy       pgtype.UUID
+	Title           string
+	Content         pgtype.Text
+	Priority        Priority
+	StatusID        int32
+	TaskNumber      string
+	Properties      []byte
+	UpdatedAt       pgtype.Timestamp
+	CreatedAt       pgtype.Timestamp
+	UserRelations   interface{}
+	ProjectTemplate interface{}
+}
+
+func (q *Queries) GetTaskDetail(ctx context.Context, id int32) (GetTaskDetailRow, error) {
+	row := q.db.QueryRow(ctx, getTaskDetail, id)
+	var i GetTaskDetailRow
+	err := row.Scan(
+		&i.ID,
+		&i.OrganizationID,
+		&i.ProjectID,
+		&i.CreatedBy,
+		&i.Title,
+		&i.Content,
+		&i.Priority,
+		&i.StatusID,
+		&i.TaskNumber,
+		&i.Properties,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.UserRelations,
+		&i.ProjectTemplate,
+	)
+	return i, err
+}
+
 const getUsers = `-- name: GetUsers :many
 SELECT Id, Name, Email FROM Users
 `

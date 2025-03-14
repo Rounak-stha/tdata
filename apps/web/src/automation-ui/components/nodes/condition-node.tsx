@@ -54,6 +54,8 @@ export const ConditionNode: FC<ConditionNodeProps> = ({ id, data, selected }) =>
     updateNodeData(id, nodeData);
   }, [nodeData, updateNodeData, id]);
 
+  console.log({ nodeData });
+
   return (
     <div className={cn("w-[280px] rounded-sm bg-background border", { "border-[#FF8800]": selected })}>
       <div className="px-4 h-12 flex items-center border-b">

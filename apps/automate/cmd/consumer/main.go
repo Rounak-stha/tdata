@@ -2,17 +2,13 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/jackc/pgx/v5"
-
 	"tdata/automate/internal/config"
 	"tdata/automate/internal/consumer"
-	"tdata/automate/internal/db"
 )
 
 func main() {
@@ -33,23 +29,6 @@ func main() {
 	// Set up graceful shutdown
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
-	// Create db connection
-	connection, err := pgx.Connect(ctx, cfg.DB.URL)
-
-	if err != nil {
-		log.Fatalf("unable to connect to database: %v", err)
-	}
-
-	defer connection.Close(ctx)
-
-	queries := db.New(connection)
-
-	users, err := queries.GetUsers(ctx)
-	if err != nil {
-		log.Fatalf("unable to get users: %v", err)
-	}
-	fmt.Printf("%v", users)
 
 	// Start consuming in the background
 	go func() {

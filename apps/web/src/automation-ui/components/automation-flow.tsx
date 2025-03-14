@@ -47,7 +47,7 @@ const AutomationFlowWithoutProvider: FC<AutomationFlowProps> = ({ project }) => 
           <FlowVariablesModal />
         </Panel>
         <Panel position="top-right">
-          <SaveFlow />
+          <SaveFlow projectId={project.id} />
         </Panel>
         <Controls className="dark:bg-background" />
         <MiniMap className="dark:bg-background" />

@@ -8,3 +8,9 @@ sql:
         package: "db"
         out: "internal/db"
         sql_package: "pgx/v5"
+        overrides:
+          [
+            { column: "automations.flow", "go_type": { "type": "AutomationFlow" } },
+            { column: "automations.variables", "go_type": { "type": "[]FlowVariable" } },
+            { "column": "project_templates.task_properties", "go_type": { type: "[]ProjectTemplateProperty" } },
+          ]

@@ -5,6 +5,7 @@ import type { Edge, Node } from "@xyflow/react";
 import { canDeleteNode, getPlaceholderNodeAndedges, isValidConnection, createNode, createEdge } from "@/automation-ui/utils";
 import type { AppState, FlowVariable, NodeType } from "@/automation-ui/types";
 import { ProjectDetail } from "@tdata/shared/types";
+import { toast } from "sonner";
 
 const InitialTriggerNode = createNode("TriggerNode");
 const InitialPlaceholderNode = createNode("PlaceholderNode", InitialTriggerNode, { label: "Placeholder Node", parentId: InitialTriggerNode.id });
@@ -19,7 +20,9 @@ export const useFlowStore = create<AppState>((set, get) => ({
   invalidConnection: false,
   project: {} as ProjectDetail,
   variables: { system: [] as FlowVariable[], custom: [] as FlowVariable[] },
+  selectedElements: { nodes: [], edges: [] },
   getFlow: () => {
+    console.log(JSON.stringify({ nodes: get().nodes, edges: get().edges }, null, 2));
     return { nodes: get().nodes, edges: get().edges };
   },
   setVariables: (variables) => {
@@ -106,10 +109,17 @@ export const useFlowStore = create<AppState>((set, get) => ({
     get().setNodes([...nodes, newNode, ...placeholderNodesAndEdges.nodes]);
     get().setEdges([...edges, newEdge, ...placeholderNodesAndEdges.edges]);
   },
-  onDeleteNode: (nodeId) => {
+  onSelectionChange: ({ nodes, edges }) => {
+    set({ selectedElements: { nodes, edges } });
+  },
+  deleteSelectedElements: () => {
     const nodes = get().nodes;
     const edges = get().edges;
-    const node = nodes.find((node) => node.id === nodeId);
+    const selectedElements = get().selectedElements;
+
+    // TODO
+
+    /* const node = nodes.find((node) => node.id === nodeId);
 
     if (!node || !canDeleteNode(node)) {
       return;
@@ -150,6 +160,7 @@ export const useFlowStore = create<AppState>((set, get) => ({
 
     get().setNodes(filteredNodes);
     get().setEdges(filteredEdges);
+ */
   },
   setNodes: (nodes) => {
     set({ nodes });
@@ -159,10 +170,36 @@ export const useFlowStore = create<AppState>((set, get) => ({
   },
   onConnect: (connection) => {
     const nodes = get().nodes;
+    const edges = get().edges;
     const sourceNode = nodes.find((node) => node.id === connection.source);
     const targetNode = nodes.find((node) => node.id === connection.target);
 
     if (!sourceNode || !targetNode) return;
+    /* const isSourceConditionNode = sourceNode.type === "ConditionNode";
+
+	const sourceOutgoingEdges = edges.filter((edge) => edge.source === connection.source);
+	const targetIncomingEdges = edges.filter((edge) => edge.target === connection.target);
+
+	if (isSourceConditionNode) {
+		const existingTrue
+	}
+
+	if (sourceOutgoingEdges.length > 0) {
+		toast.error("Source node already has outgoing connections", {
+			description: "Remove existing connection first",
+			duration: 3000,
+		});
+		return
+	}
+
+	if (targetIncomingEdges.length > 0) {
+		toast.error("Target node already has incoming connections", {
+			description: "Remove existing connection first",
+			duration: 3000,
+		});
+		return
+	}
+ */
 
     if (sourceNode.type === "PlaceholderNode") {
       get().replaceNodeWith(sourceNode.id, targetNode.id);

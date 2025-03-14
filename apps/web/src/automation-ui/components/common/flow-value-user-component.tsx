@@ -8,12 +8,12 @@ import { FlowTaskUser } from "@/automation-ui/types";
 import { Label } from "@/components/ui/label";
 import { useOrganizationMembers } from "@/hooks";
 import { Avatar } from "@/components/ui/avatar";
-import { UserIcon } from "lucide-react";
+import { TrashIcon, UserIcon } from "lucide-react";
 
 /**
  * The value of the select component is the id of one of the WorkflowStatus.
  */
-export const FlowValueUserComponent: FC<FlowValueComponentBaseProps> = ({ type, value, onChange, className, label }) => {
+export const FlowValueUserComponent: FC<FlowValueComponentBaseProps> = ({ type, value, onChange, className, label, deletable = false, onDelete }) => {
   invariant(type == "user", "StatusSelect can only be used with status fields");
   const { getVariables } = useFlowStore();
   const organizationMembers = useOrganizationMembers();
@@ -48,9 +48,18 @@ export const FlowValueUserComponent: FC<FlowValueComponentBaseProps> = ({ type, 
     }
   };
 
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete();
+    }
+  };
+
   return (
     <div className={className}>
-      <Label className="block text-xs font-medium text-muted-foreground mb-1">{label ? label : "value"}</Label>
+      <div className="flex items-center">
+        <label className="flex-1 block text-xs font-medium text-gray-500 mb-1">{label ? label : "Value"}</label>
+        {deletable && <TrashIcon size={14} onClick={handleDelete} className="hover:text-destructive cursor-pointer" />}
+      </div>{" "}
       <Select value={String(user?.id)} onValueChange={handleChange}>
         <SelectTrigger className="h-8 p-0 px-2 [&>svg]:mt-0.5 w-full">
           <SelectValue asChild>

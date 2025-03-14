@@ -14,9 +14,10 @@
     "drizzle:generate:automate": "yarn workspace @tdata/shared drizzle:generate:automate",
     "drizzle:push": "yarn workspace @tdata/shared drizzle:push",
     "test": "vitest",
-    "test:web": "vitest --root packages/web --run",
-    "test:web:watch": "vitest --root packages/web",
-    "test:web:ui": "vitest --ui --root packages/web"
+    "test:web": "vitest --root apps/web --run --disable-console-intercept",
+    "test:web:watch": "vitest --root apps/web",
+    "test:web:ui": "vitest --ui --root apps/web --disable-console-intercept",
+    "sqlc:generate": "yarn workspaces @tdata/automate sqlc:generate"
   },
   "workspaces": [
     "apps/*",

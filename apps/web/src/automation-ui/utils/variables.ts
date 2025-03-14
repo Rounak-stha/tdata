@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
-import { ProjectDetail } from "@tdata/shared/types";
-import { FlowValue, FlowVariable, FlowVariableType } from "@/automation-ui/types";
+import { FlowVariableType, ProjectDetail } from "@tdata/shared/types";
+import { FlowValue, FlowVariable } from "@/automation-ui/types";
 import invariant from "tiny-invariant";
 
 export const createCustomVariable = (name: string, value: string, type: FlowVariableType, description: string = ""): FlowVariable => {

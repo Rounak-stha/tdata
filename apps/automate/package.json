@@ -1,0 +1,12 @@
+{
+  "name": "@tdata/automate",
+  "version": "1.0.0",
+  "description": "This is a GoLang Project. The schema is shared and is generated from `@tdata/shared`.",
+  "main": "index.js",
+  "scripts": {
+    "sqlc:generate": "sqlc generate"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

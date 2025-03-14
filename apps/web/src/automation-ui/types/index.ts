@@ -1,10 +1,12 @@
-import type { Edge, Node, OnNodesChange, OnEdgesChange, OnConnect, OnConnectEnd, IsValidConnection, OnConnectStart, ReactFlow } from "@xyflow/react";
-import { Priority, ProjectDetail, ProjectTemplatePropertyTypes, Task } from "@tdata/shared/types";
+import type { Edge, Node, OnNodesChange, OnEdgesChange, OnConnect, OnConnectEnd, IsValidConnection, OnConnectStart, ReactFlow, OnSelectionChangeFunc } from "@xyflow/react";
+import { ProjectDetail, FlowVariable, Task, AutomationFlow } from "@tdata/shared/types";
 import { IconType } from "@/types";
 
 type OnDragLeave = Parameters<typeof ReactFlow>[0]["onDragLeave"];
 
 export type FlowNode = Node;
+export type Flow = AutomationFlow;
+export type { FlowVariable };
 
 export type AppState = {
   nodes: FlowNode[];
@@ -12,7 +14,8 @@ export type AppState = {
   invalidConnection: boolean;
   project: ProjectDetail;
   variables: FlowVariableStore;
-  getFlow: () => { nodes: FlowNode[]; edges: Edge[] };
+  selectedElements: { nodes: Node[]; edges: Edge[] };
+  getFlow: () => Flow;
   setVariables: (variables: FlowVariableStore) => void;
   setCustomVariable: (variable: FlowVariable) => void;
   deleteCustomVariable: (id: string) => void;
@@ -28,11 +31,12 @@ export type AppState = {
   onNodesChange: OnNodesChange<FlowNode>;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
+  onSelectionChange: OnSelectionChangeFunc;
   onConnectStart: OnConnectStart;
   onConnectEnd: OnConnectEnd;
   onAddNode: (type: NodeType, sourceNodeId: string, handleId?: string) => void;
   onDragLeave: OnDragLeave;
-  onDeleteNode: (nodeId: string) => void;
+  deleteSelectedElements: () => void;
   setNodes: (nodes: FlowNode[]) => void;
   setEdges: (edges: Edge[]) => void;
   replaceNode: (nodeId: string, newNodeType: NodeType) => void;
@@ -48,12 +52,14 @@ export type TaskStandardFields = Exclude<keyof Task, "id" | "projectId" | "organ
 
 export type EdgeType = "WithAddButton";
 export type NodeType = "ActionNode" | "TriggerNode" | "ConditionNode" | "PlaceholderNode";
-export type TriggerType = "Task_Create" | "Task_Update";
-export type FlowVariableType = ProjectTemplatePropertyTypes | "boolean" | "status" | "priority";
+/**
+ * This must be in sync with the Automation table triggerType field
+ */
+export type TriggerType = "TASK_CREATED" | "TASK_UPDATED";
 export type FlowVariableCateory = "system" | "custom";
 export type FlowVariableStore = Record<FlowVariableCateory, FlowVariable[]>;
 export type ActionType = "Update_Task" | "Add_Comment";
-export type FlowOperatorValue = "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "contains" | "starts_with" | "ends_with";
+export type FlowOperatorValue = "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "contains";
 export type FlowValueType = "static" | "variable";
 
 export type FlowTaskStatus = {
@@ -75,14 +81,6 @@ export type FlowTaskUser = {
   name: string;
   imageUrl: string | null;
   type: FlowValueType;
-};
-
-export type FlowVariable = {
-  id: string;
-  name: string;
-  type: FlowVariableType;
-  description: string;
-  value?: string;
 };
 
 export type FlowValue =
@@ -107,7 +105,7 @@ export type ActionNodeData<T extends ActionType = ActionType> = {
 };
 
 export type ActionPayloadMap = {
-  Update_Task: Record<string, FlowValue>;
+  Update_Task: Record<string, FlowValue | null>;
   Add_Comment: {
     taskId: number;
     comment: string;

@@ -186,38 +186,17 @@ func (ns NullRole) Value() (driver.Value, error) {
 }
 
 type Automation struct {
-	ID             int32
+	ID             pgtype.UUID
 	OrganizationID int32
 	Name           string
 	CreatedBy      pgtype.UUID
 	UpdatedAt      pgtype.Timestamp
 	CreatedAt      pgtype.Timestamp
-}
-
-type AutomationNode struct {
-	ID             int32
-	AutomationID   int32
-	NodeType       string
-	UpdatedAt      pgtype.Timestamp
-	CreatedAt      pgtype.Timestamp
-	OrganizationID int32
-}
-
-type AutomationNodeLink struct {
-	ID             int32
-	FromNodeID     int32
-	ToNodeID       int32
-	OrganizationID int32
-	AutomationID   int32
-}
-
-type AutomationTrigger struct {
-	ID             int32
-	AutomationID   int32
+	ProjectID      int32
+	Description    pgtype.Text
 	TriggerType    AutomationTriggerType
-	OrganizationID int32
-	UpdatedAt      pgtype.Timestamp
-	CreatedAt      pgtype.Timestamp
+	Flow           AutomationFlow
+	Variables      []FlowVariable
 }
 
 type Organization struct {
@@ -256,7 +235,7 @@ type ProjectTemplate struct {
 	OrganizationID int32
 	WorkflowID     int32
 	SingleAssignee bool
-	TaskProperties []byte
+	TaskProperties []ProjectTemplateProperty
 	UpdatedAt      pgtype.Timestamp
 	CreatedAt      pgtype.Timestamp
 }

@@ -42,6 +42,7 @@ export const createEdge = (sourceNode: FlowNode, targetNode: FlowNode, sourceHan
     sourceHandle: sourceHandle,
     targetHandle: targetHandle,
     style: edgeStyle,
+    type: "BaseEdge",
     markerEnd,
     animated: true,
   };

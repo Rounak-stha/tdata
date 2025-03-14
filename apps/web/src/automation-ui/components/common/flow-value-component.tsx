@@ -2,11 +2,11 @@ import { FlowValueComponentBaseProps } from "@/automation-ui/types/components";
 import { FC } from "react";
 import { FlowValuePrimitiveComponent } from "./flow-value-primitive-component";
 import { FlowValueComponentDisabledPlaceholer } from "./flow-value-component-disabled-placeholder";
-import { FlowVariableType } from "@/automation-ui/types";
 import { FlowValueSelectComponent } from "./flow-value-select-component";
 import { FlowValueStatusComponent } from "./flow-value-status-component";
 import { FlowValuePriorityComponent } from "./flow-value-priority-component";
 import { FlowValueUserComponent } from "./flow-value-user-component";
+import { FlowVariableType } from "@tdata/shared/types";
 
 type FlowValueComponentProps = Omit<FlowValueComponentBaseProps, "type"> & {
   type?: FlowVariableType | null;

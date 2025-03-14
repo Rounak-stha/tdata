@@ -8,6 +8,8 @@ export type FlowValueComponentBaseProps = {
   label?: string;
   className?: string;
   error?: string | null;
+  deletable?: boolean;
+  onDelete?: () => void;
   disabled?: boolean;
   /**
    * For simple use ases, the type field would be mreo than enough to render the FlowValueComponent.

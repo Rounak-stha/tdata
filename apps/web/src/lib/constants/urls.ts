@@ -12,6 +12,7 @@ export const Paths = {
   task: (org: string, taskNumber: string) => `/${org}/task/${taskNumber}`,
   projects: (org: string) => `/${org}/projects`,
   project: (orgKey: string, projectKey: string) => `/${orgKey}/projects/${projectKey}`,
+  projectAutomation: (orgKey: string, projectKey: string) => `/${orgKey}/projects/${projectKey}/automations/create`,
   newProject: (org: string) => `/${org}/projects/create`,
   myTasks: (org: string) => `/${org}/my-tasks`,
 } as const;

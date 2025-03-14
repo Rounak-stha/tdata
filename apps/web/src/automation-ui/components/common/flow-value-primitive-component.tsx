@@ -4,12 +4,23 @@ import VariableSelector from "./variable-selector";
 import { Input } from "@/components/ui/input";
 import { FlowVariable } from "@/automation-ui/types";
 import { FlowValueComponentBaseProps } from "@/automation-ui/types/components";
+import { TrashIcon } from "lucide-react";
 
 /**
  * PrimitiveValueComponent is allows users to input a primitive value.
  * Boolean is not supported by this component because although it is a primitive type, there are only 2 possible values and would be practical to use a select instead
  */
-export const FlowValuePrimitiveComponent: FC<FlowValueComponentBaseProps> = ({ value, onChange, placeholder = "", label, className = "", error = null, disabled = false }) => {
+export const FlowValuePrimitiveComponent: FC<FlowValueComponentBaseProps> = ({
+  value,
+  onChange,
+  placeholder = "",
+  label,
+  className = "",
+  error = null,
+  disabled = false,
+  deletable = false,
+  onDelete,
+}) => {
   const [inputValue, setInputValue] = useState(value?.type == "static" ? value.value : value?.type == "variable" ? value.value.name : "");
   const [showVariableSelector, setShowVariableSelector] = useState(false);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(null);
@@ -42,8 +53,15 @@ export const FlowValuePrimitiveComponent: FC<FlowValueComponentBaseProps> = ({ v
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
+    onChange({ type: "static", value: newValue });
     if (!showVariableSelector) {
       setShowVariableSelector(true);
+    }
+  };
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete();
     }
   };
 
@@ -52,7 +70,10 @@ export const FlowValuePrimitiveComponent: FC<FlowValueComponentBaseProps> = ({ v
 
   return (
     <div className={`relative ${className}`}>
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label ? label : "Field"}</label>
+      <div className="flex items-center">
+        <label className="flex-1 block text-xs font-medium text-gray-500 mb-1">{label ? label : "Field"}</label>
+        {deletable && <TrashIcon size={14} onClick={handleDelete} className="hover:text-destructive cursor-pointer" />}
+      </div>
 
       <div className="relative flex items-center">
         <Input
