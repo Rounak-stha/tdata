@@ -3,6 +3,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
+import { PostHogProvider } from "./providers/posthog";
+
 import "./globals.css";
 
 const inter = Roboto({ subsets: ["latin"], weight: ["100", "300", "400", "500", "700", "900"] });
@@ -13,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${inter.className} h-svh w-svh overflow-auto`}>
         <ScrollArea className="h-full w-full">
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true} storageKey="kanban-theme">
-            {children}
+            <PostHogProvider>{children}</PostHogProvider>
           </ThemeProvider>
           <ScrollBar orientation="vertical" />
         </ScrollArea>
