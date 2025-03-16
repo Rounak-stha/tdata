@@ -17,14 +17,16 @@ export default async function Layout({ children, params }: { children: React.Rea
 
   return (
     <SWRProvider>
-      <SidebarProvider className="h-full w-full flex flex-col">
+      <SidebarProvider className="h-full w-full flex">
         <UserProvider initialUser={{ ...user, role }}>
           <OrganizationProvider initialOrganization={{ ...organization, members }}>
-            <Header organization={organization} />
-            <div className="flex flex-1">
-              <AppSidebar />
-              {/* NOTE: the class `min-w-0` should not be removed from here as it ensures that the main content width does not exceed than it should */}
-              <main className="flex-1 min-w-0">{children}</main>
+            <AppSidebar />
+            <div className="flex-1">
+              <Header organization={organization} />
+              <div className="flex flex-1">
+                {/* NOTE: the class `min-w-0` should not be removed from here as it ensures that the main content width does not exceed than it should */}
+                <main className="flex-1 min-w-0">{children}</main>
+              </div>
             </div>
           </OrganizationProvider>
         </UserProvider>

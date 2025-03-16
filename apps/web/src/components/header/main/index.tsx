@@ -11,9 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { UserDropDown } from "./userDropDown";
 import { OrganizationDetail } from "@tdata/shared/types";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 type HeaderProps = {
   organization: Omit<OrganizationDetail, "members">;
@@ -23,10 +23,9 @@ export const Header: FC<HeaderProps> = ({ organization }) => {
   const { setTheme, theme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-50 flex h-16 border-b items-center gap-4 bg-background px-4">
+    <header className="sticky top-0 z-50 flex h-12 border-b items-center gap-4 bg-background px-4">
       <div className="flex-1 flex items-center">
         <SidebarTrigger />
-        <p className="font-bold ml-2">{organization.name}</p>
       </div>
       <div className="flex items-center gap-4">
         <Input type="search" placeholder="Search..." className="md:w-[200px] lg:w-[300px]" />

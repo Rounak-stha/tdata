@@ -1,33 +1,31 @@
-import { ChevronDownIcon } from "lucide-react";
-
-import { SidebarHeader as _SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@components/ui/sidebar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@components/ui/dropdown-menu";
+import { SidebarHeader as _SidebarHeader, SidebarMenuButton, SidebarMenuItem } from "@components/ui/sidebar";
+import { useOrganizations } from "@/hooks";
+import { OrganizationAvatar } from "../ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
 
 export const SidebarHeader = () => {
+  const { organization } = useOrganizations();
   return (
-    <>
-      <_SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  Select Workspace
-                  <ChevronDownIcon className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
-                <DropdownMenuItem>
-                  <span>Acme Inc</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Acme Corp.</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </_SidebarHeader>
-    </>
+    <_SidebarHeader>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton asChild>
+                <Button variant="outline" className="w-full border-none px-1 flex items-center justify-start">
+                  <OrganizationAvatar src={organization.imageUrl} alt="Organization avatar" fallbackText={organization.key[0]} />
+                  <span className="font-bold">{organization.name}</span>
+                </Button>
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem disabled>Settings (Coming Soon)</DropdownMenuItem>
+              <DropdownMenuItem disabled>Manage Members (Coming Soon)</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </_SidebarHeader>
   );
 };
