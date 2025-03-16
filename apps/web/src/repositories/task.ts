@@ -43,7 +43,7 @@ export class TaskRepository {
         }))
       );
 
-      await tx.insert(tasksUsers).values(insertData);
+      if (insertData.length) await tx.insert(tasksUsers).values(insertData);
       await tx.insert(taskActivities).values({
         organizationId: newTask[0].organizationId,
         action: "TASK_CREATE",

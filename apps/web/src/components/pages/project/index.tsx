@@ -16,7 +16,7 @@ export const ProjectPage: FC<ProjectPageProps> = ({ project, orgKey }) => {
     <div>
       <ProjectPageHeader project={project} orgKey={orgKey} />
       <Suspense fallback={<BoardSkeleton />}>
-        <ProjectBoard projectId={project.id} />
+        <ProjectBoard project={project} />
       </Suspense>
     </div>
   );
