@@ -190,7 +190,7 @@ export default function SearchPage() {
 
     // Apply all active filters
     const matchesFilters = filters.every((filter) => {
-      const propertyValue = issue[filter.property];
+      const propertyValue = issue[filter.property as keyof typeof issue];
 
       // Handle array properties (like labels)
       if (Array.isArray(propertyValue)) {
@@ -294,6 +294,7 @@ export default function SearchPage() {
   return (
     <div className="p-4">
       <div className="flex flex-col space-y-4">
+        <p>Demo Only</p>
         {/* Search and filters */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
@@ -432,7 +433,7 @@ export default function SearchPage() {
               <AlertCircle className="h-6 w-6 text-muted-foreground" />
             </div>
             <h3 className="mt-4 text-lg font-semibold">No issues found</h3>
-            <p className="mt-2 text-sm text-muted-foreground">Try adjusting your search or filters to find what you're looking for.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Try adjusting your search or filters to find what you&apos;re looking for.</p>
             <Button onClick={clearFilters} variant="outline" className="mt-4">
               Clear filters
             </Button>
