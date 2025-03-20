@@ -1,6 +1,6 @@
 import { createDrizzleSupabaseClient, db } from "@db";
 
-import { taskActivities, taskComments, tasks, tasksUsers, users, workflowStatus } from "@tdata/shared/db/schema";
+import { priorities, taskActivities, taskComments, tasks, tasksUsers, taskTypes, users, workflowStatus } from "@tdata/shared/db/schema";
 import {
   InsertCommentData,
   InsertTaskActivityData,
@@ -15,7 +15,7 @@ import {
   User,
 } from "@tdata/shared/types";
 import { and, eq, sql } from "drizzle-orm";
-import { TaskSelects, WorkflowStatusSelects } from "./selects";
+import { PrioritySelect, TaskSelects, TaskTypeSelect, WorkflowStatusSelects } from "./selects";
 import ProjectRepository from "./project";
 import { PagintionMeta } from "@types";
 import { unionAll } from "drizzle-orm/pg-core";
@@ -280,10 +280,14 @@ export class TaskRepository {
         .select({
           ...TaskSelects,
           status: WorkflowStatusSelects,
+          priority: PrioritySelect,
+          type: TaskTypeSelect,
         })
         .from(tasks)
         .innerJoin(tasksUsers, and(eq(tasksUsers.taskId, tasks.id), eq(tasksUsers.name, AssigneeFieldName), eq(tasksUsers.userId, userId)))
         .leftJoin(workflowStatus, eq(workflowStatus.id, tasks.statusId))
+        .leftJoin(priorities, eq(priorities.id, tasks.priorityId))
+        .leftJoin(taskTypes, eq(taskTypes.id, tasks.typeId))
         .where(and(eq(tasks.organizationId, organizationId)));
       return data;
     });

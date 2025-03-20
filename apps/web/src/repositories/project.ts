@@ -1,18 +1,31 @@
-import { organizations, projects, projectTemplates, users, workflows, workflowStatus } from "@tdata/shared/db/schema";
+import {
+  organizations,
+  priorities,
+  projectPriorities,
+  projects,
+  projectTaskTypes,
+  projectTemplates,
+  projectWorkflowStatus,
+  taskTypes,
+  users,
+  workflowStatus,
+} from "@tdata/shared/db/schema";
 import {
   InsertProjectData,
   InsertProjectTemplate,
+  Priority,
   Project,
   ProjectDetailMinimal,
   ProjectTemplate,
   ProjectTemplateDetail,
+  ProjectTemplateProperty,
   TaskGroupedByStatus,
-  WorkflowDetail,
+  TaskType,
 } from "@tdata/shared/types";
 
-import { TransactionDb } from "@types";
+import { TransactionDb, WorkflowStatus } from "@types";
 import { createDrizzleSupabaseClient, db } from "@db";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { ProjectSelects, ProjectTemplateMinimalSelects, UserSelects } from "./selects";
 
 export class ProjectRepository {
@@ -46,6 +59,47 @@ export class ProjectRepository {
     return result[0];
   }
 
+  static async createProjectAndTemplate(data: InsertProjectData, template: ProjectTemplateDetail): Promise<Project> {
+    const db = await createDrizzleSupabaseClient();
+    const createdProject = await db.rls(async (tx) => {
+      const createdProject = await tx.insert(projects).values(data).returning();
+
+      const projectTemplateCreateData: InsertProjectTemplate = {
+        id: createdProject[0].id,
+        name: template.name,
+        organizationId: data.organizationId,
+        description: template.description,
+        singleAssignee: template.singleAssignee,
+        taskProperties: template.taskProperties,
+      };
+
+      const projectStatusInserData = template.statuses.map((status) => ({
+        projectId: createdProject[0].id,
+        workflowStatusId: status.id,
+      }));
+
+      const projectPrioritiesInsertData = template.priorities.map((priority) => ({
+        projectId: createdProject[0].id,
+        priorityId: priority.id,
+      }));
+
+      const projectTaskTypesInsertData = template.taskTypes.map((taskType) => ({
+        projectId: createdProject[0].id,
+        taskTypeId: taskType.id,
+      }));
+
+      await Promise.all([
+        tx.insert(projectTemplates).values(projectTemplateCreateData).returning(),
+        tx.insert(projectWorkflowStatus).values(projectStatusInserData).returning(),
+        tx.insert(projectPriorities).values(projectPrioritiesInsertData).returning(),
+        tx.insert(projectTaskTypes).values(projectTaskTypesInsertData).returning(),
+      ]);
+
+      return createdProject[0];
+    });
+    return createdProject;
+  }
+
   static getProjectTemplate = async (projectId: number): Promise<ProjectTemplateDetail | null> => {
     const projectTemplate = await db
       .select({
@@ -53,43 +107,56 @@ export class ProjectRepository {
         name: projectTemplates.name,
         organizationId: projectTemplates.organizationId,
         description: projectTemplates.description,
-        workflowId: projectTemplates.workflowId,
         singleAssignee: projectTemplates.singleAssignee,
         taskProperties: projectTemplates.taskProperties,
         updatedAt: projectTemplates.updatedAt,
         createdAt: projectTemplates.createdAt,
-        workflow: sql<WorkflowDetail>`
-				jsonb_build_object(
-					'id', ${workflows.id},
-					'name', ${workflows.name},
-					'description', ${workflows.description},
-					'createdBy', ${workflows.createdBy},
-					'createdAt', ${workflows.createdAt},
-					'updatedAt', ${workflows.updatedAt},
-					'statuses', (
-						SELECT jsonb_agg(
-							jsonb_build_object(
-								'id', ${workflowStatus.id},
-								'workflowId', ${workflowStatus.workflowId},
-								'organizationId', ${workflowStatus.organizationId},
-								'createdBy', ${workflowStatus.createdBy},
-								'name', ${workflowStatus.name},
-								'icon', ${workflowStatus.icon},
-								'createdAt', ${workflowStatus.createdAt},
-								'updatedAt', ${workflowStatus.updatedAt}
-							)
-						)
-						FROM ${workflowStatus}
-						WHERE ${workflowStatus.workflowId} = ${workflows.id}
-						AND ${workflowStatus.organizationId} = ${projectTemplates.organizationId}
-					)
-				)`.as("workflow"),
+        statuses: sql<WorkflowStatus[]>`
+			COALESCE(jsonb_agg(DISTINCT jsonb_build_object(
+				'id', workflow_status.id,
+				'organizationId', workflow_status.organization_id,
+				'createdBy', workflow_status.created_by,
+				'name', workflow_status.name,
+				'icon', workflow_status.icon,
+				'createdAt', workflow_status.created_at,
+				'updatedAt', workflow_status.updated_at
+			)) FILTER (WHERE workflow_status.id IS NOT NULL), '[]'::jsonb)
+		`.as("statuses"),
+        priorities: sql<Priority[]>`
+			COALESCE(jsonb_agg(DISTINCT jsonb_build_object(
+				'id', priorities.id,
+				'name', priorities.name,
+				'organizationId', priorities.organization_id,
+				'createdBy', priorities.created_by,
+				'icon', priorities.icon,
+				'createdAt', priorities.created_at,
+				'updatedAt', priorities.updated_at
+			)) FILTER (WHERE priorities.id IS NOT NULL), '[]'::jsonb)
+		`.as("priorities"),
+        taskTypes: sql<TaskType[]>`
+			COALESCE(jsonb_agg(DISTINCT jsonb_build_object(
+				'id', task_types.id,
+				'name', task_types.name,
+				'organizationId', task_types.organization_id,
+				'createdBy', task_types.created_by,
+				'icon', task_types.icon,
+				'createdAt', task_types.created_at,
+				'updatedAt', task_types.updated_at
+			)) FILTER (WHERE task_types.id IS NOT NULL), '[]'::jsonb)
+		`.as("taskTypes"),
       })
       .from(projectTemplates)
-      .innerJoin(workflows, eq(projectTemplates.workflowId, workflows.id))
+      .leftJoin(projectWorkflowStatus, eq(projectTemplates.id, projectWorkflowStatus.projectId))
+      .leftJoin(workflowStatus, eq(workflowStatus.id, projectWorkflowStatus.workflowStatusId))
+      .leftJoin(projectPriorities, eq(projectTemplates.id, projectPriorities.projectId))
+      .leftJoin(priorities, eq(priorities.id, projectPriorities.priorityId))
+      .leftJoin(projectTaskTypes, eq(projectTemplates.id, projectTaskTypes.projectId))
+      .leftJoin(taskTypes, eq(taskTypes.id, projectTaskTypes.taskTypeId))
       .where(eq(projectTemplates.id, projectId))
-      .groupBy(projectTemplates.id, workflows.id)
+      .groupBy(projectTemplates.id)
       .execute();
+
+    console.log({ projectTemplate });
 
     return projectTemplate[0] as ProjectTemplateDetail;
   };
@@ -105,21 +172,20 @@ export class ProjectRepository {
 					s.icon,
 					s.organization_id as "organizationId",
 					s.created_at as "createdAt",
-					s.workflow_id as "workflowId",
 					s.created_by as "createdBy",
 					COALESCE(
 						json_agg(t) FILTER (WHERE t.id IS NOT NULL), '[]'
 					) as tasks
 				FROM workflow_status s
-				JOIN workflows w ON w.id = s.workflow_id
-				JOIN project_templates p on p.workflow_id = w.id
+				JOIN project_workflow_status w ON w.workflow_status_id = s.id
+					 AND w.project_id = ${projectId}
 				LEFT JOIN LATERAL (
 						SELECT
 							ta.id,
 							ta.title,
 							ta.content,
 							ta.status_id as "statusId",
-							ta.priority,
+							ta.priority_id as "priorityId",
 							ta.task_number as "taskNumber",
 							ta.created_by as "createdBy",
 							ta.project_id as "projectId",
@@ -149,7 +215,6 @@ export class ProjectRepository {
 						ORDER BY ta.created_at desc
 						LIMIT ${limit}
 					) t on true
-				WHERE p.id = ${projectId}
 				GROUP BY s.id;
 			`);
       return data;
@@ -197,6 +262,112 @@ export class ProjectRepository {
     });
     return result;
   };
+
+  static async getStarterTemplate(organizationId: number): Promise<ProjectTemplateDetail> {
+    const starterStatusNames = ["To Do", "In Progress", "Completed"];
+    const starterTaskTypeNames = ["Epic", "Story", "Bug", "Task"];
+    const starterPriorityNames = ["Low", "Medium", "High", "Urgent"];
+
+    const starterstatuses = await db
+      .select()
+      .from(workflowStatus)
+      .where(and(eq(workflowStatus.organizationId, organizationId), inArray(workflowStatus.name, starterStatusNames)))
+      .execute();
+    const starterTaskTypes = await db
+      .select()
+      .from(taskTypes)
+      .where(and(eq(taskTypes.organizationId, organizationId), inArray(taskTypes.name, starterTaskTypeNames)))
+      .execute();
+    const starterPriorities = await db
+      .select()
+      .from(priorities)
+      .where(and(eq(priorities.organizationId, organizationId), inArray(priorities.name, starterPriorityNames)))
+      .execute();
+
+    const taskProperties: ProjectTemplateProperty[] = [
+      {
+        name: "Due Date",
+        type: "date",
+        required: false,
+      },
+    ];
+
+    return {
+      id: 0,
+      name: "Starter Template",
+      description: "A starter template with basic task types, statuses, and priorities",
+      organizationId: organizationId,
+      taskTypes: starterTaskTypes,
+      statuses: starterstatuses,
+      priorities: starterPriorities,
+      singleAssignee: true,
+      taskProperties: taskProperties,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }
+
+  static async getProjectTemplates(organizationId: number): Promise<ProjectTemplateDetail[]> {
+    const db = await createDrizzleSupabaseClient();
+    const allProjectTemplates: ProjectTemplateDetail[] = await db.rls(async (tx) => {
+      return await tx
+        .select({
+          id: projectTemplates.id,
+          name: projectTemplates.name,
+          organizationId: projectTemplates.organizationId,
+          description: projectTemplates.description,
+          singleAssignee: projectTemplates.singleAssignee,
+          taskProperties: projectTemplates.taskProperties,
+          updatedAt: projectTemplates.updatedAt,
+          createdAt: projectTemplates.createdAt,
+          statuses: sql<WorkflowStatus[]>`
+			COALESCE(jsonb_agg(DISTINCT jsonb_build_object(
+				'id', workflow_status.id,
+				'organizationId', workflow_status.organization_id,
+				'createdBy', workflow_status.created_by,
+				'name', workflow_status.name,
+				'icon', workflow_status.icon,
+				'createdAt', workflow_status.created_at,
+				'updatedAt', workflow_status.updated_at
+			)) FILTER (WHERE workflow_status.id IS NOT NULL), '[]'::jsonb)
+			`.as("statuses"),
+          priorities: sql<Priority[]>`
+			COALESCE(jsonb_agg(DISTINCT jsonb_build_object(
+				'id', priorities.id,
+				'name', priorities.name,
+				'organizationId', priorities.organization_id,
+				'createdBy', priorities.created_by,
+				'icon', priorities.icon,
+				'createdAt', priorities.created_at,
+				'updatedAt', priorities.updated_at
+			)) FILTER (WHERE priorities.id IS NOT NULL), '[]'::jsonb)
+			`.as("priorities"),
+          taskTypes: sql<TaskType[]>`
+			COALESCE(jsonb_agg(DISTINCT jsonb_build_object(
+				'id', task_types.id,
+				'name', task_types.name,
+				'organizationId', task_types.organization_id,
+				'createdBy', task_types.created_by,
+				'icon', task_types.icon,
+				'createdAt', task_types.created_at,
+				'updatedAt', task_types.updated_at
+			)) FILTER (WHERE task_types.id IS NOT NULL), '[]'::jsonb)
+			`.as("taskTypes"),
+        })
+        .from(projectTemplates)
+        .leftJoin(projectWorkflowStatus, eq(projectTemplates.id, projectWorkflowStatus.projectId))
+        .leftJoin(workflowStatus, eq(workflowStatus.id, projectWorkflowStatus.workflowStatusId))
+        .leftJoin(projectPriorities, eq(projectTemplates.id, projectPriorities.projectId))
+        .leftJoin(priorities, eq(priorities.id, projectPriorities.priorityId))
+        .leftJoin(projectTaskTypes, eq(projectTemplates.id, projectTaskTypes.projectId))
+        .leftJoin(taskTypes, eq(taskTypes.id, projectTaskTypes.taskTypeId))
+        .where(eq(projectTemplates.organizationId, organizationId))
+        .groupBy(projectTemplates.id)
+        .execute();
+    });
+    const starterTemplate = await ProjectRepository.getStarterTemplate(organizationId);
+    return [...allProjectTemplates, starterTemplate];
+  }
 }
 
 export default ProjectRepository;

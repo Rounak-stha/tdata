@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Priority } from "@tdata/shared/types";
+import { Priority, TaskType } from "@tdata/shared/types";
 import { ProjectSelect, StatusSelect, AssigneeSelect, PrioritySelect } from "@components/selects";
 import {
   ContentRefValue,
@@ -36,6 +36,7 @@ import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@compo
 import { Label } from "@components/ui/label";
 import { CustomProperty, CustomUserProperty } from "@components/common/custom-property";
 import { ChangeParams, TaskPropertyTypes, TemplateProperty } from "@types";
+import { TaskTypeSelect } from "./selects/task-type";
 
 interface NewTaskPopupProps {
   open: boolean;
@@ -50,13 +51,14 @@ interface NewTaskPopupProps {
   onError?: (tempId: number) => void;
 }
 
-type FormItem = "title" | "project" | "content" | "status" | "priority" | "assignee";
+type FormItem = "title" | "project" | "content" | "status" | "priority" | "assignee" | "taskType";
 
 type FormItemValue = {
   assignee: User[] | undefined; // Assignee Id
   content: string;
-  priority: Priority;
+  priority?: Priority;
   project: Project | undefined;
+  taskType: TaskType | undefined;
   status?: WorkflowStatus;
   title: string;
   date: Date | undefined;
@@ -66,7 +68,7 @@ type FormItemValue = {
 type FormRef = { [key in FormItem]: FormItemContentRefValue<FormItemValue[key]> | null };
 type DynamicFormItemRef = { [key: string]: DynamicFormItemContentRefValue<TaskPropertyValue | User[]> | null };
 
-const REQUIRED_FORM_REF_KEYS = ["title", "project"] as const;
+const REQUIRED_FORM_REF_KEYS = ["title", "project", "taskType"] as const;
 const ErrorDisplayDuration = 3000;
 
 export function NewTaskPopup({
@@ -87,6 +89,7 @@ export function NewTaskPopup({
 
   const { organization } = useOrganizations();
   const [project, setProject] = useState(initialProject || organization.projects[0]);
+  const [taskType, setTaskType] = useState<TaskType | undefined>();
   const { data: projectTemplate, isLoading: isLoadingProjectTemplate } = useProjectTemplate(project.id);
   const { user } = useUser();
 
@@ -140,7 +143,8 @@ export function NewTaskPopup({
     const projectId = (formRefs.current["project"]?.getContent() as FormItemValue["project"])?.id || 0;
     const content = formRefs.current["content"]?.getContent() as FormItemValue["content"];
     const statusId = (formRefs.current["status"]?.getContent() as FormItemValue["status"] as WorkflowStatus).id;
-    const priority = formRefs.current["priority"]?.getContent() as FormItemValue["priority"];
+    const priorityId = (formRefs.current["priority"]?.getContent() as FormItemValue["priority"] as Priority).id;
+    const typeId = (formRefs.current["taskType"]?.getContent() as FormItemValue["taskType"] as TaskType).id;
     const organizationId = organization.id;
     const createdBy = user.id;
     const assignee = (() => {
@@ -182,7 +186,7 @@ export function NewTaskPopup({
     }
 
     return {
-      taskInsertData: { title, organizationId, projectId, content, statusId, priority, createdBy, properties, userRelations },
+      taskInsertData: { title, organizationId, projectId, content, statusId, priorityId, typeId, createdBy, properties, userRelations },
       users: usersMap,
     };
   };
@@ -202,7 +206,8 @@ export function NewTaskPopup({
           title: taskInsertData.title,
           content: taskInsertData.content || "",
           statusId: taskInsertData.statusId,
-          priority: taskInsertData.priority || "MEDIUM",
+          priorityId: taskInsertData.priorityId,
+          typeId: taskInsertData.typeId,
           organizationId: organization.id,
           projectId: project.id,
           createdBy: user.id,
@@ -238,7 +243,14 @@ export function NewTaskPopup({
         <div className="flex flex-col h-[80vh]">
           <DialogHeader className="p-4 border-b flex-shrink-0">
             <div className="flex items-center gap-2">
-              <span>New Task</span>
+              <SelectTaskTypeFormItem
+                ref={(val) => {
+                  formRefs.current["taskType"] = val;
+                }}
+                taskType={taskType}
+                projectId={project.id}
+                onChange={setTaskType}
+              />
               <ChevronRightIcon size={16} className="text-primary" />
               <SelectProjectFormItem
                 ref={(val) => {
@@ -275,7 +287,7 @@ export function NewTaskPopup({
                 formRefs.current["status"] = val;
               }}
               status={status}
-              allStatus={projectTemplate?.workflow.statuses || []}
+              projectId={project.id}
               isLoading={isLoadingProjectTemplate}
             />
             <SelectPriorityFormItem
@@ -283,6 +295,8 @@ export function NewTaskPopup({
                 formRefs.current["priority"] = val;
               }}
               priority={priority}
+              projectId={project.id}
+              isLoading={isLoadingProjectTemplate}
             />
             <SelectAssigneeFormItem
               ref={(val) => {
@@ -398,6 +412,46 @@ const EditorFormItem = forwardRef<FormItemContentRefValue<FormItemValue["content
   );
 });
 
+const SelectTaskTypeFormItem = forwardRef<FormItemContentRefValue<FormItemValue["taskType"]>, { taskType?: TaskType; projectId: number; onChange: (taskType: TaskType) => void }>(
+  function SelectPriorityFormItem({ taskType, projectId, onChange }, ref) {
+    const [tooltipOpen, setTooltipOpen] = useState(false);
+
+    useEffect(() => {
+      if (tooltipOpen) {
+        setTimeout(() => {
+          setTooltipOpen(false);
+        }, ErrorDisplayDuration);
+      }
+    }, [tooltipOpen]);
+
+    useImperativeHandle(ref, () => ({
+      getContent: () => taskType,
+      validate: () => {
+        if (!taskType) {
+          setTooltipOpen(true);
+          return false;
+        }
+        return true;
+      },
+    }));
+
+    return (
+      <TooltipProvider>
+        <Tooltip open={tooltipOpen}>
+          <TooltipTrigger asChild>
+            <div>
+              <TaskTypeSelect projectId={projectId} onSelect={onChange} />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent align="start" sideOffset={10}>
+            <p className="text-xs p-1 bg-destructive text-foreground rounded-md">Task Type is requried</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+);
+
 const SelectProjectFormItem = forwardRef<FormItemContentRefValue<FormItemValue["project"]>, { project?: Project; onChange: (project: Project) => void }>(
   function SelectPriorityFormItem({ project, onChange }, ref) {
     const [tooltipOpen, setTooltipOpen] = useState(false);
@@ -438,32 +492,31 @@ const SelectProjectFormItem = forwardRef<FormItemContentRefValue<FormItemValue["
   }
 );
 
-const SelectPriorityFormItem = forwardRef<FormItemContentRefValue<FormItemValue["priority"]>, { priority?: Priority }>(function SelectPriorityFormItem(
-  { priority: initialPriority },
-  ref
-) {
-  const [priority, setPriority] = useState<Priority>(initialPriority || "MEDIUM");
+const SelectPriorityFormItem = forwardRef<FormItemContentRefValue<FormItemValue["priority"]>, { priority?: Priority; projectId: number; isLoading: boolean }>(
+  function SelectPriorityFormItem({ priority: initialPriority, projectId, isLoading }, ref) {
+    const [priority, setPriority] = useState<Priority | undefined>(initialPriority);
 
-  useImperativeHandle(ref, () => ({
-    getContent: () => priority,
-    validate: () => true,
-  }));
+    useImperativeHandle(ref, () => ({
+      getContent: () => priority,
+      validate: () => true,
+    }));
 
-  const handleChange = (change: ChangeParams<Priority>) => {
-    setPriority(change.newValue);
-  };
+    const handleChange = (change: ChangeParams<Priority>) => {
+      setPriority(change.newValue);
+    };
 
-  return (
-    <div className="relative">
-      <Label className="text-muted-foreground">Priority</Label>
-      <PrioritySelect size="full" priority={priority} onChange={handleChange} />
-    </div>
-  );
-});
+    return (
+      <div className="relative">
+        <Label className="text-muted-foreground">Priority</Label>
+        <PrioritySelect size="full" projectId={projectId} priority={priority} isLoading={isLoading} onChange={handleChange} />
+      </div>
+    );
+  }
+);
 
-const SelectStatusFormItem = forwardRef<FormItemContentRefValue<FormItemValue["status"]>, { status?: WorkflowStatus; allStatus: WorkflowStatus[]; isLoading: boolean }>(
-  function SelectStatusFormItem({ status: initialStatus, allStatus, isLoading }, ref) {
-    const [status, setStatus] = useState<WorkflowStatus>(initialStatus || allStatus[0]);
+const SelectStatusFormItem = forwardRef<FormItemContentRefValue<FormItemValue["status"]>, { status?: WorkflowStatus; projectId: number; isLoading: boolean }>(
+  function SelectStatusFormItem({ status: initialStatus, projectId, isLoading }, ref) {
+    const [status, setStatus] = useState<WorkflowStatus | undefined>(initialStatus);
 
     useImperativeHandle(ref, () => ({
       getContent: () => status,
@@ -476,7 +529,7 @@ const SelectStatusFormItem = forwardRef<FormItemContentRefValue<FormItemValue["s
     return (
       <div className="relative">
         <Label className="text-muted-foreground">Status</Label>
-        <StatusSelect size="full" status={status} allStatus={allStatus} onChange={handleChange} isLoading={isLoading} />
+        <StatusSelect size="full" status={status} projectId={projectId} onChange={handleChange} isLoading={isLoading} />
       </div>
     );
   }

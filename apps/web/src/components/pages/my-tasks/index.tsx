@@ -43,9 +43,9 @@ const TaskLine: FC<TaskLineProps> = ({ task, orgKey }) => {
       className="w-full flex items-center gap-2 justify-start h-11 hover:bg-sidebar/50"
     >
       <div className="flex items-center gap-2">
-        <PrioritySelect size="icon" priority={task.priority} />
+        <PrioritySelect size="icon" priority={task.priority} projectId={task.projectId} />
         <span className="text-sm hidden sm:inline-block text-muted-foreground font-medium w-[50px] truncate shrink-0">{task.taskNumber}</span>
-        <StatusSelect size="icon" status={task.status} allStatus={[task.status]} />
+        <StatusSelect size="icon" status={task.status} projectId={task.projectId} />
       </div>
       <span className="min-w-0 flex items-center justify-start mr-1 ml-0.5">
         <Link href={Paths.task(orgKey, task.taskNumber)} className="text-xs sm:text-sm font-medium sm:font-semibold truncate hover:underline">

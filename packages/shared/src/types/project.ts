@@ -1,6 +1,8 @@
 import { projects, projectTemplates } from "@db/schema";
-import { WorkflowDetail } from "./workflow";
+import { WorkflowStatus } from "./workflow";
 import { User } from "./user";
+import { Priority } from "./priority";
+import { TaskType } from "./taskType";
 
 export type InsertProjectData = typeof projects.$inferInsert;
 export type Project = Omit<typeof projects.$inferSelect, "deletedAt">;
@@ -19,7 +21,9 @@ export type ProjectDetailMinimal = Project & {
 };
 
 export type ProjectTemplateDetail = ProjectTemplate & {
-  workflow: WorkflowDetail;
+  statuses: WorkflowStatus[];
+  priorities: Priority[];
+  taskTypes: TaskType[];
 };
 
 export type ProjectTemplatePropertyTypes = "text" | "number" | "date" | "select" | "multiSelect" | "user";

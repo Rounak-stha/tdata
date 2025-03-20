@@ -11,11 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { createProject } from "@/lib/actions/project";
-import { ProjectTemplateUI } from "@types";
 import { Paths } from "@/lib/constants";
+import { ProjectTemplateDetail } from "@tdata/shared/types";
 
 interface ProjectDetailsFormProps {
-  template: ProjectTemplateUI;
+  template: ProjectTemplateDetail;
   onBack: () => void;
 }
 

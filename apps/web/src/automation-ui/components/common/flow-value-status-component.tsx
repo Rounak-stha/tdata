@@ -19,7 +19,7 @@ export const FlowValueStatusComponent: FC<FlowValueComponentBaseProps> = ({ type
   invariant(type == "status", "Status Select can only be used with status fields");
   const { project, getVariables } = useFlowStore();
   const workflowStatuses: FlowTaskStatus[] = useMemo(() => {
-    const ws: FlowTaskStatus[] = (project?.template.workflow.statuses || []).map((s) => ({
+    const ws: FlowTaskStatus[] = (project?.template.statuses || []).map((s) => ({
       id: s.id,
       name: s.name,
       type: "static",

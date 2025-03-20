@@ -133,6 +133,26 @@ BEGIN
     INSERT INTO public.organization_memberships (organization_id, user_id, role)
     VALUES (NEW.id, NEW.created_by, 'Admin');
 
+	INSERT INTO public.workflow_status (name, organization_id, icon, created_by)
+	VALUES
+		('To Do', NEW.id, 'ToDo', New.created_by),
+		('In Progress', NEW.id, 'InProgress', New.created_by),
+		('Completed', NEW.id, 'Completed', New.created_by);
+
+	INSERT INTO public.task_types (name, organization_id, icon, created_by)
+	VALUES
+		('Epic', NEW.id, 'Epic', New.created_by),
+		('Story', NEW.id, 'Story', New.created_by),
+		('Bug', NEW.id, 'Bug', New.created_by),
+		('Task', NEW.id, 'Task', New.created_by);
+
+	INSERT INTO public.priorities (name, organization_id, icon, created_by)
+	VALUES
+		('Low', NEW.id, 'Low', New.created_by),
+		('Medium', NEW.id, 'Medium', New.created_by),
+		('High', NEW.id, 'High', New.created_by),
+		('Urgent', NEW.id, 'Urgent', New.created_by);
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -149,10 +169,14 @@ EXECUTE FUNCTION add_organization_defaults();
 grant usage on schema "public" to authenticated;
 GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA "public" TO authenticated;
 
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+
 -- I had to Grant access to the id sequence for comments table separately
 -- May be because it was created after I granted access to all tables but I ran it again and it did not work
 -- Had to specifica;;y grant access to it
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE public.task_comments_id_seq TO authenticated;
+
+-- GRANT USAGE, SELECT, UPDATE ON SEQUENCE public.task_comments_id_seq TO authenticated;
 
 -- ROW LEVEL SECURITY (RLS)
 

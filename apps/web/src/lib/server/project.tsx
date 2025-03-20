@@ -23,3 +23,7 @@ export async function getProjectTemplate(projectId: number) {
   const project = await ProjectRepository.getProjectTemplate(projectId);
   return project;
 }
+
+export async function getProjectTemplates(organizationId: number) {
+  return ProjectRepository.getProjectTemplates(organizationId);
+}

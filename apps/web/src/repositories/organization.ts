@@ -1,7 +1,20 @@
-import { organizationMemberships, organizations, projects, projectTemplates, users, workflows } from "@tdata/shared/db/schema";
-import { InsertOrganizationData, ProjectDetail, Organization, OrganizationDetail, Role, User } from "@tdata/shared/types";
-import { db } from "@db";
+import { organizationMemberships, organizations, priorities, projects, projectTemplates, taskTypes, users, workflowStatus } from "@tdata/shared/db/schema";
+import {
+  InsertOrganizationData,
+  Organization,
+  OrganizationDetail,
+  Role,
+  User,
+  Project,
+  TaskType,
+  WorkflowStatus,
+  Priority,
+  InsertTaskTypeData,
+  InsertPriorityData,
+} from "@tdata/shared/types";
+import { createDrizzleSupabaseClient, db } from "@db";
 import { and, eq, sql } from "drizzle-orm";
+import { InsertWorkflowStatuseData } from "@/types";
 
 export class OrganizationRepository {
   // Static method to get a user by ID
@@ -22,6 +35,45 @@ export class OrganizationRepository {
     return result[0];
   }
 
+  static async getTaskTypes(organizationId: number): Promise<TaskType[]> {
+    const db = await createDrizzleSupabaseClient();
+    const result = await db.rls(async (tx) => {
+      return await tx.select().from(taskTypes).where(eq(taskTypes.organizationId, organizationId)).execute();
+    });
+    return result;
+  }
+
+  static async getStatuses(organizationId: number): Promise<WorkflowStatus[]> {
+    const db = await createDrizzleSupabaseClient();
+    const result = await db.rls(async (tx) => {
+      return await tx.select().from(workflowStatus).where(eq(workflowStatus.organizationId, organizationId)).execute();
+    });
+    return result;
+  }
+
+  static async getPriorities(organizationId: number): Promise<Priority[]> {
+    const db = await createDrizzleSupabaseClient();
+    const result = await db.rls(async (tx) => {
+      return await tx.select().from(priorities).where(eq(priorities.organizationId, organizationId)).execute();
+    });
+    return result;
+  }
+
+  static async createTaskType(data: InsertTaskTypeData): Promise<TaskType> {
+    const result = await db.insert(taskTypes).values(data).returning();
+    return result[0];
+  }
+
+  static async createStatus(data: InsertWorkflowStatuseData): Promise<WorkflowStatus> {
+    const result = await db.insert(workflowStatus).values(data).returning();
+    return result[0];
+  }
+
+  static async createPriority(data: InsertPriorityData): Promise<Priority> {
+    const result = await db.insert(priorities).values(data).returning();
+    return result[0];
+  }
+
   static async getByKeyIfUserIsMember(key: string, userId: string): Promise<{ organization: Omit<OrganizationDetail, "members">; role: Role } | null> {
     const rawOrganizationDetails = await db
       .select({
@@ -32,7 +84,7 @@ export class OrganizationRepository {
         createdBy: organizations.createdBy,
         createdAt: organizations.createdAt,
         updatedAt: organizations.updatedAt,
-        projects: sql<ProjectDetail[]>`
+        projects: sql<Project[]>`
 				array_agg(
 					jsonb_build_object(
 					'id', ${projects.id},
@@ -40,22 +92,6 @@ export class OrganizationRepository {
 					'name', ${projects.name},
 					'description', ${projects.description},
 					'key', ${projects.key},
-					'template', (
-						SELECT jsonb_agg(
-							jsonb_build_object(
-								'id', ${projectTemplates.id},
-								'name', ${projectTemplates.name},
-								'description', ${projectTemplates.description},
-								'workflowId', ${projectTemplates.workflowId},
-								'singleAssignee', ${projectTemplates.singleAssignee},
-								'taskProperties', ${projectTemplates.taskProperties},
-								'created_at', ${projectTemplates.createdAt},
-								'updated_at', ${projectTemplates.updatedAt}
-							)
-						)
-						FROM ${projectTemplates}
-						WHERE ${projectTemplates.id} = ${projects.id}
-					),
 					'created_by', ${projects.createdBy},
 					'created_at', ${projects.createdAt},
 					'updated_at', ${projects.updatedAt}
@@ -65,10 +101,9 @@ export class OrganizationRepository {
       })
       .from(organizations)
       .innerJoin(organizationMemberships, eq(organizations.id, organizationMemberships.organizationId))
-      .leftJoin(workflows, and(eq(workflows.organizationId, organizations.id)))
       .leftJoin(projects, eq(projects.organizationId, organizations.id))
       .where(and(eq(organizationMemberships.userId, userId), eq(organizations.key, key)))
-      .groupBy(organizations.id, workflows.id, organizationMemberships.role)
+      .groupBy(organizations.id, organizationMemberships.role)
       .execute();
 
     if (rawOrganizationDetails.length === 0) return null;
