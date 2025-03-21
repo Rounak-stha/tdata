@@ -85,18 +85,21 @@ export class OrganizationRepository {
         createdAt: organizations.createdAt,
         updatedAt: organizations.updatedAt,
         projects: sql<Project[]>`
-				array_agg(
-					jsonb_build_object(
-					'id', ${projects.id},
-					'organization_id', ${projects.organizationId},
-					'name', ${projects.name},
-					'description', ${projects.description},
-					'key', ${projects.key},
-					'created_by', ${projects.createdBy},
-					'created_at', ${projects.createdAt},
-					'updated_at', ${projects.updatedAt}
-					) ORDER BY ${projects.id}
-				)`.as("projects"),
+				coalesce(
+    jsonb_agg(
+      jsonb_build_object(
+        'id', ${projects.id},
+        'organization_id', ${projects.organizationId},
+        'name', ${projects.name},
+        'description', ${projects.description},
+        'key', ${projects.key},
+        'created_by', ${projects.createdBy},
+        'created_at', ${projects.createdAt},
+        'updated_at', ${projects.updatedAt}
+      )
+    ) FILTER (WHERE ${projects.id} IS NOT NULL),
+    '[]'::jsonb
+  )`.as("projects"),
         userRole: organizationMemberships.role,
       })
       .from(organizations)
