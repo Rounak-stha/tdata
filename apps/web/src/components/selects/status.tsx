@@ -44,7 +44,8 @@ export function StatusSelect({ status: InitialStatus, projectId, onChange, size 
   useEffect(() => {
     if (!projectTemplate || InitialStatus) return;
     setStatus(projectTemplate.statuses[0]);
-  }, [projectTemplate, InitialStatus]);
+    if (onChange) onChange({ newValue: projectTemplate.statuses[0], previousValue: projectTemplate.statuses[0] });
+  }, [projectTemplate, InitialStatus, onChange]);
 
   const handleChange = (statusId: string) => {
     if (!projectTemplate || !status) return;

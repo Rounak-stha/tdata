@@ -37,7 +37,8 @@ export function PrioritySelect({ priority: initialPriority, projectId, onChange,
   useEffect(() => {
     if (!projectTemplate || initialPriority) return;
     setPriority(projectTemplate.priorities[0]);
-  }, [projectTemplate, initialPriority]);
+    if (onChange) onChange({ newValue: projectTemplate.priorities[0], previousValue: projectTemplate.priorities[0] });
+  }, [projectTemplate, initialPriority, onChange]);
 
   const handleChange = (priorityId: string) => {
     if (!projectTemplate || !priority) return;

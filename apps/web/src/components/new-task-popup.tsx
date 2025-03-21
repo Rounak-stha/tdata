@@ -68,7 +68,7 @@ type FormItemValue = {
 type FormRef = { [key in FormItem]: FormItemContentRefValue<FormItemValue[key]> | null };
 type DynamicFormItemRef = { [key: string]: DynamicFormItemContentRefValue<TaskPropertyValue | User[]> | null };
 
-const REQUIRED_FORM_REF_KEYS = ["title", "project", "taskType"] as const;
+const REQUIRED_FORM_REF_KEYS = ["title", "project", "taskType", "status"] as const;
 const ErrorDisplayDuration = 3000;
 
 export function NewTaskPopup({
@@ -197,7 +197,6 @@ export function NewTaskPopup({
       setLoading(true);
       if (validateForm()) return;
       const { taskInsertData, users } = getTaskData();
-
       // Optimistic Update
       if (onOptimisticAdd) {
         const optimisticTask: TaskDetail = {

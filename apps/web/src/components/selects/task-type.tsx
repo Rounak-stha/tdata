@@ -23,7 +23,8 @@ export const TaskTypeSelect: FC<TaskTypeSelectProps> = ({ projectId, onSelect })
   useEffect(() => {
     if (!projectTemplate || selectedTaskType) return;
     setSelectedTaskType(projectTemplate.taskTypes[0]);
-  }, [projectTemplate, selectedTaskType]);
+    onSelect(projectTemplate.taskTypes[0]);
+  }, [projectTemplate, selectedTaskType, onSelect]);
 
   const handleSelect = (id: number) => {
     if (!projectTemplate) return;
