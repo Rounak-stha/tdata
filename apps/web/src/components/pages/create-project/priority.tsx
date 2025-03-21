@@ -66,7 +66,7 @@ const CreatePriorityPopover: FC<CreatePriorityProps> = ({ open, onOpenChange, on
       <PopoverTrigger asChild>
         <Button size="sm" variant="outline">
           <PlusIcon className="h-3 w-3 mr-1" />
-          Add Workflow
+          Add Priority
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80" align="end">
@@ -117,7 +117,7 @@ const ExistingPrioritySelect: FC<ExistingPrioritySelectProps> = ({ onSelect }) =
     );
 
   return (
-    <div>
+    <div className="flex flex-col gap-1">
       <Select onValueChange={handleValueChange}>
         <SelectTrigger>
           {selectedPriority && (
@@ -126,7 +126,7 @@ const ExistingPrioritySelect: FC<ExistingPrioritySelectProps> = ({ onSelect }) =
               <span>{selectedPriority.name}</span>
             </div>
           )}
-          {!selectedPriority && <span>Select Task Type</span>}
+          {!selectedPriority && <span>Select Priority</span>}
           <SelectContent>
             {data?.map((taskType) => (
               <SelectItem key={taskType.id} value={String(taskType.id)}>
@@ -139,8 +139,8 @@ const ExistingPrioritySelect: FC<ExistingPrioritySelectProps> = ({ onSelect }) =
           </SelectContent>
         </SelectTrigger>
       </Select>
-      <Button size="sm" variant="outline" onClick={handleSelect}>
-        Use Selected Task Type
+      <Button variant="outline" onClick={handleSelect}>
+        Use Selected Priority
       </Button>
     </div>
   );

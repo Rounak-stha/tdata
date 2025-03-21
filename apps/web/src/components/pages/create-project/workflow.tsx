@@ -97,8 +97,8 @@ const ExistingStatusSelect: FC<ExistingStatusSelectProps> = ({ onSelect }) => {
 
   const handleValueChange = (value: string) => {
     if (!data) return;
-    const taskType = data.find((taskType) => taskType.id === Number(value));
-    setSelectedWorkflowStatus(taskType || null);
+    const status = data.find((status) => status.id === Number(value));
+    setSelectedWorkflowStatus(status || null);
   };
 
   const handleSelect = () => {
@@ -115,7 +115,7 @@ const ExistingStatusSelect: FC<ExistingStatusSelectProps> = ({ onSelect }) => {
     );
 
   return (
-    <div>
+    <div className="flex flex-col gap-1">
       <Select onValueChange={handleValueChange}>
         <SelectTrigger>
           {selectedWorkflowStatus && (
@@ -124,21 +124,21 @@ const ExistingStatusSelect: FC<ExistingStatusSelectProps> = ({ onSelect }) => {
               <span>{selectedWorkflowStatus.name}</span>
             </div>
           )}
-          {!selectedWorkflowStatus && <span>Select Task Type</span>}
+          {!selectedWorkflowStatus && <span>Select Status</span>}
           <SelectContent>
-            {data?.map((taskType) => (
-              <SelectItem key={taskType.id} value={String(taskType.id)}>
+            {data?.map((status) => (
+              <SelectItem key={status.id} value={String(status.id)}>
                 <div className="flex items-center gap-2">
-                  <IconComponent name={taskType.icon as IconType} />
-                  <span>{taskType.name}</span>
+                  <IconComponent name={status.icon as IconType} />
+                  <span>{status.name}</span>
                 </div>
               </SelectItem>
             ))}
           </SelectContent>
         </SelectTrigger>
       </Select>
-      <Button size="sm" variant="outline" onClick={handleSelect}>
-        Use Selected Task Type
+      <Button variant="outline" onClick={handleSelect}>
+        Use Selected Status
       </Button>
     </div>
   );
@@ -160,8 +160,8 @@ const CreateNewStatus: FC<CreateNewStatusProps> = ({ onCreate }) => {
     try {
       if (!newStatus.name || !newStatus.icon) return;
       setLoading(true);
-      const createdTaskType = await createStatus({ ...newStatus, organizationId: organization.id, createdBy: user.id });
-      onCreate(createdTaskType);
+      const createdStatus = await createStatus({ ...newStatus, organizationId: organization.id, createdBy: user.id });
+      onCreate(createdStatus);
     } catch (e) {
       console.error(e);
       toast.error("Failed to create task type");
