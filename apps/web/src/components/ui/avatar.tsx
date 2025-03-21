@@ -57,23 +57,24 @@ const Avatar: React.FC<AvatarProps> = ({ src, alt, size = "md", className: custo
 
 const OrganizationAvatar: React.FC<AvatarProps> = ({ src, alt, size = "md", className: customCn, fallbackText }) => {
   const className = cn(
+    "flex aspect-square items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground",
     {
-      "h-4 w-4": size === "sm",
-      "h-6 w-6": size === "md",
-      "h-8 w-8": size == "lg",
+      "size-6": size === "sm",
+      "size-8": size === "md",
+      "size-10": size == "lg",
     },
     customCn
   );
 
-  const fallbckClassName = cn("bg-blue-500", {
-    "p-0.5": size === "sm",
-    "p-1": size === "md",
-    "p-2": size == "lg",
+  const fallbckClassName = cn("flex aspect-square items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground", {
+    "size-6": size === "sm",
+    "size-8": size === "md",
+    "size-10": size == "lg",
   });
   return (
     <AvatarRoot className={className}>
       {/*  @ts-expect-error Pass null of no src as an empty string may cause the browser to download the whole page again */}
-      <AvatarImage src={src || null} alt={alt} />
+      <AvatarImage className="size-8" src={src || null} alt={alt} />
       <AvatarFallback className={fallbckClassName}>{fallbackText ? fallbackText : <UserIcon />}</AvatarFallback>
     </AvatarRoot>
   );

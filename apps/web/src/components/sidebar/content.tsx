@@ -9,83 +9,87 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@components/ui/sidebar";
-import { FolderDotIcon, FolderKanbanIcon, ListTodoIcon, PlusIcon, SearchIcon } from "lucide-react";
+import { ArrowRightIcon, CheckSquareIcon, FolderIcon, HomeIcon, ListTodoIcon, PlusIcon, SearchIcon } from "lucide-react";
 import { useOrganizations } from "@/hooks";
 import { Paths } from "@/lib/constants";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
-
-// Menu items.
-const items = [
-  {
-    title: "My Tasks",
-    url: (orgKey: string) => Paths.myTasks(orgKey),
-    icon: ListTodoIcon,
-  },
-  {
-    title: "Search",
-    url: (orgKey: string) => Paths.search(orgKey),
-    icon: SearchIcon,
-  },
-];
 
 export const SidebarContent = () => {
   const { organization } = useOrganizations();
-  const router = useRouter();
 
   return (
-    <>
-      <_SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url(organization.key)}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <Collapsible defaultOpen asChild>
+    <_SidebarContent>
+      {/* Main Navigation */}
+      <SidebarGroup>
+        <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
             <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip="Projects">
-                  <FolderDotIcon />
-                  <span>Projects</span>
-                  <SidebarMenuAction onClick={() => router.push(Paths.newProject(organization.key))}>
-                    <PlusIcon /> <span className="sr-only">Add Project</span>
-                  </SidebarMenuAction>
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {organization.projects.map((project) => (
-                    <SidebarMenuSubItem key={project.key}>
-                      <SidebarMenuSubButton asChild>
-                        <Link href={Paths.project(organization.key, project.key)}>
-                          <span>{project.name}</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
+              <SidebarMenuButton asChild tooltip="Dashboard">
+                <Link aria-disabled href="/dashboard">
+                  <HomeIcon />
+                  <span>Dashboard (Coming Soon)</span>
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
-          </Collapsible>
-        </SidebarGroup>
-      </_SidebarContent>
-    </>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Tasks">
+                <Link href={Paths.myTasks(organization.key)}>
+                  <CheckSquareIcon />
+                  <span>My Tasks</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Reports">
+                <Link href={Paths.search(organization.key)}>
+                  <SearchIcon />
+                  <span>Search (WIP)</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+
+      {/* Projects */}
+      <SidebarGroup>
+        <SidebarGroupLabel>Projects</SidebarGroupLabel>
+        <SidebarGroupAction>
+          <Link href={Paths.newProject(organization.key)} className="block">
+            <span className="sr-only">Add Project</span>
+            <PlusIcon size={16} />
+          </Link>
+        </SidebarGroupAction>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem key="sidebarMenuNewProject">
+              <SidebarMenuButton asChild tooltip="New Project">
+                <Link className="flex items-center" href={Paths.projects(organization.key)}>
+                  <FolderIcon size={16} />
+                  <span>All Projects</span>
+                  <SidebarMenuAction>
+                    <ArrowRightIcon size={16} />
+                  </SidebarMenuAction>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            {organization.projects.map((project) => (
+              <SidebarMenuItem key={project.id}>
+                <SidebarMenuButton asChild tooltip={project.name}>
+                  <Link href={Paths.project(organization.key, project.key)}>
+                    <FolderIcon />
+                    <span>{project.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </_SidebarContent>
   );
 };
