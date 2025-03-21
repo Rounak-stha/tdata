@@ -215,4 +215,9 @@ USING (
             (organization_memberships.organization_id = task_activities.organization_id)
     )
 );
+
+-- Storage RLS
+CREATE POLICY "Users can manage their Avatar 1bs1gex_0" ON storage.objects FOR INSERT TO public WITH CHECK (((bucket_id = 'avatar'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text)));
+
+CREATE POLICY "Users can manage their Avatar 1bs1gex_1" ON storage.objects FOR UPDATE TO public USING (((bucket_id = 'avatar'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text)));
 ```
