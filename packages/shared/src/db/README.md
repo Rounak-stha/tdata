@@ -125,44 +125,6 @@ FOR EACH ROW
 EXECUTE FUNCTION soft_delete_user();
 
 
--- Create Default Workflow and initial Admin member for Organization after Create
-CREATE OR REPLACE FUNCTION add_organization_defaults()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Add the organization creator as a member with 'Admin' role in organization_memberships
-    INSERT INTO public.organization_memberships (organization_id, user_id, role)
-    VALUES (NEW.id, NEW.created_by, 'Admin');
-
-	INSERT INTO public.workflow_status (name, organization_id, icon, created_by)
-	VALUES
-		('To Do', NEW.id, 'ToDo', New.created_by),
-		('In Progress', NEW.id, 'InProgress', New.created_by),
-		('Completed', NEW.id, 'Completed', New.created_by);
-
-	INSERT INTO public.task_types (name, organization_id, icon, created_by)
-	VALUES
-		('Epic', NEW.id, 'Epic', New.created_by),
-		('Story', NEW.id, 'Story', New.created_by),
-		('Bug', NEW.id, 'Bug', New.created_by),
-		('Task', NEW.id, 'Task', New.created_by);
-
-	INSERT INTO public.priorities (name, organization_id, icon, created_by)
-	VALUES
-		('Low', NEW.id, 'Low', New.created_by),
-		('Medium', NEW.id, 'Medium', New.created_by),
-		('High', NEW.id, 'High', New.created_by),
-		('Urgent', NEW.id, 'Urgent', New.created_by);
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER after_organization_create
-AFTER INSERT ON public.organizations
-FOR EACH ROW
-EXECUTE FUNCTION add_organization_defaults();
-
-
 -- Grant Access on Public Schema to Authenticated User Role
 -- https://stackoverflow.com/questions/67551593/supabase-client-permission-denied-for-schema-public
 

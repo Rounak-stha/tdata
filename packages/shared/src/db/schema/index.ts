@@ -104,7 +104,7 @@ export const projects = pgTable(
   {
     id: serial().primaryKey(),
     organizationId: integer()
-      .references(() => organizations.id)
+      .references(() => organizations.id, { onDelete: "cascade" })
       .notNull(),
     name: text().notNull(),
     key: varchar({ length: KEY_LENGTH }).unique().notNull(),
@@ -128,7 +128,7 @@ export const projectTemplates = pgTable(TableNames.projectTemplates, {
   name: text().notNull(),
   description: text(),
   organizationId: integer()
-    .references(() => organizations.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   singleAssignee: boolean().default(true).notNull(),
   taskProperties: jsonb().$type<ProjectTemplateProperty[]>(),
@@ -141,7 +141,7 @@ export const workflowStatus = pgTable(
   {
     id: serial().primaryKey(),
     organizationId: integer()
-      .references(() => organizations.id)
+      .references(() => organizations.id, { onDelete: "cascade" })
       .notNull(),
     createdBy: uuid()
       .references(() => users.id)
@@ -159,7 +159,7 @@ export const taskTypes = pgTable(
   {
     id: serial().primaryKey(),
     organizationId: integer()
-      .references(() => organizations.id)
+      .references(() => organizations.id, { onDelete: "cascade" })
       .notNull(),
     createdBy: uuid()
       .references(() => users.id)
@@ -177,7 +177,7 @@ export const priorities = pgTable(
   {
     id: serial().primaryKey(),
     organizationId: integer()
-      .references(() => organizations.id)
+      .references(() => organizations.id, { onDelete: "cascade" })
       .notNull(),
     createdBy: uuid()
       .references(() => users.id)
@@ -196,10 +196,10 @@ export const projectWorkflowStatus = pgTable(
   TableNames.projectWorkflowStatus,
   {
     projectId: integer()
-      .references(() => projects.id)
+      .references(() => projects.id, { onDelete: "cascade" })
       .notNull(),
     workflowStatusId: integer()
-      .references(() => workflowStatus.id)
+      .references(() => workflowStatus.id, { onDelete: "cascade" })
       .notNull(),
     ...timestamps,
   },
@@ -213,10 +213,10 @@ export const projectTaskTypes = pgTable(
   TableNames.projectTaskTypes,
   {
     projectId: integer()
-      .references(() => projects.id)
+      .references(() => projects.id, { onDelete: "cascade" })
       .notNull(),
     taskTypeId: integer()
-      .references(() => taskTypes.id)
+      .references(() => taskTypes.id, { onDelete: "cascade" })
       .notNull(),
     ...timestamps,
   },
@@ -230,10 +230,10 @@ export const projectPriorities = pgTable(
   TableNames.projectPriorities,
   {
     projectId: integer()
-      .references(() => projects.id)
+      .references(() => projects.id, { onDelete: "cascade" })
       .notNull(),
     priorityId: integer()
-      .references(() => priorities.id)
+      .references(() => priorities.id, { onDelete: "cascade" })
       .notNull(),
     ...timestamps,
   },
@@ -246,10 +246,10 @@ export const tasks = pgTable(
   {
     id: serial().primaryKey(),
     organizationId: integer()
-      .references(() => organizations.id)
+      .references(() => organizations.id, { onDelete: "cascade" })
       .notNull(),
     projectId: integer()
-      .references(() => projects.id)
+      .references(() => projects.id, { onDelete: "cascade" })
       .notNull(),
     createdBy: uuid()
       .references(() => users.id)
@@ -294,7 +294,7 @@ export const tasks = pgTable(
 export const taskActivities = pgTable(TableNames.taskActivities, {
   id: serial().primaryKey(),
   organizationId: integer()
-    .references(() => organizations.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   action: ActivityActionEnum().notNull(),
   taskId: integer()
@@ -310,7 +310,7 @@ export const taskActivities = pgTable(TableNames.taskActivities, {
 export const taskComments = pgTable(TableNames.taskComments, {
   id: serial().primaryKey(),
   organizationId: integer()
-    .references(() => organizations.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   taskId: integer()
     .references(() => tasks.id)
@@ -329,7 +329,7 @@ export const taskComments = pgTable(TableNames.taskComments, {
 export const tasksUsers = pgTable(TableNames.tasksUsers, {
   id: serial().primaryKey(),
   organizationId: integer()
-    .references(() => organizations.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   taskId: integer()
     .references(() => tasks.id, { onDelete: "cascade" })
@@ -354,7 +354,7 @@ export const workflowTemplates = pgTable(TableNames.workflowTemplates, {
 export const automations = pgTable("automations", {
   id: serial().primaryKey(),
   organizationId: integer()
-    .references(() => organizations.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   name: text("name").notNull(),
   createdBy: uuid()
@@ -366,7 +366,7 @@ export const automations = pgTable("automations", {
 export const automationTrigger = pgTable("automation_trigger", {
   id: serial().primaryKey(),
   organizationId: integer()
-    .references(() => organizations.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   automationId: integer()
     .references(() => automations.id)
@@ -378,7 +378,7 @@ export const automationTrigger = pgTable("automation_trigger", {
 export const automationNodes = pgTable("automation_nodes", {
   id: serial().primaryKey(),
   organizationId: integer()
-    .references(() => organizations.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   automationId: integer()
     .references(() => automations.id)
@@ -390,7 +390,7 @@ export const automationNodes = pgTable("automation_nodes", {
 export const automationNodeLinks = pgTable("automation_node_links", {
   id: serial().primaryKey(),
   organizationId: integer()
-    .references(() => organizations.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   automationId: integer()
     .references(() => automations.id)

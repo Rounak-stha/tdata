@@ -59,7 +59,12 @@ export class ProjectRepository {
     return result[0];
   }
 
-  static async createProjectAndTemplate(data: InsertProjectData, template: ProjectTemplateDetail): Promise<Project> {
+  /**
+   * This logic is duplicated in OrganizationRepository.create
+   * Had to duplicate because each Repository method creates its own transaction
+   * and we need to create a project and its template in the same transaction because we need the created organization id
+   */
+  static async createProjectAndTemplate(data: InsertProjectData, template: Omit<ProjectTemplateDetail, "id" | "createdAt" | "updatedAt">): Promise<Project> {
     const db = await createDrizzleSupabaseClient();
     const createdProject = await db.rls(async (tx) => {
       const createdProject = await tx.insert(projects).values(data).returning();

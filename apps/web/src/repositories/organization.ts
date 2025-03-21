@@ -1,4 +1,16 @@
-import { organizationMemberships, organizations, priorities, projects, projectTemplates, taskTypes, users, workflowStatus } from "@tdata/shared/db/schema";
+import {
+  organizationMemberships,
+  organizations,
+  priorities,
+  projectPriorities,
+  projects,
+  projectTaskTypes,
+  projectTemplates,
+  projectWorkflowStatus,
+  taskTypes,
+  users,
+  workflowStatus,
+} from "@tdata/shared/db/schema";
 import {
   InsertOrganizationData,
   Organization,
@@ -11,10 +23,13 @@ import {
   Priority,
   InsertTaskTypeData,
   InsertPriorityData,
+  ProjectTemplatePropertyTypes,
+  InsertProjectTemplate,
 } from "@tdata/shared/types";
 import { createDrizzleSupabaseClient, db } from "@db";
 import { and, eq, sql } from "drizzle-orm";
-import { InsertWorkflowStatuseData } from "@/types";
+import { IconType, InsertWorkflowStatuseData } from "@/types";
+import ProjectRepository from "./project";
 
 export class OrganizationRepository {
   // Static method to get a user by ID
@@ -30,9 +45,87 @@ export class OrganizationRepository {
     else return organization[0];
   }
 
+  /**
+   * This logic is duplicated in ProjectRepositoty.createProjectAndTemplate
+   * Had to duplicate because each Repository method creates its own transaction
+   * and we need to create a project and its template in the same transaction because we need the created organization id
+   */
   static async create(data: InsertOrganizationData): Promise<Organization> {
-    const result = await db.insert(organizations).values(data).returning();
-    return result[0];
+    const db = await createDrizzleSupabaseClient();
+    const organization = await db.rls(async (tx) => {
+      const organization = (await tx.insert(organizations).values(data).returning())[0];
+
+      // create organization defaults
+      const orgaizationMemberCreateData = { organizationId: organization.id, userId: organization.createdBy, role: "Admin" as Role };
+
+      const taskTypesInsertData = [
+        { name: "Epic", organizationId: organization.id, icon: "Epic" as IconType, createdBy: organization.createdBy },
+        { name: "Story", organizationId: organization.id, icon: "Story" as IconType, createdBy: organization.createdBy },
+        { name: "Bug", organizationId: organization.id, icon: "Bug" as IconType, createdBy: organization.createdBy },
+        { name: "Task", organizationId: organization.id, icon: "Task" as IconType, createdBy: organization.createdBy },
+      ];
+
+      const workflowStatusInsertData = [
+        { name: "To Do", organizationId: organization.id, icon: "ToDo" as IconType, createdBy: organization.createdBy },
+        { name: "In Progress", organizationId: organization.id, icon: "InProgress" as IconType, createdBy: organization.createdBy },
+        { name: "Completed", organizationId: organization.id, icon: "Completed" as IconType, createdBy: organization.createdBy },
+      ];
+
+      const proritiesInsertData = [
+        { name: "Low", organizationId: organization.id, icon: "Low" as IconType, createdBy: organization.createdBy },
+        { name: "Medium", organizationId: organization.id, icon: "Medium" as IconType, createdBy: organization.createdBy },
+        { name: "High", organizationId: organization.id, icon: "High" as IconType, createdBy: organization.createdBy },
+        { name: "Urgent", organizationId: organization.id, icon: "Urgent" as IconType, createdBy: organization.createdBy },
+      ];
+
+      await tx.insert(organizationMemberships).values(orgaizationMemberCreateData).execute();
+      const createdTaskTypes = await tx.insert(taskTypes).values(taskTypesInsertData).returning();
+      const createdStatuses = await tx.insert(workflowStatus).values(workflowStatusInsertData).returning();
+      const createdPriorities = await tx.insert(priorities).values(proritiesInsertData).returning();
+
+      const newProjectData = { name: "Starter Project", key: "SP", organizationId: organization.id, createdBy: organization.createdBy };
+
+      const createdProject = await tx.insert(projects).values(newProjectData).returning();
+
+      const projectTemplateCreateData: InsertProjectTemplate = {
+        id: createdProject[0].id,
+        name: "Starter Project Template",
+        description: "A starter template with basic task types, statuses, and priorities",
+        organizationId: organization.id,
+        singleAssignee: true,
+        taskProperties: [
+          {
+            name: "Due Date",
+            type: "date" as ProjectTemplatePropertyTypes,
+            required: false,
+          },
+        ],
+      };
+
+      const projectStatusInserData = createdStatuses.map((status) => ({
+        projectId: createdProject[0].id,
+        workflowStatusId: status.id,
+      }));
+
+      const projectPrioritiesInsertData = createdPriorities.map((priority) => ({
+        projectId: createdProject[0].id,
+        priorityId: priority.id,
+      }));
+
+      const projectTaskTypesInsertData = createdTaskTypes.map((taskType) => ({
+        projectId: createdProject[0].id,
+        taskTypeId: taskType.id,
+      }));
+
+      await Promise.all([
+        tx.insert(projectTemplates).values(projectTemplateCreateData).returning(),
+        tx.insert(projectWorkflowStatus).values(projectStatusInserData).returning(),
+        tx.insert(projectPriorities).values(projectPrioritiesInsertData).returning(),
+        tx.insert(projectTaskTypes).values(projectTaskTypesInsertData).returning(),
+      ]);
+      return organization;
+    });
+    return organization;
   }
 
   static async getTaskTypes(organizationId: number): Promise<TaskType[]> {
