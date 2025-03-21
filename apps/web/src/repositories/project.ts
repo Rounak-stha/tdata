@@ -156,8 +156,6 @@ export class ProjectRepository {
       .groupBy(projectTemplates.id)
       .execute();
 
-    console.log({ projectTemplate });
-
     return projectTemplate[0] as ProjectTemplateDetail;
   };
 
