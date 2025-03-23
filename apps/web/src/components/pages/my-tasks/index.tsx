@@ -15,12 +15,7 @@ type MyTaskPageProps = {
 };
 
 export const MyTaskPage: FC<MyTaskPageProps> = ({ tasks }) => {
-  return (
-    <div className=" px-6 py-4">
-      {tasks.length && <TaskList tasks={tasks} />}
-      {!tasks.length && <NoTaskAssigedInfo />}
-    </div>
-  );
+  return <div className=" px-6 py-4">{tasks.length > 0 ? <TaskList tasks={tasks} /> : <NoTaskAssigedInfo />}</div>;
 };
 
 const TaskList: FC<{ tasks: TaskMinimalGroupedByStatus[] }> = ({ tasks }) => {
