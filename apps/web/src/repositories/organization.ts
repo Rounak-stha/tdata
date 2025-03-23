@@ -29,7 +29,6 @@ import {
 import { createDrizzleSupabaseClient, db } from "@db";
 import { and, eq, sql } from "drizzle-orm";
 import { IconType, InsertWorkflowStatuseData } from "@/types";
-import ProjectRepository from "./project";
 
 export class OrganizationRepository {
   // Static method to get a user by ID

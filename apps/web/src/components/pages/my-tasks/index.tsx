@@ -8,25 +8,33 @@ import { TextSmall } from "@/components/typography";
 import { Paths } from "@/lib/constants";
 import { useOrganizations } from "@/hooks";
 import { PrioritySelect, StatusSelect } from "@/components/selects";
+import { NoTaskAssigedInfo } from "./no-task-assigned";
 
 type MyTaskPageProps = {
   tasks: TaskMinimalGroupedByStatus[];
 };
 
 export const MyTaskPage: FC<MyTaskPageProps> = ({ tasks }) => {
-  const { organization } = useOrganizations();
   return (
     <div className=" px-6 py-4">
-      <div className="flex flex-col gap-2 mt-4">
-        {tasks.map((t) => (
-          <div key={t.group.id}>
-            <TextSmall className="font-bold text-muted-foreground" text={t.group.name} />
-            {t.tasks.map((task) => (
-              <TaskLine key={task.id} task={task} orgKey={organization.key} />
-            ))}
-          </div>
-        ))}
-      </div>
+      {tasks.length && <TaskList tasks={tasks} />}
+      {!tasks.length && <NoTaskAssigedInfo />}
+    </div>
+  );
+};
+
+const TaskList: FC<{ tasks: TaskMinimalGroupedByStatus[] }> = ({ tasks }) => {
+  const { organization } = useOrganizations();
+  return (
+    <div className="flex flex-col gap-2 mt-4">
+      {tasks.map((t) => (
+        <div key={t.group.id}>
+          <TextSmall className="font-bold text-muted-foreground" text={t.group.name} />
+          {t.tasks.map((task) => (
+            <TaskLine key={task.id} task={task} orgKey={organization.key} />
+          ))}
+        </div>
+      ))}
     </div>
   );
 };

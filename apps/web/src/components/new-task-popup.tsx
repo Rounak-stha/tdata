@@ -45,6 +45,7 @@ interface NewTaskPopupProps {
   parentTaskTitle?: string;
   status?: WorkflowStatus;
   priority?: Priority;
+  assignee?: User[];
   project?: Project;
   onOptimisticAdd?: (task: TaskDetail) => void;
   onCreate?: (task: TaskDetail & { tempId?: number }) => void;
@@ -78,6 +79,7 @@ export function NewTaskPopup({
   parentTaskTitle,
   status,
   priority,
+  assignee,
   project: initialProject,
   onOptimisticAdd,
   onCreate,
@@ -301,6 +303,7 @@ export function NewTaskPopup({
               ref={(val) => {
                 formRefs.current["assignee"] = val;
               }}
+              assignee={assignee}
               singleUser={projectTemplate?.singleAssignee || false}
             />
 
