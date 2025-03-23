@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { GoogleIcon } from "@/components/icons/google";
 import { signInWithGoogle, signInWithEmail } from "@/lib/actions/auth";
+import { Logo } from "@/components/icons/logo";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -37,7 +38,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
-        <div className="flex justify-center mb-8">{/* <TDataLogo className="w-20 h-20" /> */}</div>
+        <div className="flex justify-center">
+          <Logo size={100} />
+        </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-foreground">Sign in to TData</h2>
         <p className="mt-2 text-center text-sm text-muted-foreground">Your ultimate project management solution</p>
 
