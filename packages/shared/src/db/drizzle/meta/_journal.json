@@ -43,6 +43,13 @@
       "when": 1742584607884,
       "tag": "0005_colossal_marauders",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1742741626387,
+      "tag": "0006_common_mimic",
+      "breakpoints": true
     }
   ]
 }

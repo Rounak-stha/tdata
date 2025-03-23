@@ -107,7 +107,11 @@ export const projects = pgTable(
       .references(() => organizations.id, { onDelete: "cascade" })
       .notNull(),
     name: text().notNull(),
-    key: varchar({ length: KEY_LENGTH }).unique().notNull(),
+    /**
+     * Key of the project must be unique per Organization
+     * A composite unique index iss created on organizationId and key
+     */
+    key: varchar({ length: KEY_LENGTH }).notNull(),
     description: text(),
     createdBy: uuid()
       .references(() => users.id)
