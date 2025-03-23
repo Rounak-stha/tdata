@@ -22,7 +22,7 @@ export function TaskCard({ task, disabled = false }: TaskCardProps) {
   const initialTaskPriority = useMemo(() => task.projectTemplate.priorities.find((p) => p.id === task.priorityId), [task]);
   return (
     <Card
-      className={cn("p-4 cursor-pointer transition-colors border shadow-sm rounded-sm", {
+      className={cn("p-4 cursor-pointer transition-colors border shadow-sm", {
         "bg_muted cursor-not-allowed pointer-events-none": disabled,
         "hover:bg-accent/50": !disabled,
       })}

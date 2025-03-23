@@ -1,23 +1,21 @@
-import { FC, Suspense } from "react";
+import { FC } from "react";
 
-import { Organization, Project, ProjectDetailMinimal } from "@tdata/shared/types";
+import { Organization, Project, ProjectDetailMinimal, TaskGroupedByStatus } from "@tdata/shared/types";
 import { ProjectListPageHeader, ProjectPageHeader } from "./header";
 import { ProjectBoard } from "./board";
-import { BoardSkeleton } from "./board/loading";
 import { ProjectList } from "./list";
 
 type ProjectPageProps = {
   project: Project;
   orgKey: string;
+  tasks: TaskGroupedByStatus[];
 };
 
-export const ProjectPage: FC<ProjectPageProps> = ({ project, orgKey }) => {
+export const ProjectPage: FC<ProjectPageProps> = ({ project, orgKey, tasks }) => {
   return (
     <div>
       <ProjectPageHeader project={project} orgKey={orgKey} />
-      <Suspense fallback={<BoardSkeleton />}>
-        <ProjectBoard project={project} />
-      </Suspense>
+      <ProjectBoard project={project} tasks={tasks} />
     </div>
   );
 };
