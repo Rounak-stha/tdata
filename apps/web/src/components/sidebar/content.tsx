@@ -35,7 +35,7 @@ export const SidebarContent = () => {
             </SidebarMenuItem>
 
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Tasks">
+              <SidebarMenuButton asChild tooltip="My Tasks">
                 <Link href={Paths.myTasks(organization.key)}>
                   <CheckSquareIcon />
                   <span>My Tasks</span>
@@ -44,7 +44,7 @@ export const SidebarContent = () => {
             </SidebarMenuItem>
 
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Reports">
+              <SidebarMenuButton asChild tooltip="Search">
                 <Link href={Paths.search(organization.key)}>
                   <SearchIcon />
                   <span>Search (WIP)</span>
@@ -67,7 +67,7 @@ export const SidebarContent = () => {
         <SidebarGroupContent>
           <SidebarMenu>
             <SidebarMenuItem key="sidebarMenuNewProject">
-              <SidebarMenuButton asChild tooltip="New Project">
+              <SidebarMenuButton asChild tooltip="All Projects">
                 <Link className="flex items-center" href={Paths.projects(organization.key)}>
                   <FolderIcon size={16} />
                   <span>All Projects</span>
