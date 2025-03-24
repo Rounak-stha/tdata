@@ -11,10 +11,11 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Checkbox } from "@/components/ui/checkbox";
 import { AttributeTypeSelect } from "@/components/selects/attribute-type";
 import { ShowInfo } from "@/components/common/show-info";
+import { ProjectTemplateProperty } from "@tdata/shared/types";
 
 type EditTaskPropertiesProps = {
-  attributes: TemplateProperty[];
-  setAttributes: (taskTypes: TemplateProperty[]) => void;
+  attributes: ProjectTemplateProperty[];
+  setAttributes: (taskTypes: ProjectTemplateProperty[]) => void;
 };
 
 const REQUIRED_FIELD_INFO_MESSAGE = "Required fields are mandatory while creaing a new task";

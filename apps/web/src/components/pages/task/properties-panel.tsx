@@ -8,7 +8,7 @@ import { useUser } from "@/hooks";
 import { updateTask } from "@/lib/actions/task";
 import { AssigneeFieldName } from "@/lib/constants";
 import { calcUserDiff } from "@/lib/utils";
-import { TaskDetail, TaskPropertyValue, TaskStandardFieldUpdateKeys, User, WorkflowStatus } from "@tdata/shared/types";
+import { Priority, TaskDetail, TaskPropertyValue, User, WorkflowStatus } from "@tdata/shared/types";
 import { ChangeParams, TemplateProperty } from "@types";
 import { FC, useMemo } from "react";
 
@@ -18,8 +18,9 @@ type PropertiesPanelProps = {
 
 export const PropertiesPanel: FC<PropertiesPanelProps> = ({ task }) => {
   const { user } = useUser();
-  const statuses = task.projectTemplate.workflow.statuses;
+  const statuses = task.projectTemplate.statuses;
   const initialStatus = useMemo(() => statuses.find((status) => status.id === task.statusId), [statuses, task.statusId]);
+  const initialPriority = useMemo(() => task.projectTemplate.priorities.find((priority) => priority.id === task.priorityId), [task]);
   const templateProperties = task.projectTemplate.taskProperties;
   const userRelations = task.userRelations;
 
@@ -34,7 +35,7 @@ export const PropertiesPanel: FC<PropertiesPanelProps> = ({ task }) => {
     );
   };
 
-  const handleStandardFieldPrimitiveValueUpdate = async (change: ChangeParams<string>, name: TaskStandardFieldUpdateKeys) => {
+  /*   const handleStandardFieldPrimitiveValueUpdate = async (change: ChangeParams<string>, name: TaskStandardFieldUpdateKeys) => {
     await updateTask(
       { id: task.id, organizationId: task.organizationId },
       {
@@ -44,9 +45,16 @@ export const PropertiesPanel: FC<PropertiesPanelProps> = ({ task }) => {
       }
     );
   };
-
-  const handlePriorityUpdate = async (change: ChangeParams<string>) => {
-    handleStandardFieldPrimitiveValueUpdate(change, "priority");
+ */
+  const handlePriorityUpdate = async (change: ChangeParams<Priority>) => {
+    await updateTask(
+      { id: task.id, organizationId: task.organizationId },
+      {
+        name: "StandardFieldUpdate",
+        performedBy: user.id,
+        data: { priorityId: change.newValue.id, previous: change.previousValue.name, value: change.newValue.name },
+      }
+    );
   };
 
   const handleCustomFieldUpdate = async (change: ChangeParams<TaskPropertyValue>, name: string) => {
@@ -87,11 +95,11 @@ export const PropertiesPanel: FC<PropertiesPanelProps> = ({ task }) => {
       <div className="space-y-4">
         <div className="space-y-1">
           <label className="text-sm text-muted-foreground">Status</label>
-          <StatusSelect size="full" allStatus={task.projectTemplate.workflow.statuses} status={initialStatus} onChange={handleStatusUpdate} />
+          <StatusSelect size="full" projectId={task.projectId} status={initialStatus} onChange={handleStatusUpdate} />
         </div>
         <div className="space-y-1">
           <label className="text-sm text-muted-foreground">Priority</label>
-          <PrioritySelect size="full" priority={task.priority} onChange={handlePriorityUpdate} />
+          <PrioritySelect size="full" projectId={task.projectId} priority={initialPriority} onChange={handlePriorityUpdate} />
         </div>
         <div className="space-y-1">
           <label className="text-sm text-muted-foreground">Assignee</label>

@@ -12,14 +12,14 @@ const AvatarRoot = React.forwardRef<React.ElementRef<typeof AvatarPrimitive.Root
 AvatarRoot.displayName = AvatarPrimitive.Root.displayName;
 
 const AvatarImage = React.forwardRef<React.ElementRef<typeof AvatarPrimitive.Image>, React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>>(
-  ({ className, ...props }, ref) => <AvatarPrimitive.Image ref={ref} className={cn("aspect-square h-full w-full", className)} {...props} />,
+  ({ className, ...props }, ref) => <AvatarPrimitive.Image ref={ref} className={cn("aspect-square h-full w-full", className)} {...props} />
 );
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 
 const AvatarFallback = React.forwardRef<React.ElementRef<typeof AvatarPrimitive.Fallback>, React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>>(
   ({ className, ...props }, ref) => (
     <AvatarPrimitive.Fallback ref={ref} className={cn("flex h-full w-full items-center justify-center rounded-full bg-muted text-xs", className)} {...props} />
-  ),
+  )
 );
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
@@ -28,16 +28,17 @@ type AvatarProps = {
   alt?: string;
   size?: "sm" | "md" | "lg";
   className?: string;
+  fallbackText?: string;
 };
 
-const Avatar: React.FC<AvatarProps> = ({ src, alt, size = "md", className: customCn }) => {
+const Avatar: React.FC<AvatarProps> = ({ src, alt, size = "md", className: customCn, fallbackText }) => {
   const className = cn(
     {
       "h-4 w-4": size === "sm",
       "h-6 w-6": size === "md",
       "h-8 w-8": size == "lg",
     },
-    customCn,
+    customCn
   );
 
   const fallbckClassName = cn({
@@ -49,9 +50,32 @@ const Avatar: React.FC<AvatarProps> = ({ src, alt, size = "md", className: custo
     <AvatarRoot className={className}>
       {/*  @ts-expect-error Pass null of no src as an empty string may cause the browser to download the whole page again */}
       <AvatarImage src={src || null} alt={alt} />
-      <AvatarFallback className={fallbckClassName}>
-        <UserIcon />
-      </AvatarFallback>
+      <AvatarFallback className={fallbckClassName}>{fallbackText ? fallbackText : <UserIcon />}</AvatarFallback>
+    </AvatarRoot>
+  );
+};
+
+const OrganizationAvatar: React.FC<AvatarProps> = ({ src, alt, size = "md", className: customCn, fallbackText }) => {
+  const className = cn(
+    "flex aspect-square items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground",
+    {
+      "size-6": size === "sm",
+      "size-8": size === "md",
+      "size-10": size == "lg",
+    },
+    customCn
+  );
+
+  const fallbckClassName = cn("flex aspect-square items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground", {
+    "size-6": size === "sm",
+    "size-8": size === "md",
+    "size-10": size == "lg",
+  });
+  return (
+    <AvatarRoot className={className}>
+      {/*  @ts-expect-error Pass null of no src as an empty string may cause the browser to download the whole page again */}
+      <AvatarImage className="size-8" src={src || null} alt={alt} />
+      <AvatarFallback className={fallbckClassName}>{fallbackText ? fallbackText : <UserIcon />}</AvatarFallback>
     </AvatarRoot>
   );
 };
@@ -79,4 +103,4 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatar, isUploading }) => {
   );
 };
 
-export { Avatar, AvatarUpload, AvatarSkeleton };
+export { Avatar, AvatarUpload, AvatarSkeleton, OrganizationAvatar };

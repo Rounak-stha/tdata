@@ -1,4 +1,4 @@
-import { CheckIcon, ChevronsUpDownIcon, XIcon, UserIcon, CircleUserRoundIcon } from "lucide-react";
+import { CheckIcon, ChevronsUpDownIcon, XIcon, UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";

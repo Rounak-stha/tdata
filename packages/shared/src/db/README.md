@@ -125,34 +125,20 @@ FOR EACH ROW
 EXECUTE FUNCTION soft_delete_user();
 
 
--- Create Default Workflow and initial Admin member for Organization after Create
-CREATE OR REPLACE FUNCTION add_organization_defaults()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Add the organization creator as a member with 'Admin' role in organization_memberships
-    INSERT INTO public.organization_memberships (organization_id, user_id, role)
-    VALUES (NEW.id, NEW.created_by, 'Admin');
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER after_organization_create
-AFTER INSERT ON public.organizations
-FOR EACH ROW
-EXECUTE FUNCTION add_organization_defaults();
-
-
 -- Grant Access on Public Schema to Authenticated User Role
 -- https://stackoverflow.com/questions/67551593/supabase-client-permission-denied-for-schema-public
 
 grant usage on schema "public" to authenticated;
 GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA "public" TO authenticated;
 
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+
 -- I had to Grant access to the id sequence for comments table separately
 -- May be because it was created after I granted access to all tables but I ran it again and it did not work
 -- Had to specifica;;y grant access to it
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE public.task_comments_id_seq TO authenticated;
+
+-- GRANT USAGE, SELECT, UPDATE ON SEQUENCE public.task_comments_id_seq TO authenticated;
 
 -- ROW LEVEL SECURITY (RLS)
 
@@ -191,4 +177,9 @@ USING (
             (organization_memberships.organization_id = task_activities.organization_id)
     )
 );
+
+-- Storage RLS
+CREATE POLICY "Users can manage their Avatar 1bs1gex_0" ON storage.objects FOR INSERT TO public WITH CHECK (((bucket_id = 'avatar'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text)));
+
+CREATE POLICY "Users can manage their Avatar 1bs1gex_1" ON storage.objects FOR UPDATE TO public USING (((bucket_id = 'avatar'::text) AND ((storage.foldername(name))[1] = (auth.uid())::text)));
 ```

@@ -3,15 +3,16 @@ import { Button } from "@/components/ui/button";
 import { TaskCard } from "./task-card";
 import { useState } from "react";
 import { NewTaskPopup } from "./new-task-popup";
-import { TaskDetail, TaskDetailOptimistic, WorkflowStatus } from "@tdata/shared/types";
+import { Project, TaskDetail, TaskDetailOptimistic, WorkflowStatus } from "@tdata/shared/types";
 
 interface BoardColumnProps {
   status: WorkflowStatus;
+  project: Project;
   tasks: TaskDetailOptimistic[];
   onTaskUpdate: (updatedTask: TaskDetail) => void;
 }
 
-export function BoardColumn({ status, tasks: initialTasks, onTaskUpdate }: BoardColumnProps) {
+export function BoardColumn({ status, project, tasks: initialTasks, onTaskUpdate }: BoardColumnProps) {
   const [newTaskDialogOpen, setNewTaskDialogOpen] = useState(false);
   const [tasks, setTasks] = useState(initialTasks);
 
@@ -62,6 +63,7 @@ export function BoardColumn({ status, tasks: initialTasks, onTaskUpdate }: Board
           onOptimisticAdd={handleOptimisticCreate}
           onCreate={handleCreate}
           onError={handleError}
+          project={project}
         />
       )}
     </div>

@@ -9,7 +9,7 @@ const timestamps = {
   createdAt: timestamp().defaultNow().notNull(),
 };
 
-const TableNames = {
+export const TableNames = {
   users: "users",
   organizations: "organizations",
   organizationMemberships: "organization_memberships",
@@ -17,7 +17,12 @@ const TableNames = {
   workflows: "workflows",
   projectTemplates: "project_templates",
   workflowStatus: "workflow_status",
+  projectWorkflowStatus: "project_workflow_status",
+  projectTaskTypes: "project_task_types",
+  projectPriorities: "project_priorities",
   tasks: "tasks",
+  taskTypes: "task_types",
+  priorities: "priorities",
   taskActivities: "task_activities",
   taskComments: "task_comments",
   tasksUsers: "tasks_users",
@@ -101,10 +106,14 @@ export const projects = pgTable(
   {
     id: serial().primaryKey(),
     organizationId: integer()
-      .references(() => organizations.id)
+      .references(() => organizations.id, { onDelete: "cascade" })
       .notNull(),
     name: text().notNull(),
-    key: varchar({ length: KEY_LENGTH }).unique().notNull(),
+    /**
+     * Key of the project must be unique per Organization
+     * A composite unique index iss created on organizationId and key
+     */
+    key: varchar({ length: KEY_LENGTH }).notNull(),
     description: text(),
     createdBy: uuid()
       .references(() => users.id)
@@ -113,24 +122,6 @@ export const projects = pgTable(
   },
 
   (table) => [uniqueIndex("unique_project_key_per_organization").on(table.organizationId, table.key), index("organizationIdIndex").on(table.organizationId)]
-);
-
-// Workflows Table
-export const workflows = pgTable(
-  TableNames.workflows,
-  {
-    id: serial().primaryKey(),
-    organizationId: integer()
-      .references(() => organizations.id)
-      .notNull(),
-    name: text().notNull(),
-    description: text(),
-    createdBy: uuid()
-      .references(() => users.id)
-      .notNull(),
-    ...timestamps,
-  },
-  (table) => [index("workflowOrganizationIdIndex").on(table.organizationId)]
 );
 
 /**
@@ -143,10 +134,7 @@ export const projectTemplates = pgTable(TableNames.projectTemplates, {
   name: text().notNull(),
   description: text(),
   organizationId: integer()
-    .references(() => organizations.id)
-    .notNull(),
-  workflowId: integer()
-    .references(() => workflows.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   singleAssignee: boolean().default(true).notNull(),
   taskProperties: jsonb().$type<ProjectTemplateProperty[]>(),
@@ -159,19 +147,103 @@ export const workflowStatus = pgTable(
   {
     id: serial().primaryKey(),
     organizationId: integer()
-      .references(() => organizations.id)
+      .references(() => organizations.id, { onDelete: "cascade" })
       .notNull(),
     createdBy: uuid()
       .references(() => users.id)
       .notNull(),
     icon: text().notNull(),
     name: text().notNull(),
-    workflowId: integer()
-      .references(() => workflows.id)
-      .notNull(),
     ...timestamps,
   },
   (table) => [index("wfStatusOrganizationIdIndex").on(table.organizationId)]
+);
+
+// Workflow Status Table
+export const taskTypes = pgTable(
+  TableNames.taskTypes,
+  {
+    id: serial().primaryKey(),
+    organizationId: integer()
+      .references(() => organizations.id, { onDelete: "cascade" })
+      .notNull(),
+    createdBy: uuid()
+      .references(() => users.id)
+      .notNull(),
+    icon: text().notNull(),
+    name: text().notNull(),
+    ...timestamps,
+  },
+  (table) => [index("taskTypesOrganizationIdIndex").on(table.organizationId)]
+);
+
+// Workflow Status Table
+export const priorities = pgTable(
+  TableNames.priorities,
+  {
+    id: serial().primaryKey(),
+    organizationId: integer()
+      .references(() => organizations.id, { onDelete: "cascade" })
+      .notNull(),
+    createdBy: uuid()
+      .references(() => users.id)
+      .notNull(),
+    icon: text().notNull(),
+    name: text().notNull(),
+    ...timestamps,
+  },
+  (table) => [index("prioritiesOrganizationIdIndex").on(table.organizationId)]
+);
+
+/** Junction table to hold the relation between Project and Workflow Status
+ * Workfloe status are managed under Project Templates
+ */
+export const projectWorkflowStatus = pgTable(
+  TableNames.projectWorkflowStatus,
+  {
+    projectId: integer()
+      .references(() => projects.id, { onDelete: "cascade" })
+      .notNull(),
+    workflowStatusId: integer()
+      .references(() => workflowStatus.id, { onDelete: "cascade" })
+      .notNull(),
+    ...timestamps,
+  },
+  (table) => [uniqueIndex("unique_project_workflow_status").on(table.projectId, table.workflowStatusId)]
+);
+
+/** Junction table to hold the relation between Project Template and Task Types
+ * Workfloe status are managed under Project Templates
+ */
+export const projectTaskTypes = pgTable(
+  TableNames.projectTaskTypes,
+  {
+    projectId: integer()
+      .references(() => projects.id, { onDelete: "cascade" })
+      .notNull(),
+    taskTypeId: integer()
+      .references(() => taskTypes.id, { onDelete: "cascade" })
+      .notNull(),
+    ...timestamps,
+  },
+  (table) => [uniqueIndex("unique_project_task_types").on(table.projectId, table.taskTypeId)]
+);
+
+/** Junction table to hold the relation between Project Template and Priorities
+ * Workfloe status are managed under Project Templates
+ */
+export const projectPriorities = pgTable(
+  TableNames.projectPriorities,
+  {
+    projectId: integer()
+      .references(() => projects.id, { onDelete: "cascade" })
+      .notNull(),
+    priorityId: integer()
+      .references(() => priorities.id, { onDelete: "cascade" })
+      .notNull(),
+    ...timestamps,
+  },
+  (table) => [uniqueIndex("unique_project_pririties").on(table.projectId, table.priorityId)]
 );
 
 // Tasks Table
@@ -180,17 +252,16 @@ export const tasks = pgTable(
   {
     id: serial().primaryKey(),
     organizationId: integer()
-      .references(() => organizations.id)
+      .references(() => organizations.id, { onDelete: "cascade" })
       .notNull(),
     projectId: integer()
-      .references(() => projects.id)
+      .references(() => projects.id, { onDelete: "cascade" })
       .notNull(),
     createdBy: uuid()
       .references(() => users.id)
       .notNull(),
     title: text().notNull(),
     content: text(),
-    priority: PriorityEnum().default("MEDIUM").notNull(),
     /**
      * We're storing the Status id directly in the task for flexibility, scalability and data integrity
      * If the tenant wants to update the Status name, we don't have to update all the tasks
@@ -210,6 +281,12 @@ export const tasks = pgTable(
     statusId: integer()
       .references(() => workflowStatus.id)
       .notNull(),
+    priorityId: integer()
+      .references(() => priorities.id)
+      .notNull(),
+    typeId: integer()
+      .references(() => taskTypes.id)
+      .notNull(),
     taskNumber: text().notNull(),
     properties: jsonb().$type<TaskProperty>(),
     ...timestamps,
@@ -223,7 +300,7 @@ export const tasks = pgTable(
 export const taskActivities = pgTable(TableNames.taskActivities, {
   id: serial().primaryKey(),
   organizationId: integer()
-    .references(() => organizations.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   action: ActivityActionEnum().notNull(),
   taskId: integer()
@@ -239,7 +316,7 @@ export const taskActivities = pgTable(TableNames.taskActivities, {
 export const taskComments = pgTable(TableNames.taskComments, {
   id: serial().primaryKey(),
   organizationId: integer()
-    .references(() => organizations.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   taskId: integer()
     .references(() => tasks.id)
@@ -258,7 +335,7 @@ export const taskComments = pgTable(TableNames.taskComments, {
 export const tasksUsers = pgTable(TableNames.tasksUsers, {
   id: serial().primaryKey(),
   organizationId: integer()
-    .references(() => organizations.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   taskId: integer()
     .references(() => tasks.id, { onDelete: "cascade" })
@@ -267,24 +344,6 @@ export const tasksUsers = pgTable(TableNames.tasksUsers, {
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
   name: text().notNull(),
-  ...timestamps,
-});
-
-// Transitions Table
-export const transitions = pgTable(TableNames.transitions, {
-  id: serial().primaryKey(),
-  organizationId: integer()
-    .references(() => organizations.id)
-    .notNull(),
-  workflowId: integer()
-    .references(() => workflows.id)
-    .notNull(),
-  fromStatus: integer()
-    .references(() => workflowStatus.id)
-    .notNull(),
-  toStatus: integer()
-    .references(() => workflowStatus.id)
-    .notNull(),
   ...timestamps,
 });
 
@@ -306,7 +365,7 @@ export const automations = pgTable("automations", {
     .primaryKey()
     .default(sql`uuid_generate_v4()`),
   organizationId: integer()
-    .references(() => organizations.id)
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   projectId: integer()
     .references(() => projects.id)

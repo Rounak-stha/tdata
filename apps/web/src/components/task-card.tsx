@@ -8,6 +8,7 @@ import Link from "next/link";
 import { AssigneeFieldName, Paths } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useOrganizations } from "@/hooks";
+import { useMemo } from "react";
 
 interface TaskCardProps {
   task: TaskDetail;
@@ -17,9 +18,11 @@ interface TaskCardProps {
 
 export function TaskCard({ task, disabled = false }: TaskCardProps) {
   const { organization } = useOrganizations();
+  const initialTaskStatus = useMemo(() => task.projectTemplate.statuses.find((s) => s.id === task.statusId), [task]);
+  const initialTaskPriority = useMemo(() => task.projectTemplate.priorities.find((p) => p.id === task.priorityId), [task]);
   return (
     <Card
-      className={cn("p-4 cursor-pointer transition-colors border shadow-sm rounded-sm", {
+      className={cn("p-4 cursor-pointer transition-colors border shadow-sm", {
         "bg_muted cursor-not-allowed pointer-events-none": disabled,
         "hover:bg-accent/50": !disabled,
       })}
@@ -32,13 +35,8 @@ export function TaskCard({ task, disabled = false }: TaskCardProps) {
         <h3 className="text-sm font-medium leading-none mb-3 hover:underline">{task.title}</h3>
       </Link>
       <div className="flex items-center gap-2">
-        <StatusSelect size="icon" status={task.projectTemplate.workflow.statuses.find((s) => s.id === task.statusId)} allStatus={task.projectTemplate.workflow.statuses} />
-        <PrioritySelect size="icon" priority="HIGH" />
-        {/* <DatePicker
-					date={task.dueDate ? new Date(task.dueDate) : undefined}
-					onSelect={handleDateChange}
-					className='h-8 text-xs'
-				/> */}
+        <StatusSelect size="icon" projectId={task.projectId} status={initialTaskStatus} />
+        <PrioritySelect size="icon" projectId={task.projectId} priority={initialTaskPriority} />
       </div>
     </Card>
   );

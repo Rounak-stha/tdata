@@ -1,7 +1,9 @@
 import { tasks, taskActivities, taskComments, Priorities } from "@db/schema";
 import { User, UserId } from "./user";
 import { ProjectTemplateDetail } from "./project";
-import { Workflow, WorkflowStatus } from "./workflow";
+import { WorkflowStatus } from "./workflow";
+import { Priority } from "./priority";
+import { TaskType } from "./taskType";
 
 export type TaskUserRelations = Record<string, User[]>;
 export type TaskUserRelationMinimal = Record<string, UserId[]>;
@@ -9,11 +11,9 @@ export type TaskPropertyValue = string | string[];
 export type TaskProperty = Record<string, TaskPropertyValue>;
 
 export type Task = Omit<typeof tasks.$inferSelect, "updatedAt" | "deletedAt">;
-export type TaskDetailMinimal = Task & { status: WorkflowStatus };
+export type TaskDetailMinimal = Task & { status: WorkflowStatus; priority: Priority; type: TaskType };
 export type TaskActivity = Omit<typeof taskActivities.$inferSelect, "updatedAt" | "deletedAt">;
 export type Comment = Omit<typeof taskComments.$inferSelect, "deletedAt">;
-
-export type Priority = (typeof Priorities)[number];
 
 export type TaskDetail = Task & {
   projectTemplate: ProjectTemplateDetail;
@@ -28,7 +28,7 @@ export type TaskGrouped<T, U> = {
   tasks: U[];
 };
 
-export type TaskMinimalGroupedByStatus = TaskGrouped<Pick<Workflow, "id" | "name">, TaskDetailMinimal>;
+export type TaskMinimalGroupedByStatus = TaskGrouped<Pick<WorkflowStatus, "id" | "name">, TaskDetailMinimal>;
 export type TaskGroupedByStatus = TaskGrouped<WorkflowStatus, TaskDetail>;
 
 export type TaskActivityDetail = TaskActivity & {
@@ -48,9 +48,9 @@ export type InsertTaskData = Omit<typeof tasks.$inferInsert, "taskNumber"> & { u
 export type InsertTaskActivityData = Omit<typeof taskActivities.$inferInsert, "id">;
 export type InsertCommentData = Omit<typeof taskComments.$inferInsert, "id">;
 
-export type TaskStandardFieldUpdateKeys = keyof Partial<Pick<Task, "title" | "content" | "statusId" | "priority">>;
+export type TaskStandardFieldUpdateKeys = keyof Partial<Pick<Task, "title" | "content" | "statusId" | "priorityId">>;
 
-export type TaskStandardUpdatableFields = keyof Pick<Task, "title" | "content" | "statusId" | "priority">;
+export type TaskStandardUpdatableFields = keyof Pick<Task, "title" | "content" | "statusId" | "priorityId">;
 
 export type TaskStandardFieldUpdateData = Partial<Pick<Task, TaskStandardUpdatableFields>> & {
   value: string;
