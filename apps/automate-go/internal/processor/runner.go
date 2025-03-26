@@ -13,23 +13,13 @@ type FlowRunner struct {
 
 // Run processes the flow based on the graph
 func (runner *FlowRunner) Run() error {
-	graph, err := buildFlowGraph(runner.Flow)
-	if err != nil {
-		return err
-	}
+	graph := BuildGraph(runner.Flow)
 
 	// Example logic to start execution
-	nodeQueue := []string{"1"} // Assuming trigger node is "1"
-	visitedNodes := make(map[string]bool)
+	currNode := graph.StartNode
 
-	for len(nodeQueue) > 0 {
-		nodeID := nodeQueue[0]
-		nodeQueue = nodeQueue[1:]
-
-		if visitedNodes[nodeID] {
-			continue
-		}
-		visitedNodes[nodeID] = true
+	for currNode != nil {
+		nodeID := currNode.ID
 
 		node, err := getNodeByID(runner.Flow, nodeID)
 		if err != nil {
@@ -43,13 +33,16 @@ func (runner *FlowRunner) Run() error {
 			return err
 		}
 
-		if err := evaluator.Evaluate(runner.Environment, node); err != nil {
+		success, err := evaluator.Evaluate(runner.Environment, node)
+
+		if err != nil {
 			return err
 		}
 
-		// Enqueue connected nodes
-		if targets, exists := graph[nodeID]; exists {
-			nodeQueue = append(nodeQueue, targets...)
+		if success {
+			currNode = graph.GetNextNode(currNode.ID, "true")
+		} else {
+			currNode = graph.GetNextNode(currNode.ID, "false")
 		}
 	}
 	return nil

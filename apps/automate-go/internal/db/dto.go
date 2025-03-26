@@ -24,9 +24,11 @@ const (
 )
 
 type FlowVariable struct {
-	Name  string           `json:"name"`
-	Type  FlowVariableType `json:"type"`
-	Value string           `json:"value"`
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	Type        FlowVariableType `json:"type"`
+	Description string           `json:"description"`
+	Value       *string          `json:"value,omitempty"`
 }
 
 type FlowCondition struct {
@@ -86,6 +88,29 @@ type FlowValue struct {
 	Value interface{}   `json:"value"`
 }
 
+type UpdateTaskPayload struct {
+	Fields map[string]*FlowValue `json:"fields"`
+}
+
+// AddCommentPayload - Payload structure for "Add_Comment"
+type AddCommentPayload struct {
+	TaskID  int    `json:"taskId"`
+	Comment string `json:"comment"`
+}
+
+type ActionType string
+
+const (
+	ActionUpdateTask ActionType = "Update_Task"
+	ActionAddComment ActionType = "Add_Comment"
+)
+
+type ActionNodeData struct {
+	Label   string      `json:"label"`
+	Action  ActionType  `json:"action"`
+	Payload interface{} `json:"payload"` // Can be UpdateTaskPayload or AddCommentPayload
+}
+
 type ConditionNodeData struct {
 	Label     string        `json:"label"`
 	Condition FlowCondition `json:"condition"`
@@ -109,9 +134,10 @@ type AutomationFlowNode struct {
 }
 
 type AutomationFlowEdge struct {
-	ID     string
-	Source string
-	Target string
+	ID           string  `json:"id"`
+	Source       string  `json:"source"`
+	Target       string  `json:"target"`
+	SourceHandle *string `json:"sourceHandle,omitempty"`
 }
 
 type AutomationFlow struct {
