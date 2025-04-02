@@ -312,7 +312,7 @@ export class ProjectRepository {
 
   static async getProjectTemplates(organizationId: number): Promise<ProjectTemplateDetail[]> {
     const db = await createDrizzleSupabaseClient();
-    const allProjectTemplates: ProjectTemplateDetail[] = await db.rls(async (tx) => {
+    /* const allProjectTemplates: ProjectTemplateDetail[] = await db.rls(async (tx) => {
       return await tx
         .select({
           id: projectTemplates.id,
@@ -367,9 +367,9 @@ export class ProjectRepository {
         .where(eq(projectTemplates.organizationId, organizationId))
         .groupBy(projectTemplates.id)
         .execute();
-    });
+    }); */
     const starterTemplate = await ProjectRepository.getStarterTemplate(organizationId);
-    return [...allProjectTemplates, starterTemplate];
+    return [starterTemplate];
   }
 }
 
