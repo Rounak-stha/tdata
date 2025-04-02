@@ -51,6 +51,7 @@ export type InsertCommentData = Omit<typeof taskComments.$inferInsert, "id">;
 export type TaskStandardFieldUpdateKeys = keyof Partial<Pick<Task, "title" | "content" | "statusId" | "priorityId">>;
 
 export type TaskStandardUpdatableFields = keyof Pick<Task, "title" | "content" | "statusId" | "priorityId">;
+export type TaskStandardUpdatableFieldLabels = "title" | "content" | "status" | "priority" | "assignee";
 
 export type TaskStandardFieldUpdateData = Partial<Pick<Task, TaskStandardUpdatableFields>> & {
   value: string;

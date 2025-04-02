@@ -1,6 +1,7 @@
 import { FC, useMemo, useState } from "react";
 import { FlowValueComponentBaseProps } from "@/automation-ui/types/components";
 import { useFlowStore } from "@/automation-ui/store/flow";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import invariant from "tiny-invariant";
 import { TrashIcon } from "lucide-react";
@@ -8,12 +9,16 @@ import { TrashIcon } from "lucide-react";
 /**
  * FlowValueStatusComponent is allows users to select one of the status for the field.
  * Standard selects like Status, Priority and Assignee have their own Component.
+ * For multiselect fields, we'll either be checking contains / not contains for now, so the value will be a sibgle value
+ * Even for Add or remove operators which we might add in the future, the value will be a single value
  */
 export const FlowValueSelectComponent: FC<FlowValueComponentBaseProps> = ({ type, valueFor, value, onChange, label, className = "", deletable = false, onDelete }) => {
   invariant((type == "select" || type == "multiSelect") && valueFor, "Select can only be used with select fields");
   valueFor = valueFor.toLowerCase();
 
-  const [selectValue, setSelectValue] = useState<string | undefined>(value?.type == "static" ? value.value : value?.type == "variable" ? value.value.value : undefined);
+  const [selectValue, setSelectValue] = useState<string | undefined>(
+    value?.type == "static" ? value.value : value?.type == "variable" ? (value.value.value ? value.value.value[0] : undefined) : undefined
+  );
   const { project } = useFlowStore();
   const options = useMemo(() => {
     return project?.template.taskProperties?.find((p) => p.name.toLowerCase() === valueFor && p.type == type)?.options || [];

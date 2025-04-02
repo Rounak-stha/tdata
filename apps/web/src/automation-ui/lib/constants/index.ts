@@ -1,5 +1,4 @@
-import { FlowOperator } from "@/automation-ui/types";
-import { FlowVariableType } from "@tdata/shared/types";
+import { FlowOperator, FlowVariableType } from "@tdata/shared/types";
 
 export const VERTICAL_SPACING = 350;
 export const HORIZONTAL_OFFSET = 50;
@@ -15,13 +14,4 @@ export const VariablesTypes: { label: string; value: FlowVariableType }[] = [
   { label: "Select", value: "select" },
   { label: "Status", value: "status" },
   { label: "Priority", value: "priority" },
-];
-
-export const FlowOperators: FlowOperator[] = [
-  { label: "Equal", value: "eq" },
-  { label: "Not Equal", value: "neq" },
-  { label: "Greater Than", value: "gt" },
-  { label: "Greater Than or Equal", value: "gte" },
-  { label: "Less Than", value: "lt" },
-  { label: "Less Than or Equal", value: "lte" },
 ];

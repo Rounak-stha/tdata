@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { validateFlow } from "@/automation-ui/utils/validation";
-import { ActionNodeData, ConditionNodeData, Flow, NodeType, TriggerNodeData } from "@/automation-ui/types";
+import { validateFlow } from "@tdata/shared/utils";
+import { ActionNodeData, ConditionNodeData, AutomationFlow, NodeType, TriggerNodeData } from "@tdata/shared/types";
 import { toast } from "sonner";
 
-vi.mock("sonner", () => ({
+/* vi.mock("sonner", () => ({
   toast: {
     error: vi.fn(),
   },
 }));
+ */
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -15,14 +16,14 @@ beforeEach(() => {
 
 describe("validateFlow", () => {
   it("should validate a correct workflow", () => {
-    const flow: Flow = {
+    const flow: AutomationFlow = {
       nodes: [
         {
           id: "1",
           type: "TriggerNode",
           data: {
             label: "Trigger",
-            type: "Task_Update",
+            type: "TASK_UPDATED",
             condition: {
               field: { id: "1", name: "Field Name", type: "text", value: "hello" },
               operator: { label: "Equals", value: "eq" },
@@ -41,11 +42,12 @@ describe("validateFlow", () => {
       edges: [{ id: "1", source: "1", target: "2" }],
     };
 
-    expect(() => validateFlow(flow)).not.toThrow();
+    const { isValid } = validateFlow(flow);
+    expect(isValid).toBe(true);
   });
 
   it("should return error when no trigger node is found", () => {
-    const flow: Flow = {
+    const flow: AutomationFlow = {
       nodes: [
         {
           id: "2",
@@ -57,19 +59,20 @@ describe("validateFlow", () => {
       edges: [],
     };
 
-    validateFlow(flow);
-    expect(toast.error).toHaveBeenCalledWith("No TriggerNode found");
+    const { errors, isValid } = validateFlow(flow);
+    expect(isValid).toBe(false);
+    expect(errors).toContain("No TriggerNode found");
   });
 
   it("should return error when multiple trigger nodes are found", () => {
-    const flow: Flow = {
+    const flow: AutomationFlow = {
       nodes: [
         {
           id: "1",
           type: "TriggerNode",
           data: {
             label: "Trigger",
-            type: "Task_Update",
+            type: "TASK_UPDATED",
             condition: {
               field: { id: "1", name: "Field Name", type: "text", value: "hello" },
               operator: { label: "Equals", value: "eq" },
@@ -83,7 +86,7 @@ describe("validateFlow", () => {
           type: "TriggerNode",
           data: {
             label: "Trigger",
-            type: "Task_Update",
+            type: "TASK_UPDATED",
             condition: {
               field: { id: "1", name: "Field Name", type: "text", value: "hello" },
               operator: { label: "Equals", value: "eq" },
@@ -96,19 +99,20 @@ describe("validateFlow", () => {
       edges: [],
     };
 
-    validateFlow(flow);
-    expect(toast.error).toHaveBeenCalledWith("Multiple TriggerNodes found, workflow is invalid.");
+    const { errors, isValid } = validateFlow(flow);
+    expect(isValid).toBe(false);
+    expect(errors).toContain("Multiple TriggerNodes found, workflow is invalid.");
   });
 
   it("should return error when there are unreachable nodes", () => {
-    const flow: Flow = {
+    const flow: AutomationFlow = {
       nodes: [
         {
           id: "1",
           type: "TriggerNode",
           data: {
             label: "Trigger",
-            type: "Task_Update",
+            type: "TASK_UPDATED",
             condition: {
               field: { id: "1", name: "Field Name", type: "text", value: "hello" },
               operator: { label: "Equals", value: "eq" },
@@ -139,19 +143,20 @@ describe("validateFlow", () => {
       edges: [{ id: "1", source: "1", target: "2" }],
     };
 
-    validateFlow(flow);
-    expect(toast.error).toHaveBeenCalledWith("Unreachable nodes detected");
+    const { errors, isValid } = validateFlow(flow);
+    expect(isValid).toBe(false);
+    expect(errors).toContain("Unreachable nodes detected");
   });
 
   it("should return error for invalid ConditionNode", () => {
-    const flow: Flow = {
+    const flow: AutomationFlow = {
       nodes: [
         {
           id: "1",
           type: "TriggerNode",
           data: {
             label: "Trigger",
-            type: "Task_Update",
+            type: "TASK_UPDATED",
             condition: {
               field: { id: "1", name: "Field Name", type: "text", value: "hello" },
               operator: { label: "Equals", value: "eq" },
@@ -176,19 +181,20 @@ describe("validateFlow", () => {
       edges: [{ id: "1", source: "1", target: "2" }],
     };
 
-    validateFlow(flow);
-    expect(toast.error).toHaveBeenCalledWith("ConditionNode 2 has missing field/operator/value.");
+    const { errors, isValid } = validateFlow(flow);
+    expect(isValid).toBe(false);
+    expect(errors).toContain("ConditionNode 2 has missing field/operator/value.");
   });
 
   it("should return error for invalid ActionNode payload", () => {
-    const flow: Flow = {
+    const flow: AutomationFlow = {
       nodes: [
         {
           id: "1",
           type: "TriggerNode",
           data: {
             label: "Trigger",
-            type: "Task_Update",
+            type: "TASK_UPDATED",
             condition: {
               field: { id: "1", name: "Field Name", type: "text", value: "hello" },
               operator: { label: "Equals", value: "eq" },
@@ -202,12 +208,13 @@ describe("validateFlow", () => {
       edges: [{ id: "1", source: "1", target: "2" }],
     };
 
-    validateFlow(flow);
-    expect(toast.error).toHaveBeenCalledWith("Update_Task ActionNode 2 has invalid value for field: status");
+    const { errors, isValid } = validateFlow(flow);
+    expect(isValid).toBe(false);
+    expect(errors).toContain("Update_Task ActionNode 2 has invalid value for field: status");
   });
 
   it("should detect cycles and prevent infinite loops", () => {
-    const flow: Flow = {
+    const flow: AutomationFlow = {
       nodes: [
         { id: "1", type: "TriggerNode" as NodeType, data: { type: "Update_Task", condition: { field: "status", operator: "equals", value: "open" } }, position: { x: 0, y: 0 } },
         {
@@ -223,7 +230,8 @@ describe("validateFlow", () => {
       ],
     };
 
-    validateFlow(flow);
-    expect(toast.error).not.toHaveBeenCalled(); // Should not crash
+    const { isValid } = validateFlow(flow);
+    // We need to add support to check for cycles
+    expect(isValid).toBe(true);
   });
 });

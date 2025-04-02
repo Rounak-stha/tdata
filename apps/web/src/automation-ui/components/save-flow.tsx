@@ -1,4 +1,5 @@
 import React, { FC, useState } from "react";
+
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,16 +9,19 @@ import { useFlowStore } from "@/automation-ui/store/flow";
 import { validateFlow } from "@/automation-ui/utils/validation";
 import { createAutomation } from "@/lib/actions/automation";
 import { useOrganizations, useUser } from "@/hooks";
-import { NodeType, TriggerNodeData, TriggerType } from "../types";
+import { NodeType, ProjectDetail, TriggerNodeData, TriggerType } from "@tdata/shared/types";
+import { useRouter } from "next/navigation";
+import { Paths } from "@/lib/constants";
 
 type CreateFlowProps = {
-  projectId: number;
+  project: ProjectDetail;
 };
 
-export const SaveFlow: FC<CreateFlowProps> = ({ projectId }) => {
+export const SaveFlow: FC<CreateFlowProps> = ({ project }) => {
   const [open, setOpen] = useState(false);
   const [flowName, setFlowName] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const { getFlow, getCustomVariables } = useFlowStore();
   const { organization } = useOrganizations();
   const { user } = useUser();
@@ -41,23 +45,22 @@ export const SaveFlow: FC<CreateFlowProps> = ({ projectId }) => {
       const triggerNode = flow.nodes.find((node) => node.type === ("TriggerNode" as NodeType))!;
       const customVariables = getCustomVariables();
 
-      console.log({ flow, customVariables });
-
-      return;
-      await createAutomation({
+      const automation = await createAutomation({
         name: flowName,
         flow,
         organizationId: organization.id,
-        projectId,
+        projectId: project.id,
         variables: customVariables,
         triggerType: (triggerNode.data as TriggerNodeData).type as TriggerType,
         createdBy: user.id,
       });
+
       // NOTE: Redirect users to the automation page
       toast.success("Flow saved successfully");
 
       setFlowName("");
       setOpen(false);
+      router.push(Paths.projectAutomation(organization.key, project.key, automation.id));
     } catch (e) {
       console.log(e);
       toast.error("Failed to save flow");

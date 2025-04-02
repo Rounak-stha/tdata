@@ -1,12 +1,13 @@
-import { FC, useReducer, useEffect } from "react";
-import { Handle, Node, NodeProps, Position, XYPosition } from "@xyflow/react";
+import { FC, useReducer, useEffect, memo } from "react";
+import { Handle, Node, NodeProps, Position } from "@xyflow/react";
 import { LucidePlayCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ActionType, ActionNodeData, ActionPayloadMap } from "@/automation-ui/types";
 import { ActionOptions } from "@/automation-ui/lib/constants/node";
 import { Tooltip } from "@/components/common/tooltip";
 import { ActionNodeUpdateTaskAction } from "../common/action-node-update-task-action";
 import { useFlowStore } from "@/automation-ui/store/flow";
+
+import { ActionNodeData, ActionPayloadMap, ActionType } from "@tdata/shared/types";
 
 type ActionNodeReducerAction<T extends ActionType = ActionType> =
   | { type: "SET_LABEL"; payload: { label: string } }
@@ -44,7 +45,7 @@ function actionNodeReducer<T extends ActionType>(state: ActionNodeData<T>, actio
 
 type ActionNodeProps<T extends ActionType = ActionType> = NodeProps<Node<ActionNodeData<T>, "ActionNode">>;
 
-export const ActionNode: FC<ActionNodeProps<ActionType>> = ({ id, data, selected }) => {
+export const ActionNode: FC<ActionNodeProps<ActionType>> = memo(function ActionNode({ id, data, selected }) {
   const { updateNodeData } = useFlowStore();
   const [nodeData, dispatchNodeDataAction] = useReducer(actionNodeReducer, data);
 
@@ -95,7 +96,7 @@ export const ActionNode: FC<ActionNodeProps<ActionType>> = ({ id, data, selected
       <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-[#0091FF] border-2 border-white" />
     </div>
   );
-};
+});
 
 const ActionForm: FC<{
   action: ActionType;

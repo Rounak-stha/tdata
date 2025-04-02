@@ -1,4 +1,4 @@
-import { ActionNodeData, AutomationFlow, ConditionNodeData, NodeType, TriggerNodeData } from "@tdata/shared/types";
+import { ActionNodeData, AutomationFlow, ConditionNodeData, NodeType, TriggerNodeData } from "@types";
 import { Node } from "@xyflow/react";
 import invariant from "tiny-invariant";
 

@@ -1,9 +1,9 @@
 import { Node, Edge, Connection, MarkerType } from "@xyflow/react";
 import { VERTICAL_SPACING, SIBLING_DISTANCE, NODE_WIDTH } from "@/automation-ui/lib/constants";
-import { ActionNodeData, ConditionNodeData, FlowNode, NodeType, TriggerNodeData, PlaceholderNodeData } from "@/automation-ui/types";
 import { nanoid } from "nanoid";
+import { ActionNodeData, ConditionNodeData, FlowEdge, FlowNode, NodeType, PlaceholderNodeData, TriggerNodeData } from "@tdata/shared/types";
 
-export const createNode = (type: NodeType, parent?: FlowNode, data?: Record<string, unknown>) => {
+export const createNode = (type: NodeType, parent?: FlowNode, data?: Record<string, unknown>): FlowNode => {
   const position = parent ? calculateNewNodePosition(parent) : { x: 250, y: 100 };
   let nodeData = getInitialNodeData(type);
   nodeData = data ? { ...nodeData, ...data } : nodeData;
@@ -68,7 +68,7 @@ function getInitialNodeData(nodeType: NodeType): ActionNodeData | ConditionNodeD
     case "TriggerNode":
       return {
         label: "Trigger",
-        type: "Task_Update",
+        type: "TASK_UPDATED",
         condition: {
           field: null,
           operator: null,
@@ -128,7 +128,7 @@ export const generateEdgeId = (postfix?: string | number): string => {
 /**
  * This method is used to get Placeholderr Nodes and Edges for a given node.
  */
-export function getPlaceholderNodeAndedges(parent: Node): { nodes: Node[]; edges: Edge[] } {
+export function getPlaceholderNodeAndedges(parent: FlowNode): { nodes: FlowNode[]; edges: FlowEdge[] } {
   const nodes = [];
   const edges: Edge[] = [];
 

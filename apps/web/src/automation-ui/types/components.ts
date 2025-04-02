@@ -1,4 +1,4 @@
-import { FlowOperator, FlowValue, FlowVariable, FlowVariableType } from ".";
+import { FlowOperator, FlowValue, FlowVariable, FlowVariableType } from "@tdata/shared/types";
 
 export type FlowValueComponentBaseProps = {
   type: FlowVariableType;

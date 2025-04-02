@@ -1,12 +1,13 @@
-import { useEffect, FC, useReducer } from "react";
-import { Handle, Node, NodeProps, Position, XYPosition } from "@xyflow/react";
+import { useEffect, FC, useReducer, memo } from "react";
+import { Handle, Node, NodeProps, Position } from "@xyflow/react";
 import { LucideGitBranch } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ConditionNodeData, FlowOperator, FlowValue, FlowVariable } from "@/automation-ui/types";
 import { FlowCondition } from "../common/flow-condition";
 import { ConditionChangeHandler } from "@/automation-ui/types/components";
 import { useFlowStore } from "@/automation-ui/store/flow";
+
 import { Tooltip } from "@/components/common/tooltip";
+import { ConditionNodeData, FlowOperator, FlowValue, FlowVariable } from "@tdata/shared/types";
 
 type ConditionNodeAction =
   | { type: "SET_LABEL"; payload: string }
@@ -35,7 +36,7 @@ const conditionNodeReducer = (state: ConditionNodeData, action: ConditionNodeAct
 
 type ConditionNodeProps = NodeProps<Node<ConditionNodeData, "ConditionNode">>;
 
-export const ConditionNode: FC<ConditionNodeProps> = ({ id, data, selected }) => {
+export const ConditionNode: FC<ConditionNodeProps> = memo(function CondtionNode({ id, data, selected }) {
   const { updateNodeData } = useFlowStore();
   const [nodeData, dispatchNodeDataAction] = useReducer(conditionNodeReducer, data);
 
@@ -54,8 +55,6 @@ export const ConditionNode: FC<ConditionNodeProps> = ({ id, data, selected }) =>
     updateNodeData(id, nodeData);
   }, [nodeData, updateNodeData, id]);
 
-  console.log({ nodeData });
-
   return (
     <div className={cn("w-[280px] rounded-sm bg-background border", { "border-[#FF8800]": selected })}>
       <div className="px-4 h-12 flex items-center border-b">
@@ -73,8 +72,8 @@ export const ConditionNode: FC<ConditionNodeProps> = ({ id, data, selected }) =>
       </div>
 
       {/* <button className="w-full mt-2 py-1.5 px-3 bg-orange-50 text-orange-600 rounded-md text-sm font-medium hover:bg-orange-100 transition-colors" onClick={validateCondition}>
-        Validate Condition
-      </button> */}
+		  Validate Condition
+		</button> */}
       <div className="flex justify-around text-xs mb-2">
         <div className="text-[#22C55E]">True ↓</div>
         <div className="text-[#EF4444]">↓ False</div>
@@ -85,4 +84,4 @@ export const ConditionNode: FC<ConditionNodeProps> = ({ id, data, selected }) =>
       <Handle type="source" position={Position.Bottom} id="false" className="!w-3 !h-3 !bg-[#EF4444] !border-2 !border-white !left-[70%]" />
     </div>
   );
-};
+});

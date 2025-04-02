@@ -1,14 +1,15 @@
-import { FC, useEffect, useReducer, useState } from "react";
-import { Handle, Node, NodeProps, Position, XYPosition } from "@xyflow/react";
+import { FC, memo, useEffect, useReducer } from "react";
+import { Handle, Node, NodeProps, Position } from "@xyflow/react";
 import { LucideCircleDot } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
-import { FlowOperator, FlowValue, FlowVariable, TriggerNodeData, TriggerType } from "@/automation-ui/types";
 import { useFlowStore } from "@/automation-ui/store/flow";
+
 import { ConditionChangeHandler } from "@/automation-ui/types/components";
 import { FlowCondition } from "../common/flow-condition";
 import { Tooltip } from "@/components/common/tooltip";
+import { FlowOperator, FlowValue, FlowVariable, TriggerNodeData, TriggerType } from "@tdata/shared/types";
 
 type TriggerNodeAction =
   | { type: "SET_LABEL"; payload: string }
@@ -39,7 +40,7 @@ const conditionNodeReducer = (state: TriggerNodeData, action: TriggerNodeAction)
   }
 };
 
-export const TriggerNode: FC<NodeProps<Node<TriggerNodeData, "TriggerNode">>> = ({ id, data, selected }) => {
+export const TriggerNode: FC<NodeProps<Node<TriggerNodeData, "TriggerNode">>> = memo(function TriggerNode({ id, data, selected }) {
   const { updateNodeData } = useFlowStore();
   const [nodeData, dispatchNodeDataAction] = useReducer(conditionNodeReducer, data);
 
@@ -86,10 +87,10 @@ export const TriggerNode: FC<NodeProps<Node<TriggerNodeData, "TriggerNode">>> = 
             </SelectContent>
           </Select>
         </div>
-        <FlowCondition field={data.condition.field} operator={data.condition.operator} value={data.condition.value} onChange={handleConditionChange} />
+        {/* <FlowCondition field={data.condition.field} operator={data.condition.operator} value={data.condition.value} onChange={handleConditionChange} /> */}
       </div>
       {/* Only output handle for trigger node */}
       <Handle type="source" position={Position.Bottom} className="!w-2 !h-2 hover:!w-3 hover:!h-3 !bg-[#9E77ED] !border-2" />
     </div>
   );
-};
+});

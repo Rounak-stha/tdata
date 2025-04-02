@@ -134,6 +134,13 @@ GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA "public" TO authenticated;
 GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 
+
+grant usage on schema "public" to service_role;
+GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA "public" TO service_role;
+
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO service_role;
+
 -- I had to Grant access to the id sequence for comments table separately
 -- May be because it was created after I granted access to all tables but I ran it again and it did not work
 -- Had to specifica;;y grant access to it

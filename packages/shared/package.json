@@ -17,6 +17,14 @@
       "default": "./dist/db/schema/index.js",
       "types": "./dist/db/schema/index.d.ts"
     },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "default": "./dist/utils/index.js"
+    },
+    "./lib": {
+      "types": "./dist/lib/index.d.ts",
+      "default": "./dist/lib/index.js"
+    },
     "./types": {
       "types": "./dist/types/index.d.ts"
     },
@@ -29,7 +37,9 @@
     }
   },
   "dependencies": {
-    "drizzle-orm": "^0.38.3"
+    "@xyflow/react": "^12.4.4",
+    "drizzle-orm": "^0.38.3",
+    "tiny-invariant": "^1.3.3"
   },
   "devDependencies": {
     "dotenv": "^16.4.7",

@@ -18,7 +18,7 @@ interface DynamicInputProps {
 }
 
 const DynamicInput = ({ value, onChange, placeholder = "", label, supportExpressions = true, className = "", inputType = "text", error = null }: DynamicInputProps) => {
-  const [inputValue, setInputValue] = useState(value?.value || "");
+  const [inputValue, setInputValue] = useState(value?.name || "");
   const [showVariableSelector, setShowVariableSelector] = useState(false);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(null);
   const variableOptionsRef = useRef<HTMLDivElement>(null);

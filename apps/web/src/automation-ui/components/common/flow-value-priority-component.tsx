@@ -5,11 +5,11 @@ import { IconColorMap, IconMap } from "@/lib/constants/icon";
 import { IconType } from "@types";
 import { FlowValueComponentBaseProps } from "@/automation-ui/types/components";
 import { useFlowStore } from "@/automation-ui/store/flow";
-import { extractValueFromFlowValue } from "@/automation-ui/utils/variables";
+
 import { FlowTaskPriority } from "@/automation-ui/types";
-import { Label } from "@/components/ui/label";
 import { Priorities } from "@tdata/shared/db/schema";
 import { TrashIcon } from "lucide-react";
+import { extractValueFromFlowValue } from "@tdata/shared/utils";
 
 const PriorityIcons: Record<(typeof Priorities)[number], IconType> = {
   LOW: "Low",

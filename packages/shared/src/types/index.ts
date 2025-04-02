@@ -7,3 +7,4 @@ export * from "./taskType";
 export * from "./organization";
 export * from "./workflow";
 export * from "./automation";
+export * from "./message";

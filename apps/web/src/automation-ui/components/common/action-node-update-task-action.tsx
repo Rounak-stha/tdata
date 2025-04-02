@@ -1,12 +1,10 @@
 import { Select } from "@/components/ui/select";
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
-import { ProjectTemplateDetail, ProjectTemplateProperty } from "@tdata/shared/types";
+import { FlowValue, ProjectTemplateDetail, ProjectTemplateProperty, TaskStandardUpdatableFieldLabels } from "@tdata/shared/types";
+import { StandardUpdatableFields } from "@tdata/shared/lib";
 import { FC, useMemo, useState } from "react";
 import { useFlowStore } from "@/automation-ui/store/flow";
-import { FlowValue } from "@/automation-ui/types";
 import { FlowValueComponent } from "./flow-value-component";
-
-const StandardFields = new Set(["title", "assignee", "status", "priority"]);
 
 // here's what I want to do
 // create an array of all fields like for the custom fields
@@ -30,7 +28,7 @@ export const ActionNodeUpdateTaskAction: FC<ActionNodeUpdateTaskActionProps> = (
     }, {} as Record<string, ProjectTemplateProperty>);
   }, [projectTemplate]);
 
-  const fieldNames = useMemo(() => Object.keys(customFieldMap).concat(Array.from(StandardFields)), [customFieldMap]);
+  const fieldNames = useMemo(() => Object.keys(customFieldMap).concat(Array.from(StandardUpdatableFields)), [customFieldMap]);
 
   const handleAddSelectedFields = (value: string) => {
     setSelectedFields([...selectedFields, value]);
@@ -46,9 +44,7 @@ export const ActionNodeUpdateTaskAction: FC<ActionNodeUpdateTaskActionProps> = (
     <div className="flex flex-col gap-4">
       <Select onValueChange={handleAddSelectedFields}>
         <SelectTrigger>
-          <SelectValue placeholder="Select fields to update" asChild>
-            <p>Select fields to update</p>
-          </SelectValue>
+          <SelectValue placeholder="Select fields to update" />
         </SelectTrigger>
         <SelectContent>
           {fieldNames.map((fieldName) => {
@@ -62,7 +58,7 @@ export const ActionNodeUpdateTaskAction: FC<ActionNodeUpdateTaskActionProps> = (
       </Select>
       <div className="flex flex-col gap-2">
         {selectedFields.map((fieldName) => {
-          if (StandardFields.has(fieldName)) {
+          if (StandardUpdatableFields.has(fieldName as TaskStandardUpdatableFieldLabels)) {
             return <StandardField key={fieldName} fieldName={fieldName} onChange={onChange} onRemove={removeSelectedField} />;
           }
           const field = customFieldMap[fieldName];

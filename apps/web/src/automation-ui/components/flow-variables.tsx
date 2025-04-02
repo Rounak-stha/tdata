@@ -5,14 +5,14 @@ import { PlusIcon, Trash2Icon, PencilIcon, UserIcon, ClipboardCheckIcon, FolderI
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useFlowStore } from "../store/flow";
-import { FlowVariable, FlowVariableCateory, FlowVariableType } from "../types";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { VariablesTypes } from "../lib/constants";
+import { VariablesTypes } from "@/automation-ui/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { createCustomVariable } from "../utils/variables";
+import { createCustomVariable } from "@/automation-ui/utils/variables";
+import { FlowVariable, FlowVariableCateory, FlowVariableType } from "@tdata/shared/types";
+import { useFlowStore } from "@/automation-ui/store/flow";
 
 /**
  * This component defines sucomopnent inside it but its an antipattern as o every render the subcomponent are recreated and remounted which is not good for performance
@@ -22,7 +22,7 @@ export const FlowVariablesModal = () => {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("custom");
   const [newVarName, setNewVarName] = useState("");
-  const [newVarValue, setNewVarValue] = useState("");
+  const [newVarValue, setNewVarValue] = useState<string | string[]>("");
   const [newVarType, setNewVarType] = useState<FlowVariableType>("text");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");

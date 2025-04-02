@@ -1,6 +1,4 @@
-import { FlowVariableType } from "@tdata/shared/types";
-import { FlowOperators } from "../lib/constants";
-import { FlowOperator, FlowOperatorValue } from "@/automation-ui/types";
+import { FlowOperator, FlowOperatorValue, FlowVariableType } from "@tdata/shared/types";
 
 const TemplateValueRegex = /{{\s*(\w+)\s*/;
 
@@ -11,22 +9,6 @@ export const extractVariableNameFromPlaceholder = (input: string): string => {
 
 export const createVariablePlaceholder = (variable: string): string => {
   return `{{${variable}}}`;
-};
-
-const OperatorCompatibility: Record<FlowVariableType, FlowOperatorValue[]> = {
-  boolean: ["eq", "neq"],
-  number: ["eq", "neq", "gt", "gte", "lt", "lte"],
-  text: ["eq", "neq"],
-  date: ["eq", "neq", "gt", "gte", "lt", "lte"],
-  status: ["eq", "neq"],
-  priority: ["eq", "neq"],
-  multiSelect: ["contains"],
-  select: ["eq", "neq"],
-  user: ["eq", "neq"],
-};
-
-export const getFlowOperators = (type: FlowVariableType): FlowOperator[] => {
-  return FlowOperators.filter((operator) => OperatorCompatibility[type].includes(operator.value));
 };
 
 // Function to check if a string contains a variable expression {{var}}

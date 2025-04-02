@@ -4,7 +4,8 @@ import { CheckSquareIcon, GitBranchIcon, PlusIcon } from "lucide-react";
 import { Button } from "@components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@components/ui/popover";
 import { useFlowStore } from "@/automation-ui/store/flow";
-import { FC } from "react";
+
+import { FC, memo } from "react";
 
 type PlaceholderNodeProps = {
   id: string;
@@ -13,7 +14,7 @@ type PlaceholderNodeProps = {
   };
 };
 
-export const PlaceholderNode: FC<PlaceholderNodeProps> = ({ id }) => {
+export const PlaceholderNode: FC<PlaceholderNodeProps> = memo(function PlaceholderNode({ id }) {
   const { replaceNode } = useFlowStore();
 
   return (
@@ -50,4 +51,4 @@ export const PlaceholderNode: FC<PlaceholderNodeProps> = ({ id }) => {
       </Popover>
     </div>
   );
-};
+});

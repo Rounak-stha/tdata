@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, forwardRef, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { useFlowStore } from "@/automation-ui/store/flow";
+
 import { Badge } from "@/components/ui/badge";
-import { FlowVariable, FlowVariableType } from "@/automation-ui/types";
+import { FlowVariable, FlowVariableType } from "@tdata/shared/types";
 
 interface VariableSelectorProps {
   onSelect: (variable: FlowVariable) => void;

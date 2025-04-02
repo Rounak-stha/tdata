@@ -17,9 +17,11 @@
     "incremental": true,
     "paths": {
       "@db/*": ["./src/db/*"],
-      "@types": ["./src/types"]
+      "@types": ["./src/types"],
+      "@utils": ["./src/utils"],
+      "@lib": ["./src/lib"]
     }
   },
-  "include": ["src/**/*", "src/**/*.json"],
+  "include": ["src/**/*", "src/**/*.json", "__test__/**/*"],
   "exclude": ["node_modules", "dist"]
 }

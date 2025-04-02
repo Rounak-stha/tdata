@@ -5,10 +5,10 @@ import { IconColorMap, IconMap } from "@/lib/constants/icon";
 import { IconType } from "@types";
 import { FlowValueComponentBaseProps } from "@/automation-ui/types/components";
 import { useFlowStore } from "@/automation-ui/store/flow";
-import { extractValueFromFlowValue } from "@/automation-ui/utils/variables";
+
 import { FlowTaskStatus } from "@/automation-ui/types";
-import { Label } from "@/components/ui/label";
 import { TrashIcon } from "lucide-react";
+import { extractValueFromFlowValue } from "@tdata/shared/utils";
 
 const statusIcons = IconMap;
 const statusColors = IconColorMap;
@@ -37,7 +37,8 @@ export const FlowValueStatusComponent: FC<FlowValueComponentBaseProps> = ({ type
     return [...wsVariables, ...ws];
   }, [project, getVariables]);
 
-  const initialValue = value ? parseInt(extractValueFromFlowValue(value) || "") : null;
+  // For select component, the value is the strinified id of the status
+  const initialValue = value ? parseInt((extractValueFromFlowValue(value) || "") as string) : null;
   const [status, setStatus] = useState(initialValue ? workflowStatuses.find((ws) => ws.id == initialValue) : undefined);
 
   const handleChange = (statusId: string) => {

@@ -3,12 +3,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FC, useMemo, useState } from "react";
 import { FlowValueComponentBaseProps } from "@/automation-ui/types/components";
 import { useFlowStore } from "@/automation-ui/store/flow";
-import { extractValueFromFlowValue } from "@/automation-ui/utils/variables";
-import { FlowTaskUser } from "@/automation-ui/types";
-import { Label } from "@/components/ui/label";
+
 import { useOrganizationMembers } from "@/hooks";
 import { Avatar } from "@/components/ui/avatar";
 import { TrashIcon, UserIcon } from "lucide-react";
+import { FlowTaskUser } from "@tdata/shared/types";
+import { extractValueFromFlowValue } from "@tdata/shared/utils";
 
 /**
  * The value of the select component is the id of one of the WorkflowStatus.

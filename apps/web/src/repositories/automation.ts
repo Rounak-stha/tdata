@@ -16,7 +16,18 @@ export class AutomationRepository {
     return result;
   }
 
-  static async getById(id: number): Promise<Automation | null> {
+  static async update(id: string, data: Partial<InsertAutomationData>): Promise<Automation> {
+    const db = await createDrizzleSupabaseClient();
+
+    const result = await db.rls(async (tx) => {
+      const createdAutomation = await tx.update(automations).set(data).where(eq(automations.id, id)).returning();
+      return createdAutomation[0];
+    });
+
+    return result;
+  }
+
+  static async getById(id: string): Promise<Automation | null> {
     const db = await createDrizzleSupabaseClient();
 
     const result = await db.rls(async (tx) => {

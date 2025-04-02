@@ -3,9 +3,9 @@ import DynamicInput from "./dynamic-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FlowValueComponent } from "./flow-value-component";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
-import { FlowOperator, FlowValue, FlowVariable } from "@/automation-ui/types";
-import { getFlowOperators } from "@/automation-ui/utils/form-utils";
 import { ConditionChangeHandler } from "@/automation-ui/types/components";
+import { FlowOperator, FlowValue, FlowVariable } from "@tdata/shared/types";
+import { getFlowOperators } from "@tdata/shared/utils";
 
 type FlowConditionProps = {
   field: FlowVariable | null;
