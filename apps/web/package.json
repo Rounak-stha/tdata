@@ -37,6 +37,7 @@
     "@supabase/supabase-js": "^2.47.10",
     "@tdata/shared": "*",
     "@xyflow/react": "^12.4.4",
+    "amqplib": "^0.10.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/amqplib": "^0",
     "@types/node": "^20",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
