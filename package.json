@@ -4,10 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "yarn workspace @tdata/web dev",
+    "dev:automate": "yarn workspace @tdata/automate dev",
     "dev:editor": "yarn workspace @tdata/editor dev",
     "build": "turbo run build --filter=@tdata/web",
     "build:shared": "yarn workspace @tdata/shared build",
+    "build:automate": "yarn workspace @tdata/automate build",
     "start": "next start",
+    "start:automate": "yarn workspace @tdata/automate start",
     "lint": "next lint",
     "drizzle:generate": "yarn workspace @tdata/shared drizzle:generate",
     "drizzle:generate:both": "yarn workspace @tdata/shared drizzle:generate:both",
@@ -15,6 +18,7 @@
     "drizzle:push": "yarn workspace @tdata/shared drizzle:push",
     "test": "vitest",
     "test:web": "vitest --root apps/web --run --disable-console-intercept",
+    "test:automate": "vitest --root apps/automate --run --silent=false",
     "test:web:watch": "vitest --root apps/web",
     "test:web:ui": "vitest --ui --root apps/web --disable-console-intercept",
     "sqlc:generate": "yarn workspaces @tdata/automate sqlc:generate"

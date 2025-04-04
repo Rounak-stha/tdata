@@ -1,0 +1,35 @@
+{
+  "name": "@tdata/automate",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "rollup -c",
+    "start": "node dist/index.cjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Automation Service for Tdata",
+  "dependencies": {
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@tdata/shared": "*",
+    "amqplib": "^0.10.5",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.38.3",
+    "jwt-decode": "^4.0.0",
+    "tsx": "^4.19.3",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@types/amqplib": "^0.10.7",
+    "@types/node": "^22.13.13",
+    "nodemon": "^3.1.9",
+    "rollup": "^4.39.0",
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^5.1.4"
+  }
+}

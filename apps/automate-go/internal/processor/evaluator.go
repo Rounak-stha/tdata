@@ -26,13 +26,49 @@ func getNodeEvaluator(nodeType db.NodeType) (NodeEvaluator, error) {
 	}
 }
 
+func parseActionUpdateTaskPayload(payload interface{}) (*db.UpdateTaskPayload, error) {
+	payloadMap, ok := payload.(map[string]interface{})
+	if !ok {
+		return nil, errors.New("payload is not a map")
+	}
+	fields, ok := payloadMap["fields"].(map[string]interface{})
+	if !ok {
+		return nil, errors.New("fields is not a map")
+	}
+	payload := &db.UpdateTaskPayload{
+		Fields: make(
+			map[string]*db.FlowValue,
+		),
+	}
+	for key, value := range fields {
+		payload.Fields[key] = &db.FlowValue{
+			Type:  db.FLowValueTypeString,
+			Value: value,
+		}
+	}
+	return payload, nil
+}
+
 // ActionNodeEvaluator evaluates ActionNode type nodes
 type ActionNodeEvaluator struct{}
 
 func (e *ActionNodeEvaluator) Evaluate(env *models.FlowEnvironment, node *db.AutomationFlowNode) (bool, error) {
-	// Action logic
-	fmt.Printf("Executing Action Node: %s\n", node.ID)
-	return false, nil
+	data, ok := node.Data.(*db.ActionNodeData)
+
+	if !ok {
+		fmt.Println("Action Node Data Type assertion failed")
+		return false, errors.New("invalid node data")
+	}
+
+	if data.Action == db.ActionUpdateTask {
+		payload, ok := data.Payload.(*db.UpdateTaskPayload)
+		if !ok {
+			fmt.Println("Update Task Payload Type assertion failed")
+			return false, errors.New("invalid payload data")
+		}
+
+	}
+	return true, nil
 }
 
 // TriggerNodeEvaluator evaluates TriggerNode type nodes
@@ -41,7 +77,7 @@ type TriggerNodeEvaluator struct{}
 func (e *TriggerNodeEvaluator) Evaluate(env *models.FlowEnvironment, node *db.AutomationFlowNode) (bool, error) {
 	data, ok := node.Data.(*db.TriggerNodeData)
 	if !ok {
-		fmt.Println("Type assertion failed")
+		fmt.Println("Trigger Node Data Type assertion failed")
 		return false, errors.New("invalid node data")
 	}
 	return evaluateCondition(env, &data.Condition), nil

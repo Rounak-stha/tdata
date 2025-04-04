@@ -112,7 +112,7 @@ export const getSystemVariables = (project: ProjectDetail, task?: TaskDetail, us
       id: createTriggeringTaskFieldVariableName("assignee"),
       name: createTriggeringTaskFieldVariableName("assignee"),
       type: "user",
-      value: String(task?.userRelations ? task.userRelations["assignee"][0]?.id : ""),
+      value: String(task?.userRelations ? (task.userRelations["assignee"] ? task.userRelations["assignee"][0]?.id : "") : ""),
       description: "The description of the task",
     },
     ...(project.template.taskProperties
