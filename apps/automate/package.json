@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "rollup -c",
+    "build": "yarn workspace @tdata/shared build; rollup -c",
     "start": "node dist/index.cjs"
   },
   "keywords": [],
