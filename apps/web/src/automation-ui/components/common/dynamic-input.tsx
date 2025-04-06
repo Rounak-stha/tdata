@@ -76,9 +76,7 @@ const DynamicInput = ({ value, onChange, placeholder = "", label, supportExpress
             onChange={(e) => handleInputChange(e)}
             onFocus={handleInputFocus}
             placeholder={placeholder}
-            className={`w-full bg-white border rounded-md py-1.5 px-3 text-sm ${isExpression ? "border-blue-400 bg-blue-50" : "border-gray-200"} ${
-              !isValidExpression ? "border-red-400" : ""
-            } ${error ? "border-red-400" : ""}`}
+            className={`w-full bg-white border rounded-md py-1.5 px-3 text-sm ${!isValidExpression ? "border-red-400" : ""} ${error ? "border-red-400" : ""}`}
             rows={3}
           />
         ) : (
@@ -89,7 +87,7 @@ const DynamicInput = ({ value, onChange, placeholder = "", label, supportExpress
             onChange={(e) => handleInputChange(e)}
             onFocus={handleInputFocus}
             placeholder={placeholder}
-            className={`w-full h-8  ${isExpression ? "border-blue-400 bg-blue-50" : ""} ${!isValidExpression ? "border-red-400" : ""} ${error ? "border-red-400" : ""}`}
+            className={`w-full h-8  ${!isValidExpression ? "border-red-400" : ""} ${error ? "border-red-400" : ""}`}
           />
         )}
       </div>

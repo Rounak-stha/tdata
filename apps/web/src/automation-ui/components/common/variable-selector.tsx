@@ -110,26 +110,41 @@ export const VariableSelector = forwardRef<HTMLDivElement, VariableSelectorProps
       <div ref={containerRef} className="bg-background rounded-sm border variable-selector" style={style} onWheel={handleWheel}>
         {showCategoryFilters && (
           <div className="flex gap-1 p-2 border-b">
-            <button className="px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100" onClick={() => setSearchTerm?.("task")}>
+            <button
+              className={cn("px-2 py-1 text-xs bg-muted text-muted-foreground rounded-sm hover:bg-accent", { "bg-accent": searchTerm == "task" })}
+              onClick={() => setSearchTerm?.("task")}
+            >
               Task
             </button>
-            <button className="px-2 py-1 text-xs bg-purple-50 text-purple-600 rounded-md hover:bg-purple-100" onClick={() => setSearchTerm?.("user")}>
+            <button
+              className={cn("px-2 py-1 text-xs bg-muted text-muted-foreground rounded-sm hover:bg-accent", { "bg-accent": searchTerm == "user" })}
+              onClick={() => setSearchTerm?.("user")}
+            >
               User
             </button>
-            <button className="px-2 py-1 text-xs bg-green-50 text-green-600 rounded-md hover:bg-green-100" onClick={() => setSearchTerm?.("project")}>
+            <button
+              className={cn("px-2 py-1 text-xs bg-muted text-muted-foreground rounded-sm hover:bg-accent", { "bg-accent": searchTerm == "project" })}
+              onClick={() => setSearchTerm?.("project")}
+            >
               Project
             </button>
-            <button className="px-2 py-1 text-xs bg-orange-50 text-orange-600 rounded-md hover:bg-orange-100" onClick={() => setSearchTerm?.("trigger")}>
+            <button
+              className={cn("px-2 py-1 text-xs bg-muted text-muted-foreground rounded-sm hover:bg-accent", { "bg-accent": searchTerm == "trigger" })}
+              onClick={() => setSearchTerm?.("trigger")}
+            >
               Trigger
             </button>
-            <button className="px-2 py-1 text-xs bg-gray-50 text-gray-600 rounded-md hover:bg-gray-100" onClick={() => setSearchTerm?.("variables")}>
+            <button
+              className={cn("px-2 py-1 text-xs bg-muted text-muted-foreground rounded-sm hover:bg-accent", { "bg-accent": searchTerm == "variables" })}
+              onClick={() => setSearchTerm?.("variables")}
+            >
               Custom
             </button>
           </div>
         )}
 
         {compatibleWith && (
-          <div className="p-2 border-b border-gray-100">
+          <div className="p-2 border-b">
             <div className="text-xs font-medium text-gray-500">
               Showing variables compatible with <span className="text-blue-600">{compatibleWith}</span>
             </div>
@@ -144,25 +159,12 @@ export const VariableSelector = forwardRef<HTMLDivElement, VariableSelectorProps
               <div
                 key={variable.name}
                 ref={index === highlightedIndex ? highlightedRef : null}
-                className={cn("py-2 px-3 text-sm rounded-md cursor-pointer flex flex-col", index === highlightedIndex ? "bg-blue-50" : "hover:bg-gray-50")}
+                className={cn("py-2 px-3 text-sm rounded-md cursor-pointer flex flex-col hover:bg-accent")}
                 onClick={() => handleVariableSelect(variable)}
                 onMouseOver={() => setHighlightedIndex(index)}
                 onWheel={handleWheel}
               >
-                <span
-                  className={cn(
-                    "flex items-center font-medium",
-                    variable.name.startsWith("task.")
-                      ? "text-blue-600"
-                      : variable.name.startsWith("current_user.") || variable.name.startsWith("trigger.user.")
-                      ? "text-purple-600"
-                      : variable.name.startsWith("project.")
-                      ? "text-green-600"
-                      : variable.name.startsWith("trigger.")
-                      ? "text-orange-600"
-                      : "text-gray-600"
-                  )}
-                >
+                <span className="flex items-center font-medium text-muted-foreground">
                   <span className="mr-1">{variable.name}</span>
                   {variable.type && (
                     <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/20">
