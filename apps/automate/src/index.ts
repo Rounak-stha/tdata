@@ -3,6 +3,7 @@ import "dotenv/config";
 import { RabbitMQConnection } from "./config/rabbitmq";
 import { RabbitMQService } from "./services/rabbitmq";
 import { logger } from "./config/logger";
+import { startWebServer } from "./services/http";
 
 async function bootstrap() {
   try {
@@ -23,3 +24,4 @@ async function bootstrap() {
 }
 
 bootstrap();
+startWebServer();
