@@ -38,6 +38,17 @@ export class AutomationRepository {
     if (result.length == 0) return null;
     return result[0];
   }
+
+  static async getByProjectId(projectId: number) {
+    const db = await createDrizzleSupabaseClient();
+
+    const result = await db.rls(async (tx) => {
+      const projectAutomations = await tx.select().from(automations).where(eq(automations.projectId, projectId)).execute();
+      return projectAutomations;
+    });
+
+    return result;
+  }
 }
 
 export default AutomationRepository;
