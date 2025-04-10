@@ -17,7 +17,7 @@ export default async function Layout({ children, params }: { children: React.Rea
 
   return (
     <SWRProvider>
-      <SidebarProvider className="h-full w-full flex">
+      <SidebarProvider defaultOpen={false} className="h-full w-full flex">
         <UserProvider initialUser={{ ...user, role }}>
           <OrganizationProvider initialOrganization={{ ...organization, members }}>
             <AppSidebar />
