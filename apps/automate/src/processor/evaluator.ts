@@ -80,12 +80,6 @@ export class FlowEvaluator {
     const leftValue = this.context.variableManager.getValue(condition.field.id);
     const rightValue = this.resolveValue(condition.value);
 
-    console.log({
-      variables: this.context.variableManager.getAllVariables(),
-      leftValue,
-      rightValue,
-    });
-
     if (!leftValue || !rightValue) {
       throw new NodeEvaluationError("Invalid Condition: Empty Operands", condition);
     }
