@@ -304,7 +304,7 @@ export const taskActivities = pgTable(TableNames.taskActivities, {
     .notNull(),
   action: ActivityActionEnum().notNull(),
   taskId: integer()
-    .references(() => tasks.id)
+    .references(() => tasks.id, { onDelete: "cascade" })
     .notNull(),
   metadata: jsonb().$type<TaskActivityMetadata>().notNull(),
   userId: uuid()
@@ -319,7 +319,7 @@ export const taskComments = pgTable(TableNames.taskComments, {
     .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   taskId: integer()
-    .references(() => tasks.id)
+    .references(() => tasks.id, { onDelete: "cascade" })
     .notNull(),
   userId: uuid()
     .references(() => users.id)
