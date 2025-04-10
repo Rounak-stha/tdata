@@ -1,6 +1,6 @@
 import { Select } from "@/components/ui/select";
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
-import { FlowValue, ProjectTemplateDetail, ProjectTemplateProperty, TaskStandardUpdatableFieldLabels } from "@tdata/shared/types";
+import { ActionNodeData, FlowValue, ProjectTemplateDetail, ProjectTemplateProperty, TaskStandardUpdatableFieldLabels } from "@tdata/shared/types";
 import { StandardUpdatableFields } from "@tdata/shared/lib";
 import { FC, useMemo, useState } from "react";
 import { useFlowStore } from "@/automation-ui/store/flow";
@@ -12,13 +12,20 @@ import { FlowValueComponent } from "./flow-value-component";
 // the value input type will be based on the type of the field
 
 type ActionNodeUpdateTaskActionProps = {
+  data: ActionNodeData<"Update_Task">;
   onChange: (key: string, value: FlowValue | null) => void;
   onRemove: (key: string) => void;
 };
 
-export const ActionNodeUpdateTaskAction: FC<ActionNodeUpdateTaskActionProps> = ({ onChange, onRemove }) => {
+type SelectedFields = {
+  name: string;
+  value: FlowValue | null;
+};
+
+export const ActionNodeUpdateTaskAction: FC<ActionNodeUpdateTaskActionProps> = ({ data, onChange, onRemove }) => {
   const { project } = useFlowStore();
-  const [selectedFields, setSelectedFields] = useState<string[]>([]);
+  const initiaFields = useMemo(() => Object.keys(data.payload || {}).map((key) => ({ name: key, value: data.payload?.[key] || null })), [data.payload]);
+  const [selectedFields, setSelectedFields] = useState<SelectedFields[]>(initiaFields);
   const projectTemplate = project.template as ProjectTemplateDetail;
 
   const customFieldMap = useMemo(() => {
@@ -30,14 +37,14 @@ export const ActionNodeUpdateTaskAction: FC<ActionNodeUpdateTaskActionProps> = (
 
   const fieldNames = useMemo(() => Object.keys(customFieldMap).concat(Array.from(StandardUpdatableFields)), [customFieldMap]);
 
-  const handleAddSelectedFields = (value: string) => {
-    setSelectedFields([...selectedFields, value]);
-    onChange(value, null);
+  const handleAddSelectedFields = (name: string) => {
+    setSelectedFields([...selectedFields, { name, value: null }]);
+    onChange(name, null);
   };
 
-  const removeSelectedField = (value: string) => {
-    setSelectedFields(selectedFields.filter((field) => field !== value));
-    onRemove(value);
+  const removeSelectedField = (name: string) => {
+    setSelectedFields(selectedFields.filter((field) => field.name !== name));
+    onRemove(name);
   };
 
   return (
@@ -49,7 +56,7 @@ export const ActionNodeUpdateTaskAction: FC<ActionNodeUpdateTaskActionProps> = (
         <SelectContent>
           {fieldNames.map((fieldName) => {
             return (
-              <SelectItem className="disabled:cursor-not-allowed opacity-90" key={fieldName} value={fieldName} disabled={selectedFields.includes(fieldName)}>
+              <SelectItem className="disabled:cursor-not-allowed opacity-90" key={fieldName} value={fieldName} disabled={selectedFields.some((field) => field.name == fieldName)}>
                 {fieldName}
               </SelectItem>
             );
@@ -57,9 +64,9 @@ export const ActionNodeUpdateTaskAction: FC<ActionNodeUpdateTaskActionProps> = (
         </SelectContent>
       </Select>
       <div className="flex flex-col gap-2">
-        {selectedFields.map((fieldName) => {
+        {selectedFields.map(({ name: fieldName, value }) => {
           if (StandardUpdatableFields.has(fieldName as TaskStandardUpdatableFieldLabels)) {
-            return <StandardField key={fieldName} fieldName={fieldName} onChange={onChange} onRemove={removeSelectedField} />;
+            return <StandardField key={fieldName} fieldName={fieldName} value={value} onChange={onChange} onRemove={removeSelectedField} />;
           }
           const field = customFieldMap[fieldName];
           return (
@@ -68,6 +75,7 @@ export const ActionNodeUpdateTaskAction: FC<ActionNodeUpdateTaskActionProps> = (
               valueFor={fieldName}
               type={field.type}
               label={fieldName}
+              value={value}
               onChange={(value) => onChange(fieldName, value)}
               deletable
               onDelete={() => removeSelectedField(fieldName)}
@@ -81,25 +89,26 @@ export const ActionNodeUpdateTaskAction: FC<ActionNodeUpdateTaskActionProps> = (
 
 type StandardFieldProps = {
   fieldName: string;
+  value: FlowValue | null;
   onChange: (key: string, value: FlowValue) => void;
   onRemove: (key: string) => void;
 };
 
-const StandardField: FC<StandardFieldProps> = ({ fieldName, onChange, onRemove }) => {
+const StandardField: FC<StandardFieldProps> = ({ fieldName, value, onChange, onRemove }) => {
   if (fieldName === "status") {
-    return <FlowValueComponent type="status" label="Status" onChange={(value) => onChange("status", value)} deletable onDelete={() => onRemove(fieldName)} />;
+    return <FlowValueComponent type="status" label="Status" value={value} onChange={(value) => onChange("status", value)} deletable onDelete={() => onRemove(fieldName)} />;
   }
 
   if (fieldName === "priority") {
-    return <FlowValueComponent type="priority" label="Priority" onChange={(value) => onChange("priority", value)} deletable onDelete={() => onRemove(fieldName)} />;
+    return <FlowValueComponent type="priority" label="Priority" value={value} onChange={(value) => onChange("priority", value)} deletable onDelete={() => onRemove(fieldName)} />;
   }
 
   if (fieldName === "assignee") {
-    return <FlowValueComponent type="user" label="Assignee" onChange={(value) => onChange("assignee", value)} deletable onDelete={() => onRemove(fieldName)} />;
+    return <FlowValueComponent type="user" label="Assignee" value={value} onChange={(value) => onChange("assignee", value)} deletable onDelete={() => onRemove(fieldName)} />;
   }
 
   if (fieldName == "title") {
-    return <FlowValueComponent type="text" label="Title" onChange={(value) => onChange("title", value)} deletable onDelete={() => onRemove(fieldName)} />;
+    return <FlowValueComponent type="text" label="Title" value={value} onChange={(value) => onChange("title", value)} deletable onDelete={() => onRemove(fieldName)} />;
   }
 
   return null;

@@ -88,7 +88,7 @@ export const ActionNode: FC<ActionNodeProps<ActionType>> = memo(function ActionN
       </div>
 
       <div className="px-4 py-3 space-y-3">
-        {nodeData.action && <ActionForm action={nodeData.action} onChange={handleAddToPayload} onRemove={onRemovePayloadItem} />}
+        {nodeData.action && <ActionForm action={nodeData.action} data={nodeData} onChange={handleAddToPayload} onRemove={onRemovePayloadItem} />}
         {!nodeData.action && <p className="text-muted-foreground text-sm">Select an action</p>}
       </div>
 
@@ -100,14 +100,15 @@ export const ActionNode: FC<ActionNodeProps<ActionType>> = memo(function ActionN
 
 const ActionForm: FC<{
   action: ActionType;
+  data: ActionNodeData;
   onChange: (key: string | keyof ActionPayloadMap[ActionType], value: ActionPayloadMap[ActionType][keyof ActionPayloadMap[ActionType]]) => void;
   onRemove: (key: string | keyof ActionPayloadMap[ActionType]) => void;
-}> = ({ action, onChange, onRemove }) => {
+}> = ({ action, data, onChange, onRemove }) => {
   switch (action) {
     case "Update_Task":
-      return <ActionNodeUpdateTaskAction onChange={onChange} onRemove={onRemove} />;
+      return <ActionNodeUpdateTaskAction data={data as ActionNodeData<"Update_Task">} onChange={onChange} onRemove={onRemove} />;
     case "Add_Comment":
-      return <div>Add Comment Form</div>;
+      return <div>Add Comment Form (Coming Soon)</div>;
     default:
       return <div>No form available for this action</div>;
   }
