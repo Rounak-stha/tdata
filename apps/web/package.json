@@ -36,6 +36,7 @@
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.10",
     "@tdata/shared": "*",
+    "@vercel/og": "^0.6.8",
     "@xyflow/react": "^12.4.4",
     "amqplib": "^0.10.7",
     "class-variance-authority": "^0.7.1",
