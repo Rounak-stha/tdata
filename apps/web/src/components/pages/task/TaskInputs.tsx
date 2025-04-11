@@ -31,7 +31,7 @@ export const TaskTitle: FC<TaskTitleProps> = ({ taskId, title: initialTitle }) =
           name: "StandardFieldUpdate",
           performedBy: user.id,
           data: { title: debouncedTitle, previous: previousTitle || "", value: debouncedTitle },
-        },
+        }
       );
     };
     if (initialRender.current) {
@@ -39,7 +39,7 @@ export const TaskTitle: FC<TaskTitleProps> = ({ taskId, title: initialTitle }) =
     } else handleTitleUpdate();
   }, [debouncedTitle]);
 
-  return <Input type="text" value={title} onChange={handleChange} className="text-xl md:text-2xl font-semibold bg-transparent border-0 p-0 w-full focus:outline-none" />;
+  return <Input type="text" value={title} onChange={handleChange} className="text-xl md:text-3xl font-extrabold bg-transparent border-0 p-0 w-full focus:outline-none" />;
 };
 
 type TaskContentProps = {
