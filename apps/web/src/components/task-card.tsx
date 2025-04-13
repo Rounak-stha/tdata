@@ -32,7 +32,7 @@ export function TaskCard({ task, disabled = false }: TaskCardProps) {
         <AssigneeSelect size="icon" assignee={task.userRelations[AssigneeFieldName]} />
       </div>
       <Link href={Paths.task(organization.key, task.taskNumber)} className="block">
-        <h3 className="text-sm font-medium leading-none mb-3 hover:underline">{task.title}</h3>
+        <h3 className="text-sm font-bold leading-none mb-3 hover:underline">{task.title}</h3>
       </Link>
       <div className="flex items-center gap-2">
         <StatusSelect size="icon" projectId={task.projectId} status={initialTaskStatus} />

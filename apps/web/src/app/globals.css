@@ -6,3 +6,15 @@
   As for the import below, the css file contains the styles for different nodes in the editor like heading, code blocks, blockquote.
 */
 @import "@tdata/editor/src/styles/editor.css";
+
+.landing-container {
+  @apply px-4 md:px-6 lg:px-8 max-w-7xl mx-auto;
+}
+
+.landing-section {
+  @apply py-16 md:py-24;
+}
+
+.landing-feature-card {
+  @apply bg-card border rounded-lg p-6 transition-all duration-300 hover:border-primary;
+}
