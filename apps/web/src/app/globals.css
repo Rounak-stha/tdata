@@ -6,3 +6,37 @@
   As for the import below, the css file contains the styles for different nodes in the editor like heading, code blocks, blockquote.
 */
 @import "@tdata/editor/src/styles/editor.css";
+
+/* Smooth text animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.text-streaming {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Typing cursor animation */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background-color: currentColor;
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+}

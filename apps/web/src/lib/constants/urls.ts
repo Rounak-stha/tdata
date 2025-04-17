@@ -18,3 +18,7 @@ export const Paths = {
   myTasks: (org: string) => `/${org}/my-tasks`,
   search: (org: string) => `/${org}/search`,
 } as const;
+
+export const ApiPaths = {
+  chat: (orgId: number) => `/api/${orgId}/chat`,
+};

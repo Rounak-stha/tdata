@@ -31,7 +31,7 @@ export const TaskTitle: FC<TaskTitleProps> = ({ taskId, title: initialTitle }) =
           name: "StandardFieldUpdate",
           performedBy: user.id,
           data: { title: debouncedTitle, previous: previousTitle || "", value: debouncedTitle },
-        },
+        }
       );
     };
     if (initialRender.current) {
