@@ -1,11 +1,14 @@
+"use client";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FC, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { IconColorMap, IconMap } from "@/lib/constants/icon";
 import { WorkflowStatus } from "@tdata/shared/types";
-import { LoaderCircleIcon } from "lucide-react";
+import { LoaderCircleIcon, XIcon } from "lucide-react";
 import { ChangeParams, IconType } from "@types";
 import { useProjectTemplate } from "@/hooks/data";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 
 /**
  * TODO:
@@ -105,5 +108,62 @@ const StatusSelectLoading: FC<StatusSelectLoadingProps> = ({ size }) => {
         </SelectItem>
       </SelectContent>
     </Select>
+  );
+};
+
+type StatusSelectListProps = {
+  options: WorkflowStatus[];
+  onSelect: (value: WorkflowStatus) => void;
+};
+
+export type StatusBadgeProps = {
+  status: WorkflowStatus;
+  onRemove?: () => void;
+};
+
+export const StatusBadge: FC<StatusBadgeProps> = ({ status, onRemove }) => {
+  const IcomComp = statusIcons[status.icon as IconType];
+  return (
+    <div className="flex items-center text-sm border rounded-sm py-1 px-1.5">
+      <IcomComp className={`mr-2 h-4 w-4 ${statusColors[status.icon as IconType]}`} />
+      {status.name}
+
+      {onRemove ? (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="ml-1 text-muted-foreground hover:text-destructive transition-colors"
+          aria-label={`Remove ${status.name} filter`}
+        >
+          <XIcon size={14} strokeWidth={2.5} className="hover:scale-110 transition-transform" />
+        </button>
+      ) : null}
+    </div>
+  );
+};
+
+export const StatusSelectList: FC<StatusSelectListProps> = ({ options, onSelect }) => {
+  return (
+    <Command>
+      <CommandInput placeholder="Search Status..." />
+      <CommandList>
+        <CommandEmpty>No values found.</CommandEmpty>
+        <CommandGroup>
+          {options.map((status) => {
+            const IcomComp = statusIcons[status.icon as IconType];
+            return (
+              <CommandItem key={status.id} onSelect={() => onSelect(status)} className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <IcomComp className={`mr-2 h-4 w-4 ${statusColors[status.icon as IconType]}`} />
+                  {status.name}
+                </div>
+              </CommandItem>
+            );
+          })}
+        </CommandGroup>
+      </CommandList>
+    </Command>
   );
 };

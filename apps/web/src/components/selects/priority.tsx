@@ -1,8 +1,11 @@
+"use client";
+
 import { FC, useEffect, useState } from "react";
 
-import { LoaderCircleIcon } from "lucide-react";
+import { LoaderCircleIcon, XIcon } from "lucide-react";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Priority } from "@tdata/shared/types";
 import { cn } from "@/lib/utils";
 import { ChangeParams, IconType } from "@types";
@@ -106,5 +109,62 @@ const PriorityPriorityLoading: FC<PriorityPriorityLoadingProps> = ({ size }) => 
         </SelectItem>
       </SelectContent>
     </Select>
+  );
+};
+
+export type PriorityBadgeProps = {
+  priority: Priority;
+  onRemove?: () => void;
+};
+
+export const PriorityBadge: FC<PriorityBadgeProps> = ({ priority, onRemove }) => {
+  const IcomComp = IconMap[priority.icon as IconType];
+  return (
+    <div className="flex items-center text-sm border rounded-sm py-1 px-1.5">
+      <IcomComp className={`mr-2 h-4 w-4 ${IconColorMap[priority.icon as IconType]}`} />
+      {priority.name}
+
+      {onRemove ? (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="ml-1 text-muted-foreground hover:text-destructive transition-colors"
+          aria-label={`Remove ${priority.name} filter`}
+        >
+          <XIcon size={14} strokeWidth={2.5} className="hover:scale-110 transition-transform" />
+        </button>
+      ) : null}
+    </div>
+  );
+};
+
+type PrioritySelectListProps = {
+  options: Priority[];
+  onSelect: (value: Priority) => void;
+};
+
+export const PrioritySelectList: FC<PrioritySelectListProps> = ({ options, onSelect }) => {
+  return (
+    <Command>
+      <CommandInput placeholder="Search Status..." />
+      <CommandList>
+        <CommandEmpty>No values found.</CommandEmpty>
+        <CommandGroup>
+          {options.map((priority) => {
+            const IcomComp = IconMap[priority.icon as IconType];
+            return (
+              <CommandItem key={priority.id} onSelect={() => onSelect(priority)} className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <IcomComp className={`mr-2 h-4 w-4 ${IconColorMap[priority.icon as IconType]}`} />
+                  {priority.name}
+                </div>
+              </CommandItem>
+            );
+          })}
+        </CommandGroup>
+      </CommandList>
+    </Command>
   );
 };

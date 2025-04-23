@@ -1,4 +1,6 @@
-import { CheckIcon } from "lucide-react";
+"use client";
+
+import { CheckIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -56,5 +58,56 @@ export const ProjectSelect: FC<ProjectSelectProps> = ({ project, onSelect }) => 
         </Popover>
       </Tooltip>
     </TooltipProvider>
+  );
+};
+
+export type ProjectBadgeProps = {
+  project: Project;
+  onRemove?: () => void;
+};
+
+export const ProjectBadge: FC<ProjectBadgeProps> = ({ project, onRemove }) => {
+  return (
+    <div className="flex items-center text-sm border rounded-sm py-1 px-1.5">
+      {project.name}
+
+      {onRemove ? (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="ml-1 text-muted-foreground hover:text-destructive transition-colors"
+          aria-label={`Remove ${project.name} filter`}
+        >
+          <XIcon size={14} strokeWidth={2.5} className="hover:scale-110 transition-transform" />
+        </button>
+      ) : null}
+    </div>
+  );
+};
+
+type ProjectSelectListProps = {
+  options: Project[];
+  onSelect: (value: Project) => void;
+};
+
+export const ProjectSelectList: FC<ProjectSelectListProps> = ({ options, onSelect }) => {
+  return (
+    <Command>
+      <CommandInput placeholder="Search Status..." />
+      <CommandList>
+        <CommandEmpty>No values found.</CommandEmpty>
+        <CommandGroup>
+          {options.map((project) => {
+            return (
+              <CommandItem key={project.id} onSelect={() => onSelect(project)} className="flex items-center justify-between">
+                <div className="flex items-center">{project.name}</div>
+              </CommandItem>
+            );
+          })}
+        </CommandGroup>
+      </CommandList>
+    </Command>
   );
 };

@@ -1,3 +1,5 @@
+"use client";
+
 import { CheckIcon, ChevronsUpDownIcon, XIcon, UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -209,5 +211,57 @@ export const MultiAssigneeSelect: FC<MultiAssigneeSelecProps> = ({ assignee, onC
         </Command>
       </PopoverContent>
     </Popover>
+  );
+};
+
+export type UserBadgeProps = {
+  user: User;
+  onRemove?: () => void;
+};
+
+export const UserBadge: FC<UserBadgeProps> = ({ user, onRemove }) => {
+  return (
+    <div className="flex items-center text-sm border rounded-sm py-1 px-1.5">
+      <Avatar src={user.imageUrl} alt={user.name} /> {user.name}
+      {onRemove ? (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="ml-1 text-muted-foreground hover:text-destructive transition-colors"
+          aria-label={`Remove ${user.name} filter`}
+        >
+          <XIcon size={14} strokeWidth={2.5} className="hover:scale-110 transition-transform" />
+        </button>
+      ) : null}
+    </div>
+  );
+};
+
+type UserSelectListProps = {
+  options: User[];
+  onSelect: (value: User) => void;
+};
+
+export const UserSelectList: FC<UserSelectListProps> = ({ options, onSelect }) => {
+  return (
+    <Command>
+      <CommandInput placeholder="Search Status..." />
+      <CommandList>
+        <CommandEmpty>No values found.</CommandEmpty>
+        <CommandGroup>
+          {options.map((user) => {
+            return (
+              <CommandItem key={user.id} onSelect={() => onSelect(user)} className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Avatar src={user.imageUrl} alt={user.name} /> {user.name}
+                </div>
+              </CommandItem>
+            );
+          })}
+        </CommandGroup>
+      </CommandList>
+    </Command>
   );
 };

@@ -1,4 +1,4 @@
-import { CheckIcon, LoaderCircleIcon } from "lucide-react";
+import { CheckIcon, LoaderCircleIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -35,7 +35,7 @@ export const TaskTypeSelect: FC<TaskTypeSelectProps> = ({ projectId, onSelect })
   };
 
   if (isLoadingProjectTemplate || !projectTemplate || !selectedTaskType) {
-    return <StatusSelectLoading />;
+    return <TaskTypeSelectLoading />;
   }
 
   const IconComp = IconMap[selectedTaskType.icon as IconType];
@@ -85,10 +85,67 @@ export const TaskTypeSelect: FC<TaskTypeSelectProps> = ({ projectId, onSelect })
   );
 };
 
-const StatusSelectLoading: FC = () => {
+const TaskTypeSelectLoading: FC = () => {
   return (
     <Button disabled className="h-8 w-14 flex justify-center items-center">
       <LoaderCircleIcon className="animate-spin h-4 w-4" />
     </Button>
+  );
+};
+
+export type TaskTypeBadgeProps = {
+  tasktype: TaskType;
+  onRemove?: () => void;
+};
+
+export const TaskTypeBadge: FC<TaskTypeBadgeProps> = ({ tasktype, onRemove }) => {
+  const IcomComp = IconMap[tasktype.icon as IconType];
+  return (
+    <div className="flex items-center text-sm border rounded-sm py-1 px-1.5">
+      <IcomComp className={`mr-2 h-4 w-4 ${IconColorMap[tasktype.icon as IconType]}`} />
+      {tasktype.name}
+
+      {onRemove ? (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="ml-1 text-muted-foreground hover:text-destructive transition-colors"
+          aria-label={`Remove ${tasktype.name} filter`}
+        >
+          <XIcon size={14} strokeWidth={2.5} className="hover:scale-110 transition-transform" />
+        </button>
+      ) : null}
+    </div>
+  );
+};
+
+type TaskTypeSelectListProps = {
+  options: TaskType[];
+  onSelect: (value: TaskType) => void;
+};
+
+export const TaskTypeSelectList: FC<TaskTypeSelectListProps> = ({ options, onSelect }) => {
+  return (
+    <Command>
+      <CommandInput placeholder="Search Status..." />
+      <CommandList>
+        <CommandEmpty>No values found.</CommandEmpty>
+        <CommandGroup>
+          {options.map((tasktype) => {
+            const IcomComp = IconMap[tasktype.icon as IconType];
+            return (
+              <CommandItem key={tasktype.id} onSelect={() => onSelect(tasktype)} className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <IcomComp className={`mr-2 h-4 w-4 ${IconColorMap[tasktype.icon as IconType]}`} />
+                  {tasktype.name}
+                </div>
+              </CommandItem>
+            );
+          })}
+        </CommandGroup>
+      </CommandList>
+    </Command>
   );
 };

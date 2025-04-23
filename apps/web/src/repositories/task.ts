@@ -5,6 +5,7 @@ import {
   InsertCommentData,
   InsertTaskActivityData,
   InsertTaskData,
+  PaginatedTaskFilterParams,
   Task,
   TaskActivitySectionData,
   TaskDetail,
@@ -14,8 +15,8 @@ import {
   TaskUpdateData,
   User,
 } from "@tdata/shared/types";
-import { and, eq, sql } from "drizzle-orm";
-import { PrioritySelect, TaskSelects, TaskTypeSelect, WorkflowStatusSelects } from "./selects";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { PrioritySelect, TaskSelects, TaskTypeSelect, UserSelects, WorkflowStatusSelects } from "./selects";
 import ProjectRepository from "./project";
 import { PagintionMeta } from "@types";
 import { unionAll } from "drizzle-orm/pg-core";
@@ -276,20 +277,44 @@ export class TaskRepository {
   static async getAssignedTasks(userId: string, organizationId: number): Promise<TaskMinimalGroupedByStatus[]> {
     const db = await createDrizzleSupabaseClient();
     const result: TaskDetailMinimal[] = await db.rls(async (tx) => {
-      const data = await tx
+      const taskList = await tx
         .select({
           ...TaskSelects,
           status: WorkflowStatusSelects,
           priority: PrioritySelect,
           type: TaskTypeSelect,
+          assignee: UserSelects,
         })
         .from(tasks)
         .innerJoin(tasksUsers, and(eq(tasksUsers.taskId, tasks.id), eq(tasksUsers.name, AssigneeFieldName), eq(tasksUsers.userId, userId)))
         .leftJoin(workflowStatus, eq(workflowStatus.id, tasks.statusId))
         .leftJoin(priorities, eq(priorities.id, tasks.priorityId))
-        .leftJoin(taskTypes, eq(taskTypes.id, tasks.typeId))
+        .leftJoin(tasksUsers, and(eq(tasksUsers.taskId, tasks.id), eq(tasksUsers.name, AssigneeFieldName)))
         .where(and(eq(tasks.organizationId, organizationId)));
-      return data;
+
+      const taskIds = taskList.map((task) => task.id);
+
+      const assigneesData = await tx
+        .select({
+          taskId: tasksUsers.taskId,
+          user: UserSelects,
+        })
+        .from(tasksUsers)
+        .innerJoin(users, and(eq(tasksUsers.userId, users.id), inArray(tasksUsers.taskId, taskIds)))
+        .where(eq(tasksUsers.name, AssigneeFieldName));
+
+      const assigneesMap = new Map<number, User[]>();
+
+      for (const row of assigneesData) {
+        if (!assigneesMap.has(row.taskId)) {
+          assigneesMap.set(row.taskId, []);
+        }
+        assigneesMap.get(row.taskId)!.push(row.user as User);
+      }
+      return taskList.map((task) => ({
+        ...task,
+        assignees: assigneesMap.get(task.id) || [],
+      }));
     });
 
     const groupedTasks = Object.values(
@@ -308,5 +333,64 @@ export class TaskRepository {
       }, {} as Record<number, TaskMinimalGroupedByStatus>)
     );
     return groupedTasks;
+  }
+
+  static async searchTask(organizationId: number, filter: PaginatedTaskFilterParams): Promise<TaskDetailMinimal[]> {
+    const db = await createDrizzleSupabaseClient();
+    const { title, status, priorities: priorityFilter, projects, types, assignees } = filter;
+    const whereConditions = [
+      eq(tasks.organizationId, organizationId),
+      status && status.length ? inArray(tasks.statusId, status) : undefined,
+      priorityFilter && priorityFilter.length ? inArray(tasks.priorityId, priorityFilter) : undefined,
+      projects && projects.length ? inArray(tasks.projectId, projects) : undefined,
+      types && types.length ? inArray(tasks.typeId, types) : undefined,
+      assignees && assignees.length ? inArray(tasksUsers.userId, assignees) : undefined,
+      title ? sql`lower(${tasks.title}) LIKE ${`%${title.toLowerCase()}%`}` : undefined,
+    ];
+
+    // If no filters are provided then the only filter is the organizationId
+    if (whereConditions.length === 1) {
+      return [];
+    }
+
+    return await db.rls(async (tx) => {
+      const taskList = await tx
+        .select({
+          ...TaskSelects,
+          status: WorkflowStatusSelects,
+          priority: PrioritySelect,
+          type: TaskTypeSelect,
+        })
+        .from(tasks)
+        .leftJoin(workflowStatus, eq(tasks.statusId, workflowStatus.id))
+        .leftJoin(priorities, eq(tasks.priorityId, priorities.id))
+        .leftJoin(taskTypes, eq(tasks.typeId, taskTypes.id))
+        .where(and(...whereConditions));
+
+      const taskIds = taskList.map((task) => task.id);
+
+      const assigneesData = await tx
+        .select({
+          taskId: tasksUsers.taskId,
+          user: UserSelects,
+        })
+        .from(tasksUsers)
+        .innerJoin(users, and(eq(tasksUsers.userId, users.id), inArray(tasksUsers.taskId, taskIds)))
+        .where(eq(tasksUsers.name, AssigneeFieldName));
+
+      const assigneesMap = new Map<number, User[]>();
+
+      for (const row of assigneesData) {
+        if (!assigneesMap.has(row.taskId)) {
+          assigneesMap.set(row.taskId, []);
+        }
+        assigneesMap.get(row.taskId)!.push(row.user as User);
+      }
+
+      return taskList.map((task) => ({
+        ...task,
+        assignees: assigneesMap.get(task.id) || [],
+      }));
+    });
   }
 }

@@ -17,5 +17,5 @@ export const Paths = {
   projectAutomation: (orgKey: string, projectKey: string, automationId: string) => `/${orgKey}/projects/${projectKey}/automations/${automationId}`,
   newProject: (org: string) => `/${org}/projects/create`,
   myTasks: (org: string) => `/${org}/my-tasks`,
-  search: (org: string) => `/${org}/search`,
+  search: (org: string, params?: string) => (`/${org}/search` + params ? `?${params}` : ""),
 } as const;

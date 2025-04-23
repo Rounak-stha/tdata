@@ -1,6 +1,6 @@
 import { tasks, taskActivities, taskComments, Priorities } from "@db/schema";
 import { User, UserId } from "./user";
-import { ProjectTemplateDetail } from "./project";
+import { Project, ProjectTemplateDetail } from "./project";
 import { WorkflowStatus } from "./workflow";
 import { Priority } from "./priority";
 import { TaskType } from "./taskType";
@@ -11,7 +11,7 @@ export type TaskPropertyValue = string | string[];
 export type TaskProperty = Record<string, TaskPropertyValue>;
 
 export type Task = Omit<typeof tasks.$inferSelect, "updatedAt" | "deletedAt">;
-export type TaskDetailMinimal = Task & { status: WorkflowStatus; priority: Priority; type: TaskType };
+export type TaskDetailMinimal = Task & { status: WorkflowStatus; priority: Priority; type: TaskType; assignees: User[] };
 export type TaskActivity = Omit<typeof taskActivities.$inferSelect, "updatedAt" | "deletedAt">;
 export type Comment = Omit<typeof taskComments.$inferSelect, "deletedAt">;
 
@@ -19,6 +19,57 @@ export type TaskDetail = Task & {
   projectTemplate: ProjectTemplateDetail;
   userRelations: TaskUserRelations;
 };
+
+export type TaskFilterParams = {
+  title?: string;
+  /**
+   * An array of status Ids
+   */
+  projects?: number[];
+  status?: number[];
+
+  /**
+   * An array of Priority Ids
+   */
+  priorities?: number[];
+  /**
+   * An array of assignee Ids
+   */
+  assignees?: string[];
+  /**
+   * An array of task type Ids
+   */
+  types?: number[];
+};
+
+export type TaskFilterData = {
+  /**
+   * An array of status Ids
+   */
+  projects: Project[];
+  status: WorkflowStatus[];
+
+  /**
+   * An array of Priority Ids
+   */
+  priorities: Priority[];
+  /**
+   * An array of assignee Ids
+   */
+  assignees: User[];
+  /**
+   * An array of task type Ids
+   */
+  types: TaskType[];
+};
+
+export type WithPagination<T> = T & {
+  page: number;
+  limit: number;
+  total: number;
+};
+
+export type PaginatedTaskFilterParams = WithPagination<TaskFilterParams>;
 
 export type TaskDetailOptimistic = TaskDetail & { tempId?: number; disabled?: boolean };
 

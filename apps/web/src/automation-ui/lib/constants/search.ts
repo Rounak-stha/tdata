@@ -1,0 +1,1 @@
+export const NUMBER_OF_TASKS_PER_SEARCH = 16;
