@@ -13,7 +13,7 @@ import { ContentRefValue } from "@tdata/shared/types";
 import { EditorProps, EditorRenderActionProps } from "../../types";
 
 // min-h-[300px]
-export const Editor = forwardRef<ContentRefValue, EditorProps>(function Editor({ content, className, renderActions }, ref) {
+export const Editor = forwardRef<ContentRefValue, EditorProps>(function Editor({ content, readonly = false, className, renderActions }, ref) {
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const [isEmpty, setIsEmpty] = useState(true);
@@ -42,19 +42,41 @@ export const Editor = forwardRef<ContentRefValue, EditorProps>(function Editor({
       }
       return "";
     },
+    getJSON: () => {
+      const json = viewRef?.current?.state.doc.toJSON();
+      if (json) {
+        return json;
+      }
+      return {};
+    },
+    getExcerpt: () => {
+      const parsedContent = viewRef?.current?.state.doc.content.textBetween(0, viewRef.current.state.doc.content.size, "\n\n");
+      if (parsedContent) {
+        return parsedContent.slice(0, 200);
+      }
+      return "";
+    },
   }));
 
   useEffect(() => {
     if (!editorRef.current) return;
-
+    const parsedContent = (() => {
+      try {
+        return content ? (typeof content == "string" ? schema.nodeFromJSON(JSON.parse(content)) : schema.nodeFromJSON(content)) : undefined;
+      } catch {
+        return undefined;
+      }
+    })();
     const state = EditorState.create({
-      doc: content ? schema.nodeFromJSON(JSON.parse(content)) : undefined,
+      // @ts-ignore
+      doc: parsedContent,
       schema,
       plugins: getPlugins(),
     });
 
     const view = new EditorView(editorRef.current, {
       state,
+      editable: () => !readonly,
       dispatchTransaction(transaction) {
         const newState = view.state.apply(transaction);
         view.updateState(newState);

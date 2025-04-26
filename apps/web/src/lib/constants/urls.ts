@@ -18,6 +18,11 @@ export const Paths = {
   newProject: (org: string) => `/${org}/projects/create`,
   myTasks: (org: string) => `/${org}/my-tasks`,
   search: (org: string, params?: string) => (`/${org}/search` + params ? `?${params}` : ""),
+
+  // Documents
+  docs: (org: string) => `/${org}/docs`,
+  newDoc: (org: string) => `/${org}/docs/new`,
+  doc: (org: string, docId: string) => `/${org}/docs/${docId}`,
 } as const;
 
 export const ApiPaths = {

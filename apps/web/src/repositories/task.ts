@@ -283,13 +283,12 @@ export class TaskRepository {
           status: WorkflowStatusSelects,
           priority: PrioritySelect,
           type: TaskTypeSelect,
-          assignee: UserSelects,
         })
         .from(tasks)
         .innerJoin(tasksUsers, and(eq(tasksUsers.taskId, tasks.id), eq(tasksUsers.name, AssigneeFieldName), eq(tasksUsers.userId, userId)))
         .leftJoin(workflowStatus, eq(workflowStatus.id, tasks.statusId))
         .leftJoin(priorities, eq(priorities.id, tasks.priorityId))
-        .leftJoin(tasksUsers, and(eq(tasksUsers.taskId, tasks.id), eq(tasksUsers.name, AssigneeFieldName)))
+        .leftJoin(taskTypes, eq(taskTypes.id, tasks.typeId))
         .where(and(eq(tasks.organizationId, organizationId)));
 
       const taskIds = taskList.map((task) => task.id);

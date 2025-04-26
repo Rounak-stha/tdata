@@ -6,7 +6,8 @@ export type EditorRenderActionProps = {
 };
 
 export type EditorProps = {
-  content?: string;
+  content?: string | unknown;
+  readonly?: boolean;
   className?: string;
   renderActions?: (props: EditorRenderActionProps) => React.ReactNode;
 };

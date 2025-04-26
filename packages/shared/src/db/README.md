@@ -129,14 +129,14 @@ EXECUTE FUNCTION soft_delete_user();
 -- https://stackoverflow.com/questions/67551593/supabase-client-permission-denied-for-schema-public
 
 grant usage on schema "public" to authenticated;
-GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA "public" TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "public" TO authenticated;
 
 GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 
 
 grant usage on schema "public" to service_role;
-GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA "public" TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "public" TO service_role;
 
 GRANT ALL ON ALL ROUTINES IN SCHEMA public TO service_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO service_role;

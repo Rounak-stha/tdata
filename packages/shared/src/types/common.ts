@@ -2,6 +2,8 @@ import { ProjectTemplatePropertyTypes } from "./project";
 
 export type ContentRefValue = {
   getContent: () => string;
+  getExcerpt: () => string;
+  getJSON: () => unknown;
 };
 
 export type FormItemContentRefValue<T> = {

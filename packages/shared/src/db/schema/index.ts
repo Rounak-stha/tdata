@@ -5,7 +5,9 @@ import { AutomationFlow, FlowVariable } from "src/types/automation";
 import { sql } from "drizzle-orm";
 
 const timestamps = {
-  updatedAt: timestamp().$onUpdateFn(() => new Date()),
+  updatedAt: timestamp()
+    .$onUpdateFn(() => new Date())
+    .notNull(),
   createdAt: timestamp().defaultNow().notNull(),
 };
 
@@ -28,6 +30,13 @@ export const TableNames = {
   tasksUsers: "tasks_users",
   transitions: "transitions",
   workflowTemplates: "workflow_templates",
+  documents: "documents",
+  documentVersions: "document_versions",
+  documentCollaborators: "document_collaborators",
+  documentComments: "document_comments",
+  documentsTags: "documents_tags",
+  documentProjects: "document_projects",
+  tags: "tags",
 };
 
 /**
@@ -377,6 +386,68 @@ export const automations = pgTable("automations", {
   variables: jsonb().$type<FlowVariable[]>(),
   createdBy: uuid()
     .references(() => users.id)
+    .notNull(),
+  ...timestamps,
+});
+
+// Docs
+export const documents = pgTable(TableNames.documents, {
+  id: uuid()
+    .primaryKey()
+    .default(sql`uuid_generate_v4()`),
+  title: text().notNull(),
+  content: jsonb(),
+  excerpt: text(),
+  organizationId: integer()
+    .references(() => organizations.id, { onDelete: "cascade" })
+    .notNull(),
+  createdById: uuid()
+    .references(() => users.id)
+    .notNull(),
+  ...timestamps,
+});
+
+export const tags = pgTable(
+  TableNames.tags,
+  {
+    id: serial().primaryKey(),
+    name: text().notNull(),
+    organizationId: integer()
+      .references(() => organizations.id, { onDelete: "cascade" })
+      .notNull(),
+    ...timestamps,
+  },
+  (table) => [uniqueIndex("unique_tag_name_per_organization").on(table.organizationId, table.name)]
+);
+
+export const documentsTags = pgTable(
+  TableNames.documentsTags,
+  {
+    id: serial().primaryKey(),
+    documentId: uuid()
+      .references(() => documents.id)
+      .notNull(),
+    tagId: integer()
+      .references(() => tags.id)
+      .notNull(),
+    organizationId: integer()
+      .references(() => organizations.id, { onDelete: "cascade" })
+      .notNull(),
+    ...timestamps,
+  },
+  (table) => [uniqueIndex("unique_tag_in_document").on(table.documentId, table.tagId)]
+);
+
+export const documentCollaborators = pgTable(TableNames.documentCollaborators, {
+  id: serial().primaryKey(),
+  documentId: uuid()
+    .references(() => documents.id)
+    .notNull(),
+  userId: uuid()
+    .references(() => users.id)
+    .notNull(),
+  organizationId: integer()
+    .references(() => organizations.id, { onDelete: "cascade" })
     .notNull(),
   ...timestamps,
 });
