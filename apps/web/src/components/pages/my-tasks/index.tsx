@@ -18,7 +18,7 @@ export const MyTaskPage: FC<MyTaskPageProps> = ({ tasks }) => {
   return <div className=" px-6 py-4">{tasks.length > 0 ? <TaskList tasks={tasks} /> : <NoTaskAssigedInfo />}</div>;
 };
 
-const TaskList: FC<{ tasks: TaskMinimalGroupedByStatus[] }> = ({ tasks }) => {
+export const TaskList: FC<{ tasks: TaskMinimalGroupedByStatus[] }> = ({ tasks }) => {
   const { organization } = useOrganizations();
   return (
     <div className="flex flex-col gap-2 mt-4">
@@ -43,7 +43,7 @@ const TaskLine: FC<TaskLineProps> = ({ task, orgKey }) => {
   return (
     <div
       //href={`/lndev-ui/issue/${issue.identifier}`}
-      className="w-full flex items-center gap-2 justify-start h-11 hover:bg-sidebar/50"
+      className="w-full flex items-center gap-2 justify-start h-11 rounded-sm hover:bg-muted/50"
     >
       <div className="flex items-center gap-2">
         <PrioritySelect size="icon" priority={task.priority} projectId={task.projectId} />
