@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@components/ui/sidebar";
-import { ArrowRightIcon, CheckSquareIcon, FileTextIcon, FolderIcon, HomeIcon, ListTodoIcon, PlusIcon, SearchIcon } from "lucide-react";
+import { ArrowRightIcon, AudioWaveformIcon, CheckSquareIcon, FileTextIcon, FolderIcon, HomeIcon, ListTodoIcon, PlusIcon, SearchIcon } from "lucide-react";
 import { useOrganizations } from "@/hooks";
 import { Paths } from "@/lib/constants";
 import Link from "next/link";
@@ -48,6 +48,15 @@ export const SidebarContent = () => {
                 <Link href={Paths.search(organization.key)}>
                   <SearchIcon />
                   <span>Search (WIP)</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Chat with Mira">
+                <Link href={Paths.chat(organization.key)}>
+                  <AudioWaveformIcon />
+                  <span>Chat with Mira</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

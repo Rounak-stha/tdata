@@ -23,6 +23,9 @@ export const Paths = {
   docs: (org: string) => `/${org}/docs`,
   newDoc: (org: string) => `/${org}/docs/new`,
   doc: (org: string, docId: string) => `/${org}/docs/${docId}`,
+
+  // chat
+  chat: (org: string) => `/${org}/chat`,
 } as const;
 
 export const ApiPaths = {
