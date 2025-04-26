@@ -255,7 +255,7 @@ const AddTag: FC<AddTagProps> = ({ tags, onAdd, organizationId }) => {
               ) : searchTerm ? (
                 <Button variant="ghost" size="sm" className="w-full justify-start" onClick={createTagWithSearchString}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Create "{searchTerm}"
+                  Create &quot;{searchTerm}&quot;
                 </Button>
               ) : (
                 <div className="flex justify-center text-muted-foreground mt-1">Search for tags</div>
