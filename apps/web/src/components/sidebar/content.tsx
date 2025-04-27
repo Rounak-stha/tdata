@@ -38,7 +38,7 @@ export const SidebarContent = () => {
               <SidebarMenuButton asChild tooltip="My Tasks">
                 <Link href={Paths.myTasks(organization.key)}>
                   <CheckSquareIcon />
-                  <span>My Tasks</span>
+                  <span className="mt-0.5">My Tasks</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -47,7 +47,7 @@ export const SidebarContent = () => {
               <SidebarMenuButton asChild tooltip="Search">
                 <Link href={Paths.search(organization.key)}>
                   <SearchIcon />
-                  <span>Search (WIP)</span>
+                  <span className="mt-0.5">Search (WIP)</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -56,7 +56,7 @@ export const SidebarContent = () => {
               <SidebarMenuButton asChild tooltip="Chat with Mira">
                 <Link href={Paths.chat(organization.key)}>
                   <AudioWaveformIcon />
-                  <span>Chat with Mira</span>
+                  <span className="mt-0.5">Chat with Mira</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -65,7 +65,7 @@ export const SidebarContent = () => {
               <SidebarMenuButton asChild tooltip="Documents">
                 <Link href={Paths.docs(organization.key)}>
                   <FileTextIcon />
-                  <span>Search (WIP)</span>
+                  <span className="mt-0.5">Documents</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
