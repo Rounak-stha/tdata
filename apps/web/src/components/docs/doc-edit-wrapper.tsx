@@ -2,19 +2,18 @@
 
 import { useState, useRef, useEffect, FC, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Save, X, Plus, Clock, Users, TagIcon, SlashIcon, ChevronRightIcon } from "lucide-react";
+import { Save, X, Plus, Clock, TagIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { ContentRefValue, DocumentDetail, DocumentTag, Organization, Tag, User } from "@tdata/shared/types";
+import { ContentRefValue, DocumentDetail, Organization, Tag, User } from "@tdata/shared/types";
 import { Editor } from "@tdata/editor";
 import { useDebounce, useOrganizations, useUser } from "@/hooks";
-import { DebounceDelay, LowDebouncedDelay, Paths } from "@/lib/constants";
+import { LowDebouncedDelay, Paths } from "@/lib/constants";
 import { createDocument, createTag, searchTags, updateDocument } from "@/lib/actions/document";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -49,7 +48,6 @@ export function DocumentEditWrapper({ document: _document, isNew = false, onSave
   const [title, setTitle] = useState(document.title || "Untitled Document");
   const [tags, setTags] = useState<Tag[]>(document.tags || []);
   const [isSaving, setIsSaving] = useState(false);
-  const [newTag, setNewTag] = useState("");
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const router = useRouter();
   const titleRef = useRef<HTMLInputElement>(null);
@@ -107,9 +105,9 @@ export function DocumentEditWrapper({ document: _document, isNew = false, onSave
     if (onCancel) {
       onCancel();
     } else if (isNew) {
-      router.push("/docs");
+      router.push(Paths.docs(organization.key));
     } else {
-      router.push(`/docs/${document.id}`);
+      router.push(Paths.doc(organization.key, document.id));
     }
   };
 
@@ -117,7 +115,9 @@ export function DocumentEditWrapper({ document: _document, isNew = false, onSave
     setTags([...tags, tag]);
   };
 
-  const removeTag = (tagToRemove: string) => {};
+  const removeTag = (tag: Tag) => {
+    setTags(tags.filter((t) => t.id !== tag.id));
+  };
 
   return (
     <div className="animate-in fade-in duration-300">
@@ -166,7 +166,7 @@ export function DocumentEditWrapper({ document: _document, isNew = false, onSave
                   <Badge key={tag.id} variant="secondary" className="text-xs group hover:bg-muted/80 transition-colors">
                     {tag.name}
                     <button
-                      onClick={() => removeTag(tag.name)}
+                      onClick={() => removeTag(tag)}
                       className="ml-1 rounded-full hover:bg-background/80 h-3.5 w-3.5 inline-flex items-center justify-center text-muted-foreground"
                     >
                       <X className="h-2 w-2" />
