@@ -1,7 +1,3 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
 import { DocumentEditWrapper } from "@/components/docs/doc-edit-wrapper";
 
 export default function NewDocumentPage() {
