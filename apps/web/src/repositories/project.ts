@@ -214,6 +214,7 @@ export class ProjectRepository {
 							GROUP BY tu.task_id, tu.name
 						) grouped_users ON grouped_users.task_id = ta.id 
 						WHERE ta.status_id = s.id
+						AND ta.project_id = ${projectId}
 						GROUP BY ta.id
 						ORDER BY ta.created_at desc
 						LIMIT ${limit}
