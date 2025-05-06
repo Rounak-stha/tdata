@@ -36,9 +36,9 @@ jobs:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
-          envs: IMAGE_NAME,TAG<CONTAINER_NAME
+          envs: IMAGE_NAME,TAG,CONTAINER_NAME
           script: |
-            echo "$IMAGE_NAME:$TAG $CONTAINER_NAME"
+            echo "IMAGE_NAME $TAG $CONTAINER_NAME"
             docker pull $IMAGE_NAME:$TAG
             cd tdata
             docker stop $CONTAINER_NAME
