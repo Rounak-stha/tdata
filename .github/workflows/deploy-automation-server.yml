@@ -24,7 +24,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker-compose build automate
+          docker compose build automate
 
       - name: Push image to Docker Hub
         run: |
