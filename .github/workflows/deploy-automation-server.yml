@@ -36,7 +36,7 @@ jobs:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
-          env: IMAGE_NAME,TAG<CONTAINER_NAME
+          envs: IMAGE_NAME,TAG<CONTAINER_NAME
           script: |
             export IMAGE_NAME=$IMAGE_NAME
             export TAG=$TAG
