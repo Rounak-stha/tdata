@@ -38,9 +38,8 @@ jobs:
           key: ${{ secrets.DO_SSH_KEY }}
           envs: IMAGE_NAME,TAG,CONTAINER_NAME
           script: |
-            echo "IMAGE_NAME $TAG $CONTAINER_NAME"
             docker pull $IMAGE_NAME:$TAG
             cd tdata
             docker stop $CONTAINER_NAME
             docker rm $CONTAINER_NAME
-            docker run --env-file .env --name $CONTAINER_NAME $IMAGE_NAME:$TAG
+            docker run -d --env-file .env --name $CONTAINER_NAME $IMAGE_NAME:$TAG
