@@ -1,0 +1,43 @@
+name: Deploy Automate
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: rstha/automate
+  TAG: latest
+  CONTAINER_NAME: tdata-automate
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker-compose build automate
+
+      - name: Push image to Docker Hub
+        run: |
+          docker push $IMAGE_NAME:$TAG
+
+      - name: SSH and deploy on remote server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker pull $IMAGE_NAME:$TAG
+            cd tdata
+            docker stop $CONTAINER_NAME
+            docker rm $CONTAINER_NAME
+            docker run --env-file .env --name $CONTAINER_NAME $IMAGE_NAME:$TAG
