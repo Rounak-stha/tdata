@@ -1,11 +1,7 @@
-version: "3.8"
-
 services:
   automate:
     build:
       context: . # Project root
       dockerfile: apps/automate/Dockerfile
     image: rstha/automate
-    env_file:
-      - apps/automate/.env # Optional: adjust if needed
     restart: unless-stopped
