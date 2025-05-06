@@ -33,9 +33,9 @@ jobs:
       - name: SSH and deploy on remote server
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_SSH_KEY }}
           script: |
             docker pull $IMAGE_NAME:$TAG
             cd tdata
