@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx trigger.dev@latest dev",
-    "deploy": "npx trigger.dev@latest deploy"
+    "deploy": "npx trigger.dev@latest deploy --log-level debug"
   },
   "keywords": [],
   "author": "Rounak Shrestha",
