@@ -20,6 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           corepack enable
+          yarn workspaces focus @tdata/shared
           yarn build:shared
           yarn workspaces focus @tdata/trigger
 
