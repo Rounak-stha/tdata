@@ -20,6 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           corepack enable
+          yarn build:shared
           yarn workspaces focus @tdata/trigger
 
       - name: 🚀 Deploy Trigger.dev
