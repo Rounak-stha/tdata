@@ -68,7 +68,6 @@ export const Editor = forwardRef<ContentRefValue, EditorProps>(function Editor({
       }
     })();
     const state = EditorState.create({
-      // @ts-ignore
       doc: parsedContent,
       schema,
       plugins: getPlugins(),

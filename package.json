@@ -21,7 +21,9 @@
     "test:automate": "vitest --root apps/automate --run --silent=false",
     "test:web:watch": "vitest --root apps/web",
     "test:web:ui": "vitest --ui --root apps/web --disable-console-intercept",
-    "sqlc:generate": "yarn workspaces @tdata/automate sqlc:generate"
+    "sqlc:generate": "yarn workspaces @tdata/automate sqlc:generate",
+    "trigger:dev": "yarn workspace @tdata/trigger dev",
+    "trigger:deploy": "yarn workspace @tdata/trigger deploy"
   },
   "workspaces": [
     "apps/*",

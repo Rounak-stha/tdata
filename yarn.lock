@@ -5127,7 +5127,6 @@ __metadata:
     prosemirror-history: "npm:^1.3.2"
     prosemirror-inputrules: "npm:^1.4.0"
     prosemirror-keymap: "npm:^1.2.2"
-    prosemirror-markdown: "npm:^1.13.2"
     prosemirror-model: "npm:^1.19.4"
     prosemirror-schema-basic: "npm:^1.2.2"
     prosemirror-schema-list: "npm:^1.3.0"
@@ -5162,7 +5161,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@tdata/trigger@workspace:apps/trigger":
+"@tdata/trigger@npm:*, @tdata/trigger@workspace:apps/trigger":
   version: 0.0.0-use.local
   resolution: "@tdata/trigger@workspace:apps/trigger"
   dependencies:
@@ -5215,6 +5214,7 @@ __metadata:
     "@supabase/ssr": "npm:^0.5.2"
     "@supabase/supabase-js": "npm:^2.47.10"
     "@tdata/shared": "npm:*"
+    "@tdata/trigger": "npm:*"
     "@types/amqplib": "npm:^0"
     "@types/node": "npm:^20"
     "@types/react": "npm:^19.0.7"
@@ -12948,7 +12948,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prosemirror-markdown@npm:^1.13.1, prosemirror-markdown@npm:^1.13.2":
+"prosemirror-markdown@npm:^1.13.1":
   version: 1.13.2
   resolution: "prosemirror-markdown@npm:1.13.2"
   dependencies:

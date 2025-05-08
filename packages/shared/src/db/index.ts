@@ -3,7 +3,9 @@
  */
 
 import { sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/postgres-js";
 import { PgDatabase } from "drizzle-orm/pg-core";
+import { decodeJWT } from "@utils";
 
 type SupabaseToken = {
   iss?: string;
@@ -15,6 +17,15 @@ type SupabaseToken = {
   jti?: string;
   role?: string;
 };
+
+const SUPABASE_DB_URL = process.env.SUPABASE_DB_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_DB_URL) {
+  throw new Error("Missing Supabase DB Envs");
+}
+
+export const db = drizzle({ connection: SUPABASE_DB_URL, casing: "snake_case" /* logger: true */ });
 
 // eslint-disable-next-line
 export function createDrizzle<Database extends PgDatabase<any, any, any>, Token extends SupabaseToken = SupabaseToken>(token: Token, { client }: { client: Database }) {
@@ -80,4 +91,9 @@ export function createDrizzleForServiceRole<Database extends PgDatabase<any, any
       }, ...rest);
     }) as typeof client.transaction,
   };
+}
+
+export async function createDrizzleSupabaseServiceRoleClient() {
+  if (!SUPABASE_SERVICE_ROLE_KEY) throw new Error("Missing Supabase Service Role Key");
+  return createDrizzleForServiceRole(decodeJWT(SUPABASE_SERVICE_ROLE_KEY!), { client: db });
 }

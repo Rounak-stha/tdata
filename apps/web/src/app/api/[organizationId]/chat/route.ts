@@ -27,6 +27,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ organiz
 	  `,
     temperature: 0.7,
     tools,
+    maxSteps: 3,
   });
 
   return result.toDataStreamResponse();

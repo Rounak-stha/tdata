@@ -1,11 +1,21 @@
 import { createDrizzleSupabaseClient } from "@db";
 
-import { and, eq, ilike, sql } from "drizzle-orm";
+import { and, cosineDistance, eq, gt, ilike, sql } from "drizzle-orm";
 
-import { documentCollaborators, documents, documentsTags, tags, users } from "@tdata/shared/db/schema";
-import { Document, DocumentDetail, DocumentDetailMinimal, InsertDocumentData, InsertDocumentTagData, InsertTagData, Tag, UpdateDocumentData, User } from "@tdata/shared/types";
+import { documentCollaborators, documentEmbeddings, documents, documentsTags, tags, users } from "@tdata/shared/db/schema";
+import {
+  Document,
+  DocumentDetail,
+  DocumentDetailMinimal,
+  DocumentEmbeddingsMinimalForLLM,
+  InsertDocumentData,
+  InsertDocumentTagData,
+  InsertTagData,
+  Tag,
+  UpdateDocumentData,
+  User,
+} from "@tdata/shared/types";
 import { alias } from "drizzle-orm/pg-core";
-import { UserSelects } from "./selects";
 
 export class DocumentRepository {
   static async create(data: InsertDocumentData): Promise<Document> {
@@ -176,5 +186,20 @@ export class DocumentRepository {
         .groupBy(documents.id, creatorUser.id);
     });
     return (result[0] ?? null) as unknown as DocumentDetail;
+  }
+
+  static async findDocumentsFromQueryEmbedding(queryEmbedding: number[], organizationId: number): Promise<DocumentEmbeddingsMinimalForLLM[]> {
+    const db = await createDrizzleSupabaseClient();
+    return await db.rls(async (tx) => {
+      const similarity = sql<number>`1 - (${cosineDistance(documentEmbeddings.embedding, queryEmbedding)})`;
+      return await tx
+        .select({ similarity, content: documentEmbeddings.content, document: { id: documents.id, title: documents.title } })
+        .from(documentEmbeddings)
+        .leftJoin(documents, eq(documents.id, documentEmbeddings.documentId))
+        .where(and(eq(documentEmbeddings.organizationId, organizationId), gt(similarity, 0.5)))
+        .orderBy(similarity)
+        .limit(5)
+        .execute();
+    });
   }
 }

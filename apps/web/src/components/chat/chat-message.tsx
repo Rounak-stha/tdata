@@ -7,7 +7,7 @@ import type { Message } from "ai";
 import { formatDistanceToNow } from "date-fns";
 // import { FunctionResultDisplay } from "./function-result-display"
 import { useUser } from "@/hooks";
-import { ChatTaskAssignedTaskList } from "./function-result-display";
+import { ChatTaskAssignedTaskList, DocumentSource } from "./function-result-display";
 import { MemoizedMarkdown } from "./markdown";
 
 interface ChatMessageProps {
@@ -92,6 +92,14 @@ export function ChatMessage({ message, isStreaming, isLastMessage }: ChatMessage
                     case "result":
                       return <ChatTaskAssignedTaskList key={index} tasks={part.toolInvocation.result} />;
                   }
+                case "getDocumentationInformation": {
+                  switch (part.toolInvocation.state) {
+                    case "call":
+                      return <div key={index}>Getting documentation information...</div>;
+                    case "result":
+                      return <DocumentSource key={index} documents={part.toolInvocation.result} />;
+                  }
+                }
               }
             }
           }

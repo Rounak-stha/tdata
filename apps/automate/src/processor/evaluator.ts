@@ -242,7 +242,6 @@ export class FlowEvaluator {
   }
 
   private async addComment(payload: { taskId: number; comment: string }) {
-    // Could update variables or perform side effects
     console.log("Adding comment", payload);
   }
 }

@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, boolean, integer, timestamp, uniqueIndex, index, serial, pgEnum, varchar, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, boolean, integer, timestamp, uniqueIndex, index, serial, pgEnum, varchar, jsonb, vector } from "drizzle-orm/pg-core";
 
 import { ProjectTemplateProperty, TaskActivityMetadata, TaskProperty } from "@types";
 import { AutomationFlow, FlowVariable } from "src/types/automation";
@@ -36,6 +36,7 @@ export const TableNames = {
   documentComments: "document_comments",
   documentsTags: "documents_tags",
   documentProjects: "document_projects",
+  documentEmbeddings: "document_embeddings",
   tags: "tags",
 };
 
@@ -451,3 +452,22 @@ export const documentCollaborators = pgTable(TableNames.documentCollaborators, {
     .notNull(),
   ...timestamps,
 });
+
+// https://www.youtube.com/watch?v=MDxEXKkxf2Q
+// https://orm.drizzle.team/docs/guides/vector-similarity-search
+export const documentEmbeddings = pgTable(
+  TableNames.documentEmbeddings,
+  {
+    id: serial().primaryKey(),
+    content: text().notNull(),
+    embedding: vector("embedding", { dimensions: 384 }).notNull(),
+    documentId: uuid()
+      .references(() => documents.id)
+      .notNull(),
+    organizationId: integer()
+      .references(() => organizations.id, { onDelete: "cascade" })
+      .notNull(),
+    ...timestamps,
+  },
+  (table) => [index("embeddingIndex").using("hnsw", table.embedding.op("vector_cosine_ops"))]
+);

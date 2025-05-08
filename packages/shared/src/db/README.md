@@ -4,6 +4,9 @@
 
 ```SQL
 
+-- Create Vector Extension
+CREATE EXTENSION IF NOT EXISTS vector;
+
 -- SQL used to create the `create_project_sequence` function
 CREATE OR REPLACE FUNCTION create_project_sequence(project_id integer)
 RETURNS void AS $$

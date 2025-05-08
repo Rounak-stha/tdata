@@ -1,9 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircleIcon } from "lucide-react";
-import { TaskMinimalGroupedByStatus } from "@tdata/shared/types";
+import { CheckCircleIcon, FileTextIcon } from "lucide-react";
+import { DocumentEmbeddingsMinimalForLLM, TaskMinimalGroupedByStatus } from "@tdata/shared/types";
 import { FC, useMemo } from "react";
 import { TaskList } from "../pages/my-tasks";
+import Link from "next/link";
+import { Paths } from "@/lib/constants";
+import { useOrganizations } from "@/hooks";
 
 type ChatTaskCardProps = {
   tasks: TaskMinimalGroupedByStatus[];
@@ -25,5 +28,42 @@ export const ChatTaskAssignedTaskList: FC<ChatTaskCardProps> = ({ tasks }) => {
 
       {tasks.length === 0 ? <div className="text-center py-6 text-gray-400 text-sm">No tasks assigned to you right now.</div> : <TaskList tasks={tasks} />}
     </Card>
+  );
+};
+
+type DocumentSourceProps = {
+  /**
+   * This is actually a list of rows from the DocumentEmbeddings table which are returned as the result of the function call
+   * We only need the documentId part to link to the sources
+   */
+  documents: DocumentEmbeddingsMinimalForLLM[];
+};
+
+export const DocumentSource: FC<DocumentSourceProps> = ({ documents }) => {
+  const { organization } = useOrganizations();
+  const documentMap = useMemo(
+    () =>
+      documents.reduce((a, c) => {
+        if (a[c.document.id]) return a;
+        else {
+          a[c.document.id] = c.document.title;
+          return a;
+        }
+      }, {} as Record<string, string>),
+    [documents]
+  );
+
+  return (
+    <div className="mt-1">
+      <p className="font-bold mb-0.5">Sources</p>
+      <ul>
+        {Object.entries(documentMap).map(([id, title]) => (
+          <Link key={id} href={Paths.doc(organization.key, id)} className="flex items-center gap-1 font-bold text-primary">
+            <FileTextIcon size={20} />
+            <li className="mt-0.5">{title}</li>
+          </Link>
+        ))}
+      </ul>
+    </div>
   );
 };
