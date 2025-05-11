@@ -19,7 +19,7 @@ export const tools = {
 
   getDocumentationInformation: tool({
     description:
-      "Get information for your knowledge from the Organization documents to answer any relevant user questions that require organization specific knowledge. You can rephrase the user query before passing to the tool if it seems vague or unclear so that the similarity search can find the relevant documents.",
+      "Get information for your knowledge from the Organization documents to answer any relevant user questions that require organization specific knowledge. You can rephrase the user query (maybe add some more context to it) before passing to the tool if it seems vague or unclear so that the similarity search can find the relevant documents.",
     parameters: z.object({
       query: z.string().describe("The user query"),
       organizationId: z.number().describe("The ID of the organization"),

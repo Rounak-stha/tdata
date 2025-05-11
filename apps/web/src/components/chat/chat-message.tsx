@@ -76,7 +76,7 @@ export function ChatMessage({ message, isStreaming, isLastMessage }: ChatMessage
       {/* Message content */}
       <div className={cn("ml-9")}>
         <div ref={contentRef} className="whitespace-pre-wrap tracking-wide">
-          {renderedContent}
+          <MemoizedMarkdown id={message.id} content={renderedContent} />
           {!isFullyRendered && !isUser && <span className="inline-block w-1 h-4 ml-0.5 bg-[#3b82f6] animate-pulse" />}
         </div>
       </div>
