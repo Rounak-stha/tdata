@@ -52,3 +52,12 @@
   margin-left: 2px;
   animation: blink 1s step-end infinite;
 }
+
+/* Prosemirror styles */
+.ProseMirror th {
+  @apply bg-muted/20 border-border;
+}
+
+.ProseMirror td {
+  @apply border-border;
+}

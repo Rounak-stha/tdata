@@ -52,7 +52,7 @@ export const DocumentPage: FC<DocumentPageProps> = ({ document: _document }) => 
 
             <div className="flex flex-col gap-3">
               <div className="flex items-start justify-between">
-                <h1 className="text-3xl font-bold tracking-tight">{document.title}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{document.title}</h1>
               </div>
 
               <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
