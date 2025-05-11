@@ -30,7 +30,7 @@ export const EmbedDocumentTask = task({
         chunkOverlap: 50, // characters to overlap between chunks
       });
 
-      const chunks = await textSplitter.splitText(mdDocument);
+      const chunks = (await textSplitter.splitText(mdDocument)).map((chunk) => `# ${document.title}\n\n${chunk}`);
 
       const cohereEmbeddings = new CohereEmbeddings({
         model: "embed-multilingual-light-v3.0",
