@@ -7,7 +7,7 @@ import { DocumentEditWrapper } from "@/components/docs/doc-edit-wrapper";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DocumentDetail, DocumentDetailMinimal, Organization } from "@tdata/shared/types";
-import { ClockIcon, Edit2Icon, TagIcon, PlusCircle } from "lucide-react";
+import { ClockIcon, Edit2Icon, TagIcon, PlusCircle, FileTextIcon, Plus } from "lucide-react";
 
 import { DocCard } from "@/components/docs/doc-card";
 
@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Editor } from "@tdata/editor";
 import { Paths } from "@/lib/constants";
 import { DocumentBreadCrump } from "@/components/docs/doc-breadcrump";
+import { useOrganizations } from "@/hooks";
 
 type DocumentPageProps = {
   document: DocumentDetail;
@@ -97,6 +98,7 @@ type DocumentListPage = {
 };
 
 export const DocumentListPage: FC<DocumentListPage> = ({ documents, organization }) => {
+  if (documents.length == 0) return <NoDocsInfo organization={organization} />;
   return (
     <div className="px-6 py-4 space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -169,6 +171,28 @@ export const DocumentListPage: FC<DocumentListPage> = ({ documents, organization
 		  </div> */}
         </div>
       </div>
+    </div>
+  );
+};
+
+interface NoDocsInfoProps {
+  organization: Organization;
+}
+
+export const NoDocsInfo: FC<NoDocsInfoProps> = ({ organization }) => {
+  return (
+    <div className="flex flex-col items-center justify-center h-[50vh] p-6 text-center">
+      <div className="bg-muted/30 p-4 rounded-full mb-4">
+        <FileTextIcon className="h-12 w-12 text-muted-foreground" />
+      </div>
+      <h3 className="text-xl font-semibold mb-2">Crete New Document</h3>
+      <p className="text-muted-foreground mb-6">Documentation made effortless — keep your project knowledge clear, organized, and spotlight what matters most.</p>
+      <Link href={Paths.newDoc(organization.key)}>
+        <Button className="flex items-center">
+          <Plus className="mr-2 h-4 w-4" />
+          Create Document
+        </Button>
+      </Link>
     </div>
   );
 };
