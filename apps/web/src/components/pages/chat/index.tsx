@@ -29,7 +29,7 @@ export function ChatPage() {
 
 function TempChatPage() {
   return (
-    <div className="flex flex-col h-screen bg-[#121212]">
+    <div className="flex flex-col h-screen">
       <ChatHeader />
       <ChatMessages />
       <ChatInput />

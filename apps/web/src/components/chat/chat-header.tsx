@@ -5,14 +5,14 @@ import { memo } from "react";
 
 export const ChatHeader = memo(function ChatHeader() {
   return (
-    <header className="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a] bg-[#121212]/90 backdrop-blur-sm sticky top-0 z-10">
+    <header className="flex items-center justify-between px-6 py-4 border-b backdrop-blur-sm sticky top-0 z-10">
       <div className="flex items-center gap-3">
         <div className="h-8 w-1 bg-gradient-to-b from-[#3b82f6] to-[#2563eb] rounded-full" />
         <div>
-          <h1 className="text-xl font-semibold text-white">Mira</h1>
+          <h1 className="text-xl font-semibold">Mira</h1>
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      {/* <div className="flex items-center gap-2">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -51,7 +51,7 @@ export const ChatHeader = memo(function ChatHeader() {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      </div>
+      </div> */}
     </header>
   );
 });

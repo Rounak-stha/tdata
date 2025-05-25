@@ -38,8 +38,8 @@ export function ChatInput() {
   };
 
   return (
-    <div className="border-t border-[#2a2a2a] bg-[#121212] p-4 sticky bottom-0 z-10">
-      <Card className="max-w-3xl mx-auto bg-[#1a1a1a] border-[#2a2a2a] shadow-lg backdrop-blur-sm">
+    <div className="border-t p-4 sticky bottom-0 z-10">
+      <Card className="max-w-3xl mx-auto">
         <form onSubmit={handleSubmit} className="relative">
           <Textarea
             ref={textareaRef}
@@ -48,13 +48,13 @@ export function ChatInput() {
             onKeyDown={handleKeyDown}
             placeholder="Message AI Assistant..."
             rows={inputRows}
-            className="min-h-[60px] w-full resize-none border-0 bg-transparent p-4 pr-24 text-white focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-gray-500"
+            className="min-h-[60px] w-full resize-none border-0 bg-transparent p-4 pr-24 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-gray-500"
           />
           <div className="absolute bottom-3 right-3 flex gap-2">
-            <Button type="button" size="icon" variant="ghost" className="h-8 w-8 rounded-md text-gray-400 hover:text-white hover:bg-[#2a2a2a]">
+            <Button type="button" size="icon" variant="ghost">
               <PaperclipIcon className="h-4 w-4" />
             </Button>
-            <Button type="button" size="icon" variant="ghost" className="h-8 w-8 rounded-md text-gray-400 hover:text-white hover:bg-[#2a2a2a]">
+            <Button type="button" size="icon" variant="ghost">
               <MicIcon className="h-4 w-4" />
             </Button>
             <Button
@@ -62,19 +62,19 @@ export function ChatInput() {
               size="icon"
               disabled={status == "submitted" || input.trim() === ""}
               className={cn(
-                "h-8 w-8 rounded-md bg-[#3b82f6] hover:bg-[#2563eb] transition-colors shadow-md",
-                (status == "submitted" || input.trim() === "") && "opacity-50 cursor-not-allowed"
+                "h-8 w-8 rounded-md bg-primary/90 hover:bg-primary transition-colors shadow-md",
+                (status == "submitted" || input.trim() === "") && "opacity-50 cursor-not-allowed",
               )}
             >
               <ArrowUpIcon className="h-4 w-4" />
             </Button>
           </div>
         </form>
-        <Separator className="bg-[#2a2a2a]" />
+        <Separator />
         <div className="px-4 py-2 text-xs text-gray-400 flex items-center justify-between">
           <span>
-            {isMobile ? "Tap" : "Press"} <kbd className="px-1 py-0.5 bg-[#2a2a2a] rounded text-gray-300">Enter</kbd> to send,{" "}
-            <kbd className="px-1 py-0.5 bg-[#2a2a2a] rounded text-gray-300">Shift + Enter</kbd> for new line
+            {isMobile ? "Tap" : "Press"} <kbd className="px-1 py-0.5 bg-muted rounded text-muted-foreground">Enter</kbd> to send,{" "}
+            <kbd className="px-1 py-0.5 bg-muted rounded text-muted-foreground">Shift + Enter</kbd> for new line
           </span>
         </div>
       </Card>

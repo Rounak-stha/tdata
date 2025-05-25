@@ -68,7 +68,7 @@ export function ChatMessage({ message, isStreaming, isLastMessage }: ChatMessage
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Avatar src={isUser ? user.imageUrl : ""} alt={isUser ? "User Avatar" : "AI Avatar"} />
-          <span className="font-medium text-sm text-gray-300">{isUser ? "You" : "AI Assistant"}</span>
+          <span className="font-medium text-sm text-muted-foreground">{isUser ? "You" : "AI Assistant"}</span>
         </div>
         <span className="text-xs text-muted-foreground">{formatDistanceToNow(timestamp, { addSuffix: true })}</span>
       </div>
@@ -77,7 +77,7 @@ export function ChatMessage({ message, isStreaming, isLastMessage }: ChatMessage
       <div className={cn("ml-9")}>
         <div ref={contentRef} className="whitespace-pre-wrap tracking-wide">
           <MemoizedMarkdown id={message.id} content={renderedContent} />
-          {!isFullyRendered && !isUser && <span className="inline-block w-1 h-4 ml-0.5 bg-[#3b82f6] animate-pulse" />}
+          {!isFullyRendered && !isUser && <span className="inline-block w-1 h-4 ml-0.5 bg-primary animate-pulse" />}
         </div>
       </div>
       <div className={cn("ml-9")}>

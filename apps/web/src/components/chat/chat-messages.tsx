@@ -32,13 +32,13 @@ export function ChatMessages() {
           <div className="group mb-6">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Avatar fallbackText="S" alt="System Avatar" />
-                <span className="font-medium text-sm text-gray-300">AI Assistant</span>
+                <Avatar fallbackText="M" alt="System Avatar" />
+                <span className="font-medium text-sm text-muted-foreground">AI Assistant</span>
               </div>
             </div>
 
-            <div className="relative ml-9 p-4 rounded-lg transition-all duration-300 bg-gradient-to-r from-[#1a1a1a] to-[#1c1c1c] rounded-tl-none border border-[#2a2a2a]/50 min-h-[56px]">
-              <div className="absolute top-0 w-3 h-3 transform rotate-45 bg-[#1a1a1a] left-[calc(100%-12px)] border-l border-t border-[#2a2a2a]/50" />
+            <div className="relative ml-9 p-4 rounded-lg transition-all duration-300 bg-background rounded-tl-none border min-h-[56px]">
+              <div className="absolute top-0 w-3 h-3 transform rotate-45 left-[calc(100%-12px)] border-l border-t" />
               <TypingIndicator />
             </div>
           </div>
