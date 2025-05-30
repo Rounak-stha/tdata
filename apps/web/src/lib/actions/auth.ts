@@ -3,17 +3,15 @@
 import { redirect } from "next/navigation";
 
 import OrganizationRepository from "@/repositories/organization";
-import { OnboardingData } from "@types";
+import { ActionReturnType, OnboardingData, OnboardingUserContext } from "@types";
 import { createSupabaseClient } from "@lib/supabase/server/client";
 
 import type { Session } from "@supabase/supabase-js";
+import { SITE_URL } from "@lib/constants";
+import { Organization } from "@tdata/shared/types";
+import { InvitationRepository, UserRepository } from "@/repositories";
 
 type Provider = "google";
-
-const SITE_URL = (() => {
-  if (process.env.NEXT_PUBLIC_VERCEL_ENV === "production" || process.env.NEXT_PUBLIC_VERCEL_ENV === "preview") return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
-  return "http://localhost:3000";
-})();
 
 const getCallbackUrl = (provider: Provider) => `${SITE_URL}/api/auth/callback/${provider}`;
 
@@ -65,7 +63,6 @@ export const verifyOtp = async (email: string, otp: string) => {
     const supabase = await createSupabaseClient();
 
     const { error } = await supabase.auth.verifyOtp({ email, token: otp, type: "email" });
-
     if (error) throw error;
     return { success: true };
   } catch (e) {
@@ -95,7 +92,21 @@ export const signout = async () => {
   }
 };
 
-export const onboardUser = async (data: OnboardingData) => {
+export const setActiveOrg = async (org: Organization) => {
+  const supabase = await createSupabaseClient();
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData || !userData.user) return { success: false };
+  await supabase.auth.updateUser({
+    data: {
+      ...userData.user.user_metadata,
+      organizationId: org.id,
+      organizationKey: org.key,
+    },
+  });
+  await supabase.auth.refreshSession();
+};
+
+export const onboardUser = async (data: OnboardingData, userContext: OnboardingUserContext) => {
   /**
    * NOTE: There's no proper error handling here
    * We're using both Supabase CLient and ORM to interact with the database, so we can't wrap both in a transaction
@@ -106,11 +117,19 @@ export const onboardUser = async (data: OnboardingData) => {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData || !userData.user) return { success: false };
 
-  const organization = await OrganizationRepository.create({
-    name: data.organizationName,
-    key: data.organizationKey,
-    createdBy: userData.user?.id,
-  });
+  let organization: Organization;
+
+  if (userContext.type == "New_User") {
+    organization = await OrganizationRepository.create({
+      name: data.organization.name,
+      key: data.organization.key,
+      createdBy: userData.user?.id,
+    });
+  } else {
+    const organizationByKey = await OrganizationRepository.getByKey(data.organization.key);
+    if (!organizationByKey) return { success: false };
+    organization = organizationByKey;
+  }
 
   const { data: updatedUserData } = await supabase.auth.updateUser({
     data: {
@@ -138,6 +157,29 @@ export const getSession = async (): Promise<{ success: false; data: null } | { s
   const { data, error } = await supabase.auth.getSession();
   if (error || !data?.session) return { success: false, data: null };
   return { success: true, data: data.session };
+};
+
+export const acceptInvitation = async (token: string): Promise<ActionReturnType<null>> => {
+  try {
+    const { success, data } = await getSession();
+
+    if (!success) throw new Error("Failed to accept invitation");
+
+    const userId = data.user.id;
+    const invitation = await InvitationRepository.getInvitationByToken(token);
+    const user = await UserRepository.getUserById(userId);
+
+    if (!invitation || invitation.acceptedAt !== null) throw new Error("Invalid Invite");
+    if (!user || invitation.email !== user.email) throw new Error("Invalid User");
+
+    await InvitationRepository.acceptInvitation(token, userId);
+    await setActiveOrg(invitation.organization);
+
+    return { success: true, message: "Invitation accepted successfully", data: null };
+  } catch (e) {
+    console.error(e);
+    return { success: false, message: "Could not accept invitation", data: null };
+  }
 };
 
 export const signInWithGoogle = signInWith("google");

@@ -11,6 +11,9 @@ const timestamps = {
   createdAt: timestamp().defaultNow().notNull(),
 };
 
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+const InvitationExpiryTimeFn = () => new Date(Date.now() + SEVEN_DAYS_MS);
+
 export const TableNames = {
   users: "users",
   organizations: "organizations",
@@ -38,6 +41,8 @@ export const TableNames = {
   documentProjects: "document_projects",
   documentEmbeddings: "document_embeddings",
   tags: "tags",
+
+  invitations: "invitations",
 };
 
 /**
@@ -108,7 +113,7 @@ export const organizationMemberships = pgTable(
     role: RoleEnum().default("Member").notNull(), // Role directly in the table as enum
     test: text(),
   },
-  (table) => [uniqueIndex("unique_membership").on(table.organizationId, table.userId)]
+  (table) => [uniqueIndex("unique_membership").on(table.organizationId, table.userId)],
 );
 
 export const projects = pgTable(
@@ -131,7 +136,7 @@ export const projects = pgTable(
     ...timestamps,
   },
 
-  (table) => [uniqueIndex("unique_project_key_per_organization").on(table.organizationId, table.key), index("organizationIdIndex").on(table.organizationId)]
+  (table) => [uniqueIndex("unique_project_key_per_organization").on(table.organizationId, table.key), index("organizationIdIndex").on(table.organizationId)],
 );
 
 /**
@@ -166,7 +171,7 @@ export const workflowStatus = pgTable(
     name: text().notNull(),
     ...timestamps,
   },
-  (table) => [index("wfStatusOrganizationIdIndex").on(table.organizationId)]
+  (table) => [index("wfStatusOrganizationIdIndex").on(table.organizationId)],
 );
 
 // Workflow Status Table
@@ -184,7 +189,7 @@ export const taskTypes = pgTable(
     name: text().notNull(),
     ...timestamps,
   },
-  (table) => [index("taskTypesOrganizationIdIndex").on(table.organizationId)]
+  (table) => [index("taskTypesOrganizationIdIndex").on(table.organizationId)],
 );
 
 // Workflow Status Table
@@ -202,7 +207,7 @@ export const priorities = pgTable(
     name: text().notNull(),
     ...timestamps,
   },
-  (table) => [index("prioritiesOrganizationIdIndex").on(table.organizationId)]
+  (table) => [index("prioritiesOrganizationIdIndex").on(table.organizationId)],
 );
 
 /** Junction table to hold the relation between Project and Workflow Status
@@ -219,7 +224,7 @@ export const projectWorkflowStatus = pgTable(
       .notNull(),
     ...timestamps,
   },
-  (table) => [uniqueIndex("unique_project_workflow_status").on(table.projectId, table.workflowStatusId)]
+  (table) => [uniqueIndex("unique_project_workflow_status").on(table.projectId, table.workflowStatusId)],
 );
 
 /** Junction table to hold the relation between Project Template and Task Types
@@ -236,7 +241,7 @@ export const projectTaskTypes = pgTable(
       .notNull(),
     ...timestamps,
   },
-  (table) => [uniqueIndex("unique_project_task_types").on(table.projectId, table.taskTypeId)]
+  (table) => [uniqueIndex("unique_project_task_types").on(table.projectId, table.taskTypeId)],
 );
 
 /** Junction table to hold the relation between Project Template and Priorities
@@ -253,7 +258,7 @@ export const projectPriorities = pgTable(
       .notNull(),
     ...timestamps,
   },
-  (table) => [uniqueIndex("unique_project_pririties").on(table.projectId, table.priorityId)]
+  (table) => [uniqueIndex("unique_project_pririties").on(table.projectId, table.priorityId)],
 );
 
 // Tasks Table
@@ -304,7 +309,7 @@ export const tasks = pgTable(
   (table) => [
     // We will always be filtering by organization, so apart from the constraint added by the folloing index, we will also get the performance benefit of the index
     uniqueIndex("unique_task_number_per_organization").on(table.organizationId, table.taskNumber),
-  ]
+  ],
 );
 
 export const taskActivities = pgTable(TableNames.taskActivities, {
@@ -418,7 +423,7 @@ export const tags = pgTable(
       .notNull(),
     ...timestamps,
   },
-  (table) => [uniqueIndex("unique_tag_name_per_organization").on(table.organizationId, table.name)]
+  (table) => [uniqueIndex("unique_tag_name_per_organization").on(table.organizationId, table.name)],
 );
 
 export const documentsTags = pgTable(
@@ -436,7 +441,7 @@ export const documentsTags = pgTable(
       .notNull(),
     ...timestamps,
   },
-  (table) => [uniqueIndex("unique_tag_in_document").on(table.documentId, table.tagId)]
+  (table) => [uniqueIndex("unique_tag_in_document").on(table.documentId, table.tagId)],
 );
 
 export const documentCollaborators = pgTable(TableNames.documentCollaborators, {
@@ -469,5 +474,21 @@ export const documentEmbeddings = pgTable(
       .notNull(),
     ...timestamps,
   },
-  (table) => [index("embeddingIndex").using("hnsw", table.embedding.op("vector_cosine_ops"))]
+  (table) => [index("embeddingIndex").using("hnsw", table.embedding.op("vector_cosine_ops"))],
 );
+
+export const invitations = pgTable(TableNames.invitations, {
+  id: serial().primaryKey(),
+  email: text().notNull(),
+  organizationId: integer()
+    .references(() => organizations.id)
+    .notNull(),
+  token: text().notNull(),
+  invitedById: uuid()
+    .references(() => users.id)
+    .notNull(),
+  createdAt: timestamps.createdAt,
+  expiresAt: timestamp().$defaultFn(InvitationExpiryTimeFn).notNull(),
+  acceptedAt: timestamp(),
+  role: RoleEnum().default("Member").notNull(),
+});

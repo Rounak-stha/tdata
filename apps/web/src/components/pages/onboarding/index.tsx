@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
@@ -8,41 +8,42 @@ import { toast } from "sonner";
 import { onboardUser } from "@/lib/actions/auth";
 import { Paths } from "@/lib/constants";
 
-import { OnboardingData } from "@types";
-import { InfantUser } from "@tdata/shared/types";
+import { OnboardingData, OnboardingUserContext } from "@types";
+import { InfantUser, InvitationDetail } from "@tdata/shared/types";
 
 import { PersonalInfoStep } from "./personal-info-step";
 import { OrganizationStep } from "./organization-step";
 import { ProgressIndicator } from "./progress-indicator";
 
-type OnboardingFlowProps = { user: InfantUser };
+type OnboardingFlowProps = { user: InfantUser; invitation: InvitationDetail | null };
 
-export const OnboardingFlow: FC<OnboardingFlowProps> = ({ user }) => {
+export const OnboardingFlow: FC<OnboardingFlowProps> = ({ user, invitation }) => {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<Partial<OnboardingData>>({});
   const router = useRouter();
-  const totalSteps = 2;
+  const totalSteps = useMemo(() => {
+    if (!invitation) return 2;
+    return 1;
+  }, [invitation]);
 
-  const handlePersonalInfoNext = (personalInfo: { name: string; email: string; avatar?: string }) => {
-    setData({ ...data, ...personalInfo });
-    setStep(2);
+  const handlePersonalInfoNext = (personalInfo: { name: string; email: string; avatar?: string }, setLoading: (val: boolean) => void) => {
+    const updatedData = { ...data, ...personalInfo };
+    setData(updatedData);
+    if (invitation !== null) {
+      updatedData.organization = { name: invitation.organization.name, key: invitation.organization.key };
+      handleOnboardUser(updatedData as OnboardingData, setLoading);
+    } else {
+      setStep(2);
+    }
   };
 
-  const handleOrganizationNext = async (
-    orgInfo: {
-      organizationName: string;
-      teamSize: string;
-      organizationKey: string;
-    },
-    setLoading: (val: boolean) => void
-  ) => {
+  const handleOnboardUser = async (data: OnboardingData, setLoading: (val: boolean) => void) => {
     try {
       setLoading(true);
-      const updatedData = { ...data, ...orgInfo };
-      setData(updatedData);
-      const { success } = await onboardUser(updatedData as OnboardingData);
+      const userContext: OnboardingUserContext = { type: invitation ? "Invited" : "New_User" };
+      const { success } = await onboardUser(data, userContext);
       if (success) {
-        router.push(Paths.root);
+        router.push(Paths.root());
       }
     } catch (e) {
       console.log(e);
@@ -52,6 +53,12 @@ export const OnboardingFlow: FC<OnboardingFlowProps> = ({ user }) => {
     }
   };
 
+  const handleOrganizationNext = async (organization: OnboardingData["organization"], setLoading: (val: boolean) => void) => {
+    const updatedData = { ...data, organization };
+    setData(updatedData);
+    handleOnboardUser(updatedData as OnboardingData, setLoading);
+  };
+
   const handleBack = () => {
     setStep(step - 1);
   };
@@ -59,7 +66,7 @@ export const OnboardingFlow: FC<OnboardingFlowProps> = ({ user }) => {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-lg">
-        <ProgressIndicator currentStep={step} totalSteps={totalSteps} />
+        {totalSteps > 1 ? <ProgressIndicator currentStep={step} totalSteps={totalSteps} /> : null}
 
         <div className="bg-card rounded-lg p-8">
           {step === 1 && <PersonalInfoStep user={user} onNext={handlePersonalInfoNext} />}

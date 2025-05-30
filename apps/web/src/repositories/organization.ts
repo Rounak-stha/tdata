@@ -1,4 +1,5 @@
 import {
+  invitations,
   organizationMemberships,
   organizations,
   priorities,
@@ -27,8 +28,9 @@ import {
   InsertProjectTemplate,
 } from "@tdata/shared/types";
 import { createDrizzleSupabaseClient, db } from "@db";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, lt, or, sql, isNull } from "drizzle-orm";
 import { IconType, InsertWorkflowStatuseData } from "@/types";
+import { Invitation } from "@tdata/shared/types";
 
 export class OrganizationRepository {
   // Static method to get a user by ID
@@ -39,6 +41,13 @@ export class OrganizationRepository {
 
   static async getByKey(key: string): Promise<Organization | null> {
     const organization = await db.select().from(organizations).where(eq(organizations.key, key)).limit(1).execute();
+
+    if (!organization.length) return null;
+    else return organization[0];
+  }
+
+  static async getById(id: number): Promise<Organization | null> {
+    const organization = await db.select().from(organizations).where(eq(organizations.id, id)).limit(1).execute();
 
     if (!organization.length) return null;
     else return organization[0];
@@ -225,6 +234,17 @@ export class OrganizationRepository {
       .limit(10);
 
     return result;
+  }
+
+  static async getUnAcceptedInvitations(organizationId: number): Promise<Invitation[]> {
+    const db = await createDrizzleSupabaseClient();
+    return await db.rls(async (tx) => {
+      return tx
+        .select()
+        .from(invitations)
+        .where(and(eq(invitations.organizationId, organizationId), or(lt(invitations.expiresAt, new Date()), isNull(invitations.acceptedAt))))
+        .execute();
+    });
   }
 }
 

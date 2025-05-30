@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { GoogleIcon } from "@/components/icons/google";
 import { signInWithGoogle, signInWithEmail } from "@/lib/actions/auth";
 import { Logo } from "@/components/icons/logo";
+import { Paths } from "@/lib/constants";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -26,7 +27,7 @@ export default function LoginPage() {
     try {
       const { success } = await signInWithEmail(email);
       if (success) {
-        router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
+        router.push(Paths.verifyEmail({ email: encodeURIComponent(email) }));
       } else toast.error("Failed to send login link");
     } catch (error: unknown) {
       setError((error as Error).message);

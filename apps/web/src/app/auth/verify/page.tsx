@@ -1,24 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 // import TDataLogo from '@/components/TDataLogo'
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { InputOTP } from "@components/ui/input-otp";
 import { Paths } from "@/lib/constants";
 import { toast } from "sonner";
-import { verifyOtp } from "@/lib/actions/auth";
+import { acceptInvitation, verifyOtp } from "@/lib/actions/auth";
 
 export default function VerifyOTPPage() {
   const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window?.location?.search);
     const email = searchParams.get("email");
+
     if (email) {
       setEmail(decodeURIComponent(email));
     } else {
@@ -35,9 +37,20 @@ export default function VerifyOTPPage() {
       }
       const { success } = await verifyOtp(email, otp);
       if (!success) toast.error("Invalid OTP");
-      else router.push(Paths.root);
+      else {
+        const token = searchParams.get("token");
+        let path = "";
+        if (token) {
+          const { success } = await acceptInvitation(token);
+          if (success) path = Paths.root({ token });
+          else throw new Error("Failed to accept invitation");
+        } else {
+          path = Paths.root();
+        }
+        router.push(path);
+      }
     } catch (error: unknown) {
-      console.log((error as Error).message);
+      console.log(error);
       toast.error((error as Error).message);
       setLoading(false);
     }

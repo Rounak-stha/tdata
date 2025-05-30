@@ -7,9 +7,10 @@ import { Tooltip } from "./tooltip";
 import { useDebounce } from "@/hooks";
 import { checkOrganizationKeyAvailability } from "@/lib/actions/auth";
 import { CheckCircleIcon, XCircleIcon } from "lucide-react";
+import { OnboardingData } from "@/types";
 
 interface OrganizationStepProps {
-  onNext: (data: { organizationName: string; teamSize: string; organizationKey: string }, setLoading: (val: boolean) => void) => void;
+  onNext: (data: OnboardingData["organization"], setLoading: (val: boolean) => void) => void;
   onBack: () => void;
 }
 
@@ -48,7 +49,7 @@ export function OrganizationStep({ onNext, onBack }: OrganizationStepProps) {
       return;
     }
 
-    onNext({ organizationName, teamSize, organizationKey }, setLoading);
+    onNext({ name: organizationName, key: organizationKey }, setLoading);
   };
 
   const generateKeyName = useCallback(() => {
