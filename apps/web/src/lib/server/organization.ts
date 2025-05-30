@@ -1,3 +1,4 @@
+import { InvitationRepository } from "@/repositories";
 import OrganizationRepository from "@/repositories/organization";
 import { CustomError } from "@lib/error";
 
@@ -17,4 +18,8 @@ export async function getOrganizationByKey(key: string) {
 
   if (!result) throw new CustomError("404- Organization not found");
   return result;
+}
+
+export async function getOrganizationUnAcceptedInvitations(organizationId: number) {
+  return await InvitationRepository.getOrganizationUnAcceptedInvitation(organizationId);
 }

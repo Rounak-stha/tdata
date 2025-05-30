@@ -11,17 +11,17 @@ import { InfantUser } from "@tdata/shared/types";
 
 interface PersonalInfoStepProps {
   user: InfantUser;
-  onNext: (data: { name: string; email: string; avatar?: string; jobTitle: string; bio: string }) => void;
+  onNext: (data: { name: string; email: string; avatar?: string }, setLoading: (val: boolean) => void) => void;
 }
 
 export function PersonalInfoStep({ user, onNext }: PersonalInfoStepProps) {
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
   const [avatar, setAvatar] = useState<string | null>(user.imageUrl);
-  const [jobTitle, setJobTitle] = useState("");
   const [bio, setBio] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -44,7 +44,7 @@ export function PersonalInfoStep({ user, onNext }: PersonalInfoStepProps) {
     e.preventDefault();
     setError(null);
 
-    if (!name.trim() || !email.trim() || !jobTitle.trim()) {
+    if (!name.trim() || !email.trim()) {
       setError("Please fill in all required fields");
       return;
     }
@@ -54,13 +54,14 @@ export function PersonalInfoStep({ user, onNext }: PersonalInfoStepProps) {
       return;
     }
 
-    onNext({
-      name,
-      email,
-      avatar: avatar || undefined,
-      jobTitle,
-      bio,
-    });
+    onNext(
+      {
+        name,
+        email,
+        avatar: avatar || undefined,
+      },
+      setLoading,
+    );
   };
 
   return (
@@ -99,12 +100,6 @@ export function PersonalInfoStep({ user, onNext }: PersonalInfoStepProps) {
           <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required disabled />
         </div>
 
-        {/* Job Title Field */}
-        <div className="space-y-2">
-          <Label htmlFor="jobTitle">Job Title *</Label>
-          <Input id="jobTitle" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} placeholder="e.g. Product Manager, Developer, Designer" required />
-        </div>
-
         {/* Bio Field */}
         <div className="space-y-2">
           <Label htmlFor="bio">Bio</Label>
@@ -113,7 +108,7 @@ export function PersonalInfoStep({ user, onNext }: PersonalInfoStepProps) {
         </div>
 
         {error && <p className="text-destructive text-sm">{error}</p>}
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" disabled={loading}>
           Continue
         </Button>
       </form>

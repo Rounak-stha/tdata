@@ -49,3 +49,19 @@ export const getInfantUser = async (): Promise<InfantUser> => {
     imageUrl: data.user.user_metadata.avatar_url,
   };
 };
+
+/**
+ * To be used in server components to get the logged in user
+ * @returns User
+ */
+export const getAuthedUser = async (): Promise<InfantUser | null> => {
+  const supabase = await createSupabaseClient();
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data) return null;
+  return {
+    id: data.user.id,
+    email: data.user.email!,
+    name: data.user.user_metadata.name,
+    imageUrl: data.user.user_metadata.avatar_url,
+  };
+};

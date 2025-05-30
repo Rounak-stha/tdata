@@ -2,7 +2,12 @@ export type OnboardingData = {
   name: string;
   email: string;
   avatar?: string;
-  organizationName: string;
-  teamSize: string;
-  organizationKey: string;
+  organization: {
+    name: string;
+    key: string;
+  };
+};
+
+export type OnboardingUserContext = {
+  type: "Invited" | "New_User";
 };

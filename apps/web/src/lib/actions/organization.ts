@@ -1,8 +1,11 @@
 "use server";
 
 import { InsertPriorityData, InsertTaskTypeData } from "@tdata/shared/types";
-import { OrganizationRepository } from "@/repositories";
+import { InvitationRepository, OrganizationRepository, UserRepository } from "@/repositories";
 import { InsertWorkflowStatuseData } from "@/types";
+import { Role } from "@tdata/shared/types";
+import { sendInviteEmail } from "@lib/actions/email";
+import { generateInviteToken } from "@lib/utils/crypto";
 
 export const createTaskType = async (data: InsertTaskTypeData) => {
   try {
@@ -30,3 +33,17 @@ export const createPriority = async (data: InsertPriorityData) => {
     throw "Failed to create priority";
   }
 };
+
+export async function createInvitation(data: { organizationId: number; invitedById: string; email: string; role: Role }) {
+  const { organizationId, invitedById, email, role } = data;
+  const organization = await OrganizationRepository.getById(organizationId);
+  const invitedBy = await UserRepository.getUserById(invitedById);
+
+  if (!organization || !invitedBy) return { success: false };
+
+  const token = generateInviteToken();
+  const { success } = await sendInviteEmail(email, organization.name, token);
+  if (!success) return { success };
+  await InvitationRepository.create({ email, organizationId: organization.id, invitedById: invitedBy.id, token, role });
+  return { success: true };
+}

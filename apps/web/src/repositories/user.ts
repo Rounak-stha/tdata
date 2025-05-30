@@ -22,4 +22,12 @@ export class UserRepository {
 
     return { ...user, role };
   }
+
+  static async getUserById(userId: string): Promise<Omit<User, "role"> | null> {
+    const result = await db.select().from(users).where(eq(users.id, userId));
+
+    if (result.length == 0) return null;
+
+    return result[0];
+  }
 }

@@ -1,13 +1,32 @@
+export const SITE_URL = (() => {
+  if (process.env.NEXT_PUBLIC_VERCEL_ENV === "production" || process.env.NEXT_PUBLIC_VERCEL_ENV === "preview") return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  return "http://localhost:3000";
+})();
+
 export const PathPrefix = {
   api: "/api",
   auth: "/auth",
 } as const;
 
+const withSearchParam = (path: string) => {
+  return (params?: Record<string, string>) => {
+    let fullPath = path;
+    if (params) {
+      const parsedParams = new URLSearchParams(params);
+      fullPath += `?${parsedParams.toString()}`;
+    }
+    return fullPath;
+  };
+};
+
+export const InvitePath = "/invite";
+
 export const Paths = {
-  root: "/",
+  root: withSearchParam("/"),
   signin: `${PathPrefix.auth}/signin`,
-  onboarding: "/onboarding",
+  onboarding: withSearchParam("/onboarding"),
   error: "/error",
+  verifyEmail: withSearchParam("/auth/verify"),
   org: (org: string) => `/${org}`,
   task: (org: string, taskNumber: string) => `/${org}/task/${taskNumber}`,
   projects: (org: string) => `/${org}/projects`,
@@ -26,6 +45,9 @@ export const Paths = {
 
   // chat
   chat: (org: string) => `/${org}/chat`,
+
+  // invite
+  invite: (token: string) => `${SITE_URL}${InvitePath}?token=${token}`,
 } as const;
 
 export const ApiPaths = {

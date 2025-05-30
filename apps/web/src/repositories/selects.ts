@@ -1,5 +1,5 @@
-import { projects, projectTemplates, tasks, users, workflowStatus, priorities, taskTypes } from "@tdata/shared/db/schema";
-import { Project, ProjectTemplateMinimal, Task, User, WorkflowStatus, Priority, TaskType } from "@tdata/shared/types";
+import { projects, projectTemplates, tasks, users, workflowStatus, priorities, taskTypes, organizations, invitations } from "@tdata/shared/db/schema";
+import { Project, ProjectTemplateMinimal, Task, User, WorkflowStatus, Priority, TaskType, Organization, InvitationDetail } from "@tdata/shared/types";
 import { PgColumn } from "drizzle-orm/pg-core";
 
 export const UserSelects: Record<keyof Omit<User, "role">, PgColumn> = {
@@ -8,6 +8,29 @@ export const UserSelects: Record<keyof Omit<User, "role">, PgColumn> = {
   imageUrl: users.imageUrl,
   name: users.name,
   createdAt: users.createdAt,
+};
+
+export const OrganizationSelects: Record<keyof Organization, PgColumn> = {
+  id: organizations.id,
+  name: organizations.name,
+  key: organizations.key,
+  imageUrl: organizations.imageUrl,
+  createdAt: organizations.createdAt,
+  createdBy: organizations.createdBy,
+};
+
+export const InvitationDetailSelect: Record<keyof InvitationDetail, PgColumn | Record<string, PgColumn>> = {
+  id: invitations.id,
+  email: invitations.email,
+  token: invitations.token,
+  createdAt: invitations.createdAt,
+  expiresAt: invitations.expiresAt,
+  acceptedAt: invitations.acceptedAt,
+  organizationId: invitations.organizationId,
+  invitedById: invitations.invitedById,
+  role: invitations.role,
+  organization: OrganizationSelects,
+  invitedby: UserSelects,
 };
 
 export const ProjectTemplateMinimalSelects: Record<keyof ProjectTemplateMinimal, PgColumn> = {

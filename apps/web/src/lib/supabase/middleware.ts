@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { PathPrefix, Paths } from "@lib/constants";
+import { InvitePath, PathPrefix, Paths } from "@lib/constants";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -32,7 +32,9 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user && request.nextUrl.pathname == "/") return supabaseResponse;
+  // A check for request method is added to not interfere with POST request made by server actions.
+  // As the server action makes a POST request to the same path as it is in, the middleware interferes with it and does not work correctly.
+  if ((!user && request.nextUrl.pathname == "/") || request.nextUrl.pathname == InvitePath || request.method !== "GET") return supabaseResponse;
 
   if (!user && !request.nextUrl.pathname.startsWith("/api/auth") && !request.nextUrl.pathname.startsWith(PathPrefix.auth)) {
     // no user, potentially respond by redirecting the user to the login page
@@ -41,16 +43,20 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && !user.user_metadata.onboarded && !request.nextUrl.pathname.startsWith(Paths.onboarding)) {
+  if (user && !user.user_metadata.onboarded && !request.nextUrl.pathname.startsWith(Paths.onboarding())) {
     const url = request.nextUrl.clone();
-    url.pathname = Paths.onboarding;
+    const token = url.searchParams.get("token");
+    url.pathname = Paths.onboarding();
+    if (token) {
+      url.search = `?token=${token}`;
+    }
     return NextResponse.redirect(url);
   }
 
-  if (user && user.user_metadata.onboarded && (request.nextUrl.pathname == Paths.root || request.nextUrl.pathname.startsWith(Paths.onboarding))) {
+  if (user && user.user_metadata.onboarded && (request.nextUrl.pathname == Paths.root() || request.nextUrl.pathname.startsWith(Paths.onboarding()))) {
     const activeOrgKey = user?.user_metadata.organizationKey;
     const url = request.nextUrl.clone();
-    url.pathname = Paths.root;
+    url.pathname = Paths.root();
     if (activeOrgKey) {
       url.pathname = Paths.org(activeOrgKey);
     }
