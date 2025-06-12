@@ -15,6 +15,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
 
     return NextResponse.json({ data: projectTemplate });
   } catch (e) {
+    console.log(e);
     if (isAPIError(e)) {
       return NextResponse.json({ message: e.message, additionalMessage: e.additionalMessage }, { status: e.httpCode });
     }

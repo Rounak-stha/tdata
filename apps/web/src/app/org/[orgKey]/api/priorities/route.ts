@@ -3,15 +3,14 @@ import { ERRORS, HTTP_CODES } from "@lib/constants";
 import { APIError, isAPIError } from "@/lib/error/api-error";
 import { OrganizationRepository } from "@/repositories";
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ organizationId: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ orgKey: string }> }) {
   try {
-    const organizationId = parseInt((await params).organizationId);
+    const orgKey = (await params).orgKey;
+    const organization = await OrganizationRepository.getByKey(orgKey);
 
-    if (isNaN(organizationId)) {
-      throw new APIError("INVALID_REQUEST", "OrganizationId is inavlid");
-    }
+    if (!organization) throw new APIError("INVALID_REQUEST", "No Access on Organization");
 
-    const organizationPriorities = await OrganizationRepository.getPriorities(organizationId);
+    const organizationPriorities = await OrganizationRepository.getPriorities(organization.id);
 
     return NextResponse.json({ data: organizationPriorities });
   } catch (e) {

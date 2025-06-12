@@ -13,7 +13,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useOrganizationTaskTypes } from "@/hooks/data/organization-task-types";
 import { useOrganizations, useUser } from "@/hooks";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
-import { SelectValue } from "@radix-ui/react-select";
 import { createTaskType } from "@/lib/actions/organization";
 import { toast } from "sonner";
 
@@ -93,8 +92,7 @@ type ExistingTaskTypeSelectProps = {
 };
 
 export const ExistingTaskTypeSelect: FC<ExistingTaskTypeSelectProps> = ({ onSelect }) => {
-  const { organization } = useOrganizations();
-  const { data, isLoading } = useOrganizationTaskTypes(organization.id);
+  const { data, isLoading } = useOrganizationTaskTypes();
 
   const [selectedTaskType, setSelectedTaskType] = useState<TaskType | null>(null);
 

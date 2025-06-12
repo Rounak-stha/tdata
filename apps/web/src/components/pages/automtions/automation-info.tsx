@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useOrganizations } from "@/hooks";
 import { Paths } from "@/lib/constants";
 import { Project } from "@tdata/shared/types";
 import { InfoIcon, PlusIcon, ZapIcon } from "lucide-react";
@@ -13,7 +12,6 @@ type AutomationInfoProps = {
 };
 
 export const AutomationInfo: FC<AutomationInfoProps> = ({ project }) => {
-  const { organization } = useOrganizations();
   return (
     <div className="bg-background text-center">
       <div className="max-w-md mx-auto">
@@ -46,7 +44,7 @@ export const AutomationInfo: FC<AutomationInfoProps> = ({ project }) => {
           </div>
         </div>
 
-        <Link href={Paths.projectAutomationCreate(organization.key, project.key)}>
+        <Link href={Paths.projectAutomationCreate(project.key)}>
           <Button className="px-5 py-2 bg-[#9E77ED] hover:bg-[#8B5CF6] text-white border-none">
             <PlusIcon className="h-4 w-4 mr-2" />
             Create Your First Automation

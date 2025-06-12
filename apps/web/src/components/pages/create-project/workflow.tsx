@@ -90,8 +90,7 @@ type ExistingStatusSelectProps = {
 };
 
 const ExistingStatusSelect: FC<ExistingStatusSelectProps> = ({ onSelect }) => {
-  const { organization } = useOrganizations();
-  const { data, isLoading } = useOrganizationStatuses(organization.id);
+  const { data, isLoading } = useOrganizationStatuses();
 
   const [selectedWorkflowStatus, setSelectedWorkflowStatus] = useState<WorkflowStatus | null>(null);
 

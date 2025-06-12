@@ -6,7 +6,6 @@ import { FC, useMemo } from "react";
 import { TaskList } from "../pages/my-tasks";
 import Link from "next/link";
 import { Paths } from "@/lib/constants";
-import { useOrganizations } from "@/hooks";
 
 type ChatTaskCardProps = {
   tasks: TaskMinimalGroupedByStatus[];
@@ -40,17 +39,19 @@ type DocumentSourceProps = {
 };
 
 export const DocumentSource: FC<DocumentSourceProps> = ({ documents }) => {
-  const { organization } = useOrganizations();
   const documentMap = useMemo(
     () =>
-      documents.reduce((a, c) => {
-        if (a[c.document.id]) return a;
-        else {
-          a[c.document.id] = c.document.title;
-          return a;
-        }
-      }, {} as Record<string, string>),
-    [documents]
+      documents.reduce(
+        (a, c) => {
+          if (a[c.document.id]) return a;
+          else {
+            a[c.document.id] = c.document.title;
+            return a;
+          }
+        },
+        {} as Record<string, string>,
+      ),
+    [documents],
   );
 
   return (
@@ -58,7 +59,7 @@ export const DocumentSource: FC<DocumentSourceProps> = ({ documents }) => {
       <p className="font-bold mb-0.5">Sources</p>
       <ul>
         {Object.entries(documentMap).map(([id, title]) => (
-          <Link key={id} href={Paths.doc(organization.key, id)} className="flex items-center gap-1 font-bold text-primary">
+          <Link key={id} href={Paths.doc(id)} className="flex items-center gap-1 font-bold text-primary">
             <FileTextIcon size={20} />
             <li className="mt-0.5">{title}</li>
           </Link>

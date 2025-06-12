@@ -11,7 +11,7 @@ export function useChatWithHistory(organizationId: number, chatId?: string) {
   const chatHelpers = useAIChat({
     id: chatId || "New Chat",
     initialMessages: [],
-    api: ApiPaths.chat(organizationId),
+    api: ApiPaths.chat(),
   });
 
   // State to manage whether to show sample messages or real chat

@@ -76,12 +76,12 @@ export function ProjectDetailsForm({ template, onBack }: ProjectDetailsFormProps
             organizationId: organization.id,
             createdBy: user.id,
           },
-          { ...template }
+          { ...template },
         );
         resetForm();
 
         toast.success("Project created successfully");
-        router.push(Paths.project(organization.key, createdProject.key));
+        router.push(Paths.project(createdProject.key));
       }
     } catch (error) {
       console.error(error);

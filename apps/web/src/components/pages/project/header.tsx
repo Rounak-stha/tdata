@@ -19,7 +19,7 @@ export const ProjectPageHeader: FC<ProjectPageHeaderProps> = ({ project, orgKey 
       <Heading3 text={project.name} />
       <div className="flex items-center gap-2">
         <Button asChild variant="ghost" size="sm">
-          <Link href={Paths.projectAutomations(orgKey, project.key)}>
+          <Link href={Paths.projectAutomations(orgKey)}>
             <ZapIcon className="h-4 w-4 text-orange-400 dark:text-orange-300" />
           </Link>
         </Button>
@@ -36,13 +36,13 @@ type ProjectListPageHeaderProps = {
   project: ProjectDetailMinimal;
 };
 
-export const ProjectListPageHeader: FC<ProjectListPageHeaderProps> = ({ organization, project }) => {
+export const ProjectListPageHeader: FC<ProjectListPageHeaderProps> = () => {
   return (
     <div className="flex items-center justify-between my-4">
       <Heading3 text="Projects" />
       <div className="flex items-center gap-2">
         <Button asChild>
-          <Link href={Paths.newProject(organization.key)}>
+          <Link href={Paths.newProject()}>
             <span className="text-sm">New Project</span>
             <PlusIcon className="h-4 w-4" />
           </Link>

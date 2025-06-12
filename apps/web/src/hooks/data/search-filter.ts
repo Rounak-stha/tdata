@@ -92,7 +92,7 @@ export const useSearchFilter = (): SearchFilterHookReturn => {
   const { organization } = useOrganizations();
   const searchParams = useSearchParams();
   const [data, setData] = useState<TaskFilterData>(InitialData);
-  const { data: statusPriorityTypes, isLoading } = useSWR<Required<Pick<TaskFilterData, "status" | "priorities" | "types">>>(`/api/${organization.id}/search/filters`, null, {
+  const { data: statusPriorityTypes, isLoading } = useSWR<Required<Pick<TaskFilterData, "status" | "priorities" | "types">>>(`/api/search/filters`, null, {
     revalidateOnFocus: false,
   });
   const [filters, dispatch] = useReducer(taskFilterReducer, getInitialFilterData(searchParams));

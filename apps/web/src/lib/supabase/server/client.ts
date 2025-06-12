@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { createServerClient } from "@supabase/ssr";
 import { InfantUser } from "@tdata/shared/types";
-import { Paths } from "@/lib/constants";
+import { ApexDomain, Paths } from "@/lib/constants";
 
 const SUPABASE_URL = process.env.SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY!;
@@ -29,6 +29,12 @@ export async function createSupabaseClient() {
           // user sessions.
         }
       },
+    },
+    cookieOptions: {
+      domain: ApexDomain,
+      maxAge: 7 * 86400,
+      path: "/",
+      sameSite: "lax",
     },
   });
 }

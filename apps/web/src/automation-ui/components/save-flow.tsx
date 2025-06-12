@@ -60,7 +60,7 @@ export const SaveFlow: FC<CreateFlowProps> = ({ project }) => {
 
       setFlowName("");
       setOpen(false);
-      router.push(Paths.projectAutomation(organization.key, project.key, automation.id));
+      router.push(Paths.projectAutomation(project.key, automation.id));
     } catch (e) {
       console.log(e);
       toast.error("Failed to save flow");

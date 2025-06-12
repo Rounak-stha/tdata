@@ -3,7 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Clock } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
-import { DocumentDetail, DocumentDetailMinimal, Organization } from "@tdata/shared/types";
+import { DocumentDetailMinimal, Organization } from "@tdata/shared/types";
 import { Paths } from "@/lib/constants";
 
 interface DocCardProps {
@@ -11,7 +11,7 @@ interface DocCardProps {
   organization: Organization;
 }
 
-export function DocCard({ document, organization }: DocCardProps) {
+export function DocCard({ document }: DocCardProps) {
   return (
     <div className="group relative flex items-center justify-between p-4 rounded-sm border bg-card/30 hover:bg-card/60 transition-all hover:shadow-sm">
       <div className="flex items-center gap-4 min-w-0">
@@ -22,7 +22,7 @@ export function DocCard({ document, organization }: DocCardProps) {
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <Link href={Paths.doc(organization.key, document.id)} className="font-bold hover:underline truncate">
+            <Link href={Paths.doc(document.id)} className="font-bold hover:underline truncate">
               {document.title}
             </Link>
           </div>

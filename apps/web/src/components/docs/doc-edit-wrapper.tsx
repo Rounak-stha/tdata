@@ -92,7 +92,7 @@ export function DocumentEditWrapper({ document: _document, isNew = false, onSave
       }
 
       if (isNew) {
-        router.push(Paths.doc(organization.key, upsertedDocument.id));
+        router.push(Paths.doc(upsertedDocument.id));
       }
     } catch {
       toast.error("Failed to save document");
@@ -105,9 +105,9 @@ export function DocumentEditWrapper({ document: _document, isNew = false, onSave
     if (onCancel) {
       onCancel();
     } else if (isNew) {
-      router.push(Paths.docs(organization.key));
+      router.push(Paths.docs());
     } else {
-      router.push(Paths.doc(organization.key, document.id));
+      router.push(Paths.doc(document.id));
     }
   };
 

@@ -26,7 +26,7 @@ export const ProjectList: FC<ProjectListProps> = ({ organization, projects }) =>
           {projects.map((project) => (
             <TableRow key={project.id} className="border hover:bg-muted">
               <TableCell>
-                <Link href={Paths.project(organization.key, project.key)} className="text-blue-400 hover:underline cursor-pointer">
+                <Link href={Paths.project(project.key)} className="text-blue-400 hover:underline cursor-pointer">
                   {project.name}
                 </Link>
               </TableCell>

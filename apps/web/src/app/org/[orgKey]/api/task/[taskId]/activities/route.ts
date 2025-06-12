@@ -1,24 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ERRORS, HTTP_CODES } from "@lib/constants";
 import { APIError, isAPIError } from "@/lib/error/api-error";
-import { TaskRepository } from "@/repositories";
+import { OrganizationRepository, TaskRepository } from "@/repositories";
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ organizationId: string; taskId: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ orgKey: string; taskId: string }> }) {
   try {
     const awaitedParams = await params;
-    const organizationId = parseInt(awaitedParams.organizationId);
+    const orgKey = (await params).orgKey;
     const taskId = parseInt(awaitedParams.taskId);
     const searchParams = req.nextUrl.searchParams;
     const limit = parseInt(searchParams.get("limit") || "0");
     const page = parseInt(searchParams.get("page") || "0");
 
-    if (isNaN(organizationId) || isNaN(taskId)) {
+    const organization = await OrganizationRepository.getByKey(orgKey);
+
+    if (!organization || isNaN(taskId)) {
       throw new APIError("INVALID_REQUEST", "Inavlid Params");
     }
 
     const taskActivities = await TaskRepository.getActivities({
       taskId,
-      organizationId,
+      organizationId: organization.id,
       limit: limit || 10,
       page: page || 1,
     });

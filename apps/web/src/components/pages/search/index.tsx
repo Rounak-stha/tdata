@@ -54,7 +54,7 @@ const SearchItemTable: FC<SearchItemTableProps> = async ({ orgKey, searchParams 
             <TableRow key={task.id}>
               <TableCell className="font-mono text-sm">{task.taskNumber}</TableCell>
               <TableCell>
-                <Link href={Paths.task(organization.key, task.taskNumber)}>{task.title}</Link>
+                <Link href={Paths.task(task.taskNumber)}>{task.title}</Link>
               </TableCell>
               <TableCell>
                 <StatusSelect size="full" projectId={task.projectId} status={task.status} />

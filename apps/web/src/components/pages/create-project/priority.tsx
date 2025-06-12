@@ -93,7 +93,7 @@ type ExistingPrioritySelectProps = {
 
 const ExistingPrioritySelect: FC<ExistingPrioritySelectProps> = ({ onSelect }) => {
   const { organization } = useOrganizations();
-  const { data, isLoading } = useOrganizationPriorities(organization.id);
+  const { data, isLoading } = useOrganizationPriorities();
 
   const [selectedPriority, setSelectedPriority] = useState<Priority | null>(null);
 

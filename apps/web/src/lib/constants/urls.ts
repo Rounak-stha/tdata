@@ -1,11 +1,12 @@
 export const SITE_URL = (() => {
   if (process.env.NEXT_PUBLIC_VERCEL_ENV === "production" || process.env.NEXT_PUBLIC_VERCEL_ENV === "preview") return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
-  return "http://localhost:3000";
+  return "http://localtest.com:3000";
 })();
 
 export const PathPrefix = {
   api: "/api",
   auth: "/auth",
+  org: "/org",
 } as const;
 
 const withSearchParam = (path: string) => {
@@ -21,35 +22,38 @@ const withSearchParam = (path: string) => {
 
 export const InvitePath = "/invite";
 
+export const TenantUrl = (orgKey: string) => `${orgKey}.${new URL(SITE_URL).hostname}`;
+export const ApexDomain = `.${new URL(SITE_URL).hostname}`;
+
 export const Paths = {
   root: withSearchParam("/"),
   signin: `${PathPrefix.auth}/signin`,
   onboarding: withSearchParam("/onboarding"),
   error: "/error",
   verifyEmail: withSearchParam("/auth/verify"),
-  org: (org: string) => `/${org}`,
-  task: (org: string, taskNumber: string) => `/${org}/task/${taskNumber}`,
-  projects: (org: string) => `/${org}/projects`,
-  project: (orgKey: string, projectKey: string) => `/${orgKey}/projects/${projectKey}`,
-  projectAutomations: (orgKey: string, projectKey: string) => `/${orgKey}/projects/${projectKey}/automations`,
-  projectAutomationCreate: (orgKey: string, projectKey: string) => `/${orgKey}/projects/${projectKey}/automations/create`,
-  projectAutomation: (orgKey: string, projectKey: string, automationId: string) => `/${orgKey}/projects/${projectKey}/automations/${automationId}`,
-  newProject: (org: string) => `/${org}/projects/create`,
-  myTasks: (org: string) => `/${org}/my-tasks`,
-  search: (org: string, params?: string) => (`/${org}/search` + params ? `?${params}` : ""),
+  org: () => "/org",
+  task: (taskNumber: string) => `/task/${taskNumber}`,
+  projects: () => "/projects",
+  project: (projectKey: string) => `/projects/${projectKey}`,
+  projectAutomations: (projectKey: string) => `/projects/${projectKey}/automations`,
+  projectAutomationCreate: (projectKey: string) => `/projects/${projectKey}/automations/create`,
+  projectAutomation: (projectKey: string, automationId: string) => `/projects/${projectKey}/automations/${automationId}`,
+  newProject: () => "/projects/create",
+  myTasks: () => "/my-tasks",
+  search: (params?: string) => "/search" + (params ? `?${params}` : ""),
 
   // Documents
-  docs: (org: string) => `/${org}/docs`,
-  newDoc: (org: string) => `/${org}/docs/new`,
-  doc: (org: string, docId: string) => `/${org}/docs/${docId}`,
+  docs: () => "/docs",
+  newDoc: () => `/docs/new`,
+  doc: (docId: string) => `/docs/${docId}`,
 
   // chat
-  chat: (org: string) => `/${org}/chat`,
+  chat: () => "/chat",
 
   // invite
   invite: (token: string) => `${SITE_URL}${InvitePath}?token=${token}`,
 } as const;
 
 export const ApiPaths = {
-  chat: (orgId: number) => `/api/${orgId}/chat`,
+  chat: () => `/api/chat`,
 };

@@ -64,7 +64,7 @@ export const SearchAndFilter = () => {
     }
     startTransition(() => {
       const searchParams = encodeTaskFilterParams(filters);
-      router.push(Paths.search(organization.key, searchParams));
+      router.push(Paths.search(searchParams));
     });
   }, [filters, router, organization.key]);
 
@@ -208,7 +208,7 @@ const FilterGroup: FC<FilterGroupProps> = ({ type, children, select }) => {
       className={cn(
         "group w-fit relative flex items-center gap-2 rounded-sm px-3 py-1.5",
         "bg-background/30 hover:bg-muted/30 shadow-sm border border-border",
-        "transition-all duration-200"
+        "transition-all duration-200",
       )}
     >
       <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">

@@ -36,7 +36,7 @@ export const SidebarContent = () => {
 
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip="My Tasks">
-                <Link href={Paths.myTasks(organization.key)}>
+                <Link href={Paths.myTasks()}>
                   <CheckSquareIcon />
                   <span className="mt-0.5">My Tasks</span>
                 </Link>
@@ -45,7 +45,7 @@ export const SidebarContent = () => {
 
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip="Search">
-                <Link href={Paths.search(organization.key)}>
+                <Link href={Paths.search()}>
                   <SearchIcon />
                   <span className="mt-0.5">Search (WIP)</span>
                 </Link>
@@ -54,7 +54,7 @@ export const SidebarContent = () => {
 
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip="Chat with Mira">
-                <Link href={Paths.chat(organization.key)}>
+                <Link href={Paths.chat()}>
                   <AudioWaveformIcon />
                   <span className="mt-0.5">Chat with Mira</span>
                 </Link>
@@ -63,7 +63,7 @@ export const SidebarContent = () => {
 
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip="Documents">
-                <Link href={Paths.docs(organization.key)}>
+                <Link href={Paths.docs()}>
                   <FileTextIcon />
                   <span className="mt-0.5">Documents</span>
                 </Link>
@@ -77,7 +77,7 @@ export const SidebarContent = () => {
       <SidebarGroup>
         <SidebarGroupLabel>Projects</SidebarGroupLabel>
         <SidebarGroupAction>
-          <Link href={Paths.newProject(organization.key)} className="block">
+          <Link href={Paths.newProject()} className="block">
             <span className="sr-only">Add Project</span>
             <PlusIcon size={16} />
           </Link>
@@ -86,7 +86,7 @@ export const SidebarContent = () => {
           <SidebarMenu>
             <SidebarMenuItem key="sidebarMenuNewProject">
               <SidebarMenuButton asChild tooltip="All Projects">
-                <Link className="flex items-center" href={Paths.projects(organization.key)}>
+                <Link className="flex items-center" href={Paths.projects()}>
                   <FolderIcon size={16} />
                   <span>All Projects</span>
                   <SidebarMenuAction>
@@ -98,7 +98,7 @@ export const SidebarContent = () => {
             {organization.projects.map((project) => (
               <SidebarMenuItem key={project.id}>
                 <SidebarMenuButton asChild tooltip={project.name}>
-                  <Link href={Paths.project(organization.key, project.key)}>
+                  <Link href={Paths.project(project.key)}>
                     <FolderIcon />
                     <span>{project.name}</span>
                   </Link>

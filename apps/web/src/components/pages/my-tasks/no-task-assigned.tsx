@@ -18,7 +18,7 @@ export const NoTaskAssigedInfo = () => {
   const router = useRouter();
 
   const handleTaskCreate = (task: TaskDetail) => {
-    router.push(Paths.task(organization.key, task.taskNumber));
+    router.push(Paths.task(task.taskNumber));
     setNewTaskPopupOpen(false);
   };
   return (

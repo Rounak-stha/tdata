@@ -107,7 +107,7 @@ export const DocumentListPage: FC<DocumentListPage> = ({ documents, organization
           <p className="text-muted-foreground">Create, manage and collaborate on documents</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href={Paths.newDoc(organization.key)}>
+          <Link href={Paths.newDoc()}>
             <Button className="gap-2 shadow-sm transition-all hover:shadow-md">
               <PlusCircle className="h-4 w-4" />
               New Document
@@ -187,7 +187,7 @@ export const NoDocsInfo: FC<NoDocsInfoProps> = ({ organization }) => {
       </div>
       <h3 className="text-xl font-semibold mb-2">Crete New Document</h3>
       <p className="text-muted-foreground mb-6">Documentation made effortless — keep your project knowledge clear, organized, and spotlight what matters most.</p>
-      <Link href={Paths.newDoc(organization.key)}>
+      <Link href={Paths.newDoc()}>
         <Button className="flex items-center">
           <Plus className="mr-2 h-4 w-4" />
           Create Document

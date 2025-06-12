@@ -15,13 +15,13 @@ export const DocumentBreadCrump: FC<DocumentBreadCrumpProps> = ({ document }) =>
   return (
     <Breadcrumb className="flex items-center gap-1 text-sm text-muted-foreground">
       <BreadcrumbItem>
-        <Link href={Paths.org(organization.key)}>{organization.key}</Link>
+        <Link href={Paths.org()}>{organization.key}</Link>
       </BreadcrumbItem>
       <BreadcrumbItem>
         <ChevronRightIcon className="h-4 w-4" />
       </BreadcrumbItem>
       <BreadcrumbItem>
-        <Link href={Paths.docs(organization.key)}>Docs</Link>
+        <Link href={Paths.docs()}>Docs</Link>
       </BreadcrumbItem>
       <BreadcrumbItem>
         <ChevronRightIcon className="h-4 w-4" />

@@ -28,7 +28,7 @@ export const AutomationList: FC<ProjectListProps> = ({ project, automations }) =
           {automations.map((automation) => (
             <TableRow key={project.id} className="border hover:bg-muted">
               <TableCell>
-                <Link href={Paths.projectAutomation(organization.key, project.key, automation.id)} className="text-blue-400 hover:underline cursor-pointer">
+                <Link href={Paths.projectAutomation(project.key, automation.id)} className="text-blue-400 hover:underline cursor-pointer">
                   {automation.name}
                 </Link>
               </TableCell>

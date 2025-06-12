@@ -21,13 +21,13 @@ type HeaderProps = {
   organization: Omit<OrganizationDetail, "members">;
 };
 
-export const Header: FC<HeaderProps> = ({ organization }) => {
+export const Header: FC<HeaderProps> = () => {
   const { setTheme, theme } = useTheme();
   const [newTaskDialogOpen, setNewTaskDialogOpen] = useState(false);
   const router = useRouter();
 
   const handleTaskCreate = (task: TaskDetail) => {
-    router.push(Paths.task(organization.key, task.taskNumber));
+    router.push(Paths.task(task.taskNumber));
     setNewTaskDialogOpen(false);
   };
 

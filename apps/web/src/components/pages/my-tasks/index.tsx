@@ -51,7 +51,7 @@ const TaskLine: FC<TaskLineProps> = ({ task, orgKey }) => {
         <StatusSelect size="icon" status={task.status} projectId={task.projectId} />
       </div>
       <span className="min-w-0 flex items-center justify-start mr-1 ml-0.5">
-        <Link href={Paths.task(orgKey, task.taskNumber)} className="text-xs sm:text-sm font-medium sm:font-semibold truncate hover:underline">
+        <Link href={Paths.task(task.taskNumber)} className="text-xs sm:text-sm font-medium sm:font-semibold truncate hover:underline">
           {task.title}
         </Link>
       </span>

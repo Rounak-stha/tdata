@@ -40,7 +40,7 @@ export class OrganizationRepository {
   }
 
   static async getByKey(key: string): Promise<Organization | null> {
-    const organization = await db.select().from(organizations).where(eq(organizations.key, key)).limit(1).execute();
+    const organization = await db.select().from(organizations).where(eq(organizations.key, key.toUpperCase())).limit(1).execute();
 
     if (!organization.length) return null;
     else return organization[0];

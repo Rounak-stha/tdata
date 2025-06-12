@@ -11,7 +11,7 @@ import { SWRProvider } from "@/components/providers";
 export default async function Layout({ children, params }: { children: React.ReactNode; params: Promise<{ orgKey: string }> }) {
   const { orgKey } = await params;
   const { user: sessionUser } = await getSession();
-  const { organization, role } = await getOrganizationByUserAndKey(sessionUser.id, orgKey);
+  const { organization, role } = await getOrganizationByUserAndKey(sessionUser.id, orgKey.toUpperCase());
   const user = await getUser(sessionUser.id, organization.id);
   const members = await getOrganizationMembers(organization.id);
 

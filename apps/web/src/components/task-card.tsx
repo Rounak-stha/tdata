@@ -1,13 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { StatusSelect } from "@components/selects/status";
 import { PrioritySelect } from "@components/selects/priority";
-// import { DatePicker } from './date-picker'
 import { AssigneeSelect } from "@components/selects/assignee";
 import type { TaskDetail } from "@tdata/shared/types";
 import Link from "next/link";
 import { AssigneeFieldName, Paths } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { useOrganizations } from "@/hooks";
 import { useMemo } from "react";
 
 interface TaskCardProps {
@@ -17,7 +15,6 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task, disabled = false }: TaskCardProps) {
-  const { organization } = useOrganizations();
   const initialTaskStatus = useMemo(() => task.projectTemplate.statuses.find((s) => s.id === task.statusId), [task]);
   const initialTaskPriority = useMemo(() => task.projectTemplate.priorities.find((p) => p.id === task.priorityId), [task]);
   return (
@@ -31,7 +28,7 @@ export function TaskCard({ task, disabled = false }: TaskCardProps) {
         <span className="text-xs text-muted-foreground font-mono">{task.taskNumber}</span>
         <AssigneeSelect size="icon" assignee={task.userRelations[AssigneeFieldName]} />
       </div>
-      <Link href={Paths.task(organization.key, task.taskNumber)} className="block">
+      <Link href={Paths.task(task.taskNumber)} className="block">
         <h3 className="text-sm font-bold leading-none mb-3 hover:underline">{task.title}</h3>
       </Link>
       <div className="flex items-center gap-2">
