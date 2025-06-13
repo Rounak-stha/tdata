@@ -23,7 +23,7 @@ const withSearchParam = (path: string) => {
 export const InvitePath = "/invite";
 
 export const TenantUrl = (orgKey: string) => `${orgKey}.${new URL(SITE_URL).hostname}`;
-export const ApexDomain = `.${new URL(SITE_URL).hostname}`;
+export const ApexDomain = `.${new URL(SITE_URL).hostname.replace("www.", "")}`;
 
 export const Paths = {
   root: withSearchParam("/"),

@@ -30,9 +30,9 @@ function extractSubdomain(request: NextRequest): string | null {
 
   // Production environment
   // Regular subdomain detection
-  const isSubdomain = hostname !== RootDomainFormatted && hostname !== `www.${RootDomainFormatted}` && hostname.endsWith(`.${RootDomainFormatted}`);
+  const isSubdomain = hostname !== RootDomainFormatted && !hostname.startsWith("www.");
 
-  return isSubdomain ? hostname.replace(`.${RootDomainFormatted}`, "") : null;
+  return isSubdomain ? hostname.split(".")[0] : null;
 }
 
 export async function updateSession(request: NextRequest) {
