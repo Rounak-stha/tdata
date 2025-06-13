@@ -8,30 +8,10 @@ const RootDomainFormatted = new URL(SITE_URL).hostname;
  * Method adapted from: https://github.com/vercel/platforms/blob/main/middleware.ts
  */
 function extractSubdomain(request: NextRequest): string | null {
-  const url = request.url;
   const host = request.headers.get("host") || ""; // tenant.localtest.com:3000
   const hostname = host.split(":")[0]; // tenant.localtest.com
 
-  // Local development environment
-  if (url.includes("localhost") || url.includes("127.0.0.1")) {
-    // Try to extract subdomain from the full URL
-    const fullUrlMatch = url.match(/http:\/\/([^.]+)\.localtest/);
-    if (fullUrlMatch && fullUrlMatch[1]) {
-      return fullUrlMatch[1];
-    }
-
-    // Fallback to host header approach
-    if (hostname.includes(".localtest")) {
-      return hostname.split(".")[0];
-    }
-
-    return null;
-  }
-
-  // Production environment
-  // Regular subdomain detection
   const isSubdomain = hostname !== RootDomainFormatted && !hostname.startsWith("www.");
-
   return isSubdomain ? hostname.split(".")[0] : null;
 }
 
