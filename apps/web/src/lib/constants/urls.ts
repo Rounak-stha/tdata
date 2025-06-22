@@ -28,7 +28,7 @@ export const ApexDomain = `.${SiteUrlWithoutWWWTld}`;
 
 export const Paths = {
   root: withSearchParam("/"),
-  signin: `${SITE_URL}/${PathPrefix.auth}/signin`,
+  signin: `${SITE_URL}${PathPrefix.auth}/signin`,
   onboarding: withSearchParam("/onboarding"),
   error: "/error",
   verifyEmail: withSearchParam("/auth/verify"),
