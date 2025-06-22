@@ -7,29 +7,27 @@ import { ProjectList } from "./list";
 
 type ProjectPageProps = {
   project: Project;
-  orgKey: string;
   tasks: TaskGroupedByStatus[];
 };
 
-export const ProjectPage: FC<ProjectPageProps> = ({ project, orgKey, tasks }) => {
+export const ProjectPage: FC<ProjectPageProps> = ({ project, tasks }) => {
   return (
     <div>
-      <ProjectPageHeader project={project} orgKey={orgKey} />
+      <ProjectPageHeader project={project} />
       <ProjectBoard project={project} tasks={tasks} />
     </div>
   );
 };
 
 type ProjectListPageProps = {
-  organization: Organization;
   projects: ProjectDetailMinimal[];
 };
 
-export const ProjectListPage: FC<ProjectListPageProps> = ({ organization, projects }) => {
+export const ProjectListPage: FC<ProjectListPageProps> = ({ projects }) => {
   return (
     <div className="px-6 py-4">
-      <ProjectListPageHeader organization={organization} project={projects[0]} />
-      <ProjectList organization={organization} projects={projects} />
+      <ProjectListPageHeader project={projects[0]} />
+      <ProjectList projects={projects} />
     </div>
   );
 };

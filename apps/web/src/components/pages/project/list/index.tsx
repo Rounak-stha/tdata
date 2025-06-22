@@ -1,16 +1,15 @@
 import { Avatar } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Paths } from "@/lib/constants";
-import { Organization, ProjectDetailMinimal } from "@tdata/shared/types";
+import { ProjectDetailMinimal } from "@tdata/shared/types";
 import Link from "next/link";
 import { FC } from "react";
 
 type ProjectListProps = {
-  organization: Organization;
   projects: ProjectDetailMinimal[];
 };
 
-export const ProjectList: FC<ProjectListProps> = ({ organization, projects }) => {
+export const ProjectList: FC<ProjectListProps> = ({ projects }) => {
   return (
     <div className="rounded-sm border">
       <Table>

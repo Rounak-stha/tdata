@@ -36,11 +36,13 @@ export class ProjectRepository {
   }
 
   static async getByKey(key: string, organizationKey: string): Promise<Project | null> {
+    const upperCasedOrgKey = organizationKey.toUpperCase();
+
     const project = await db
       .select(ProjectSelects)
       .from(projects)
       .where(eq(projects.key, key))
-      .innerJoin(organizations, and(eq(projects.organizationId, organizations.id), eq(organizations.key, organizationKey)))
+      .innerJoin(organizations, and(eq(projects.organizationId, organizations.id), eq(organizations.key, upperCasedOrgKey)))
       .limit(1)
       .execute();
     if (project.length === 0) return null;
