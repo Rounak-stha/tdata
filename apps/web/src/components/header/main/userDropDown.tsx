@@ -49,7 +49,7 @@ const Signout = () => {
 
   return (
     <DropdownMenuItem onClick={handleClick} disabled={loading}>
-      Log outhaha
+      Logout
     </DropdownMenuItem>
   );
 };
